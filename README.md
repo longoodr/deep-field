@@ -1,2 +1,2 @@
-# deep-field
+# Deep Field
 Machine learning for fantasy baseball
