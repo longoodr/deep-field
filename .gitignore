@@ -131,3 +131,6 @@ dmypy.json
 # VS code project settings
 .vscode/
 .history/
+
+# database
+**/*.db
