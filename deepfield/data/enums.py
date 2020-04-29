@@ -1,4 +1,4 @@
-from enum import Enum, Flag
+from enum import Enum, IntFlag
 
 class TimeOfDay(Enum):
     DAY = 0
@@ -17,7 +17,8 @@ class InningHalf(Enum):
     TOP = 0
     BTM = 1
 
-class OnBase(Flag):
-    FIRST = 1
+class OnBase(IntFlag):
+    FIRST = 4
     SECOND = 2
-    THIRD = 4
+    THIRD = 1
+    LOADED = 7
