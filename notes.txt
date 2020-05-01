@@ -25,11 +25,13 @@ Scraping- pulling HTML pages from baseball-reference and populating a database w
     Parser thread process:
         Pull request from parse queue
         Instantiate page from HTML
-        Delete HTML
-        Insert fields into database
-        Check all reference fields (e.g. Players)
         For each reference field not in database:
             Add page for reference field to downloader queue
+        If any reference fields not in database:
+            Reinsert self into parse queue
+        Else:
+            Insert fields into database
+            Delete HTML
 
     Database tables:
         Game
