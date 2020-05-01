@@ -16,11 +16,12 @@ class Team(DeepFieldModel):
     
 class Player(DeepFieldModel):
     name = CharField()
+    name_id = CharField(9, unique=True)
     bats = SmallIntegerField()
     throws = SmallIntegerField()
 
 class Game(DeepFieldModel):
-    name = CharField()
+    name_id = FixedCharField(12, unique=True)
     local_start_time = TimeField("%H:%M", null=True)
     time_of_day = SmallIntegerField(null=True)
     field_type = SmallIntegerField(null=True)
