@@ -8,11 +8,11 @@ class DeepFieldModel(Model):
         database = db
 
 class Venue(DeepFieldModel):
-    name = CharField()
+    name = CharField(unique=True)
     
 class Team(DeepFieldModel):
-    name = CharField()
-    abbreviation = FixedCharField(3)
+    name = CharField(unique=True)
+    abbreviation = FixedCharField(3, unique=True)
     
 class Player(DeepFieldModel):
     name = CharField()
