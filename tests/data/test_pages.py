@@ -1,3 +1,4 @@
+from datetime import date, time
 from pathlib import Path
 
 import pytest
@@ -5,6 +6,7 @@ from peewee import SqliteDatabase
 
 from deepfield.data.dbmodels import Game, Play, Player, Team, Venue
 from deepfield.data.dependencies import IgnoreDependencies
+from deepfield.data.enums import FieldType, TimeOfDay
 from deepfield.data.pages import GamePage, SchedulePage
 
 test_db = SqliteDatabase(":memory:")
@@ -68,6 +70,16 @@ class TestGamePage(TestPage):
         pass
 
     def test_queries(self):
-        Venue.get(Venue.name == "Nationals Park")
-        Team.get(Team.name == "Washington Nationals" and Team.abbreviation == "WSN")
-        Team.get(Team.name == "Chicago Cubs" and Team.abbreviation == "CHC")
+        venue = Venue.get(Venue.name == "Nationals Park")
+        home = Team.get(Team.name == "Washington Nationals" and Team.abbreviation == "WSN")
+        away = Team.get(Team.name == "Chicago Cubs" and Team.abbreviation == "CHC")
+        Game.get(
+                Game.name_id == "WAS201710120"
+                and Game.local_start_time == time(20, 8)
+                and Game.time_of_day == TimeOfDay.NIGHT.value
+                and Game.field_type == FieldType.GRASS.value
+                and Game.date == date(2017, 10, 12)
+                and Game.venue_id == venue.id
+                and Game.home_team_id == home.id
+                and Game.away_team_id == away.id
+            )

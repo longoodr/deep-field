@@ -1,13 +1,14 @@
 from abc import ABC, abstractmethod
+from datetime import date, time, datetime
 from typing import Iterable, List, Tuple
 
 import requests
 from bs4 import BeautifulSoup
 from peewee import Query
 
-from deepfield.data.dbmodels import Team, Venue
+from deepfield.data.dbmodels import Game, Team, Venue
 from deepfield.data.dependencies import DependencyResolver
-
+from deepfield.data.enums import TimeOfDay, FieldType
 
 class Page(ABC):
     """A collection of data located on an HTML page. A page may have
@@ -70,11 +71,14 @@ class GamePage(BBRefPage):
         super().__init__(html, dep_res)
         self._scorebox = self._soup.find("div", {"class": "scorebox"})
         self._scorebox_meta = self._scorebox.find("div", {"class": "scorebox_meta"})
+        page_url = self._soup.find("link", rel="canonical")["href"] # /.../.../game.shtml
+        self._name = page_url.split("/")[-1].split(".")[0]
     
     def _run_queries(self) -> None:
         # TODO: should add the teams, venue, game, contained plays in that order
         teams = self._add_teams()
         venue = self._add_venue()
+        game = self._add_game(teams, venue)
     
     def _add_venue(self) -> Venue:
         name = self._get_venue_name()
@@ -82,11 +86,14 @@ class GamePage(BBRefPage):
         return venue
         
     def _get_venue_name(self) -> str:
-        venue_div_filter = lambda div: div.text.startswith("Venue: ")
-        venue_div = self._scorebox_meta.find(venue_div_filter)
+        venue_div = self._scorebox_meta.find(self._venue_div_filter)
         return venue_div.text.split(": ")[1] # "Venue: <venue name>"
     
-    def _add_teams(self) -> Iterable[Team]:
+    @staticmethod
+    def _venue_div_filter(div) -> bool:
+        return div.text.startswith("Venue: ")
+    
+    def _add_teams(self) -> List[Team]:
         teams = []
         info = self._get_team_info()
         for name, abbreviation in info:
@@ -94,7 +101,7 @@ class GamePage(BBRefPage):
             teams.append(team)
         return teams
     
-    def _get_team_info(self) -> Iterable[Tuple[str, str]]:
+    def _get_team_info(self) -> List[Tuple[str, str]]:
         """Returns a 2 element list, which contains tuples of the name and
         abbreviation for away, home teams respectively
         """
@@ -107,6 +114,77 @@ class GamePage(BBRefPage):
             name = str(team_info.string)
             info.append((name, abbreviation))
         return info
+    
+    def _add_game(self, teams: List[Team], venue: Venue) -> Game:
+        fields = {
+            "name_id": self._name,
+            "local_start_time": self._get_local_start_time(),
+            "time_of_day": self._enum_to_int(self._get_time_of_day()),
+            "field_type": self._enum_to_int(self._get_field_type()),
+            "date": self._get_date(),
+            "venue_id": venue.id,
+            "away_team_id": teams[0].id,
+            "home_team_id": teams[1].id,
+        }
+        game, _ = Game.get_or_create(**fields)
+        
+    @staticmethod
+    def _enum_to_int(enum):
+        if enum is None:
+            return None
+        return enum.value
+        
+    def _get_local_start_time(self) -> time:
+        lst_div = self._scorebox_meta.find(self._lst_filter)
+        # Start Time: %I:%M [a.m.|p.m.] Local
+        lst_text = lst_div.text.split("Time: ")[-1] # "%I:%M [a.m.|p.m.] Local"
+        lst_text = lst_text[:-1 * len(" Local")] # "%I:%M [a.m.|p.m.]"
+        lst_text = lst_text.replace(".", "").upper() # "%I:%M %p"
+        dt = datetime.strptime(lst_text, "%I:%M %p")
+        return dt.time()
+    
+    @staticmethod
+    def _lst_filter(div) -> bool:
+        return "Time: " in div.text
+    
+    def _get_time_of_day(self) -> TimeOfDay:
+        tod_div = self._scorebox_meta.find(self._tod_filter)
+        if tod_div is None:
+            return None
+        tod_text = tod_div.text.split()[0]
+        return TimeOfDay[tod_text.upper()]
+        
+    
+    @staticmethod
+    def _tod_filter(div) -> bool:
+        for tod in ["day", "night"]:
+            if div.text.lower().startswith(tod):
+                return True
+        return False
+    
+    def _get_field_type(self) -> FieldType:
+        field_div = self._scorebox_meta.find(self._field_div_filter)
+        if field_div is None:
+            return None
+        field_text = field_div.text.split()[-1]
+        return FieldType[field_text.upper()]
+        
+    @staticmethod
+    def _field_div_filter(div) -> bool:
+        for field in ["turf", "grass"]:
+            if div.text.endswith(field):
+                return True
+        return False
+    
+    def _get_date(self) -> date:
+        date_div = self._scorebox_meta.find(self._date_div_filter)
+        dt = datetime.strptime(date_div.text, "%A, %B %d, %Y")
+        return dt.date()
+    
+    @staticmethod
+    def _date_div_filter(div) -> bool:
+        weekday = div.text.split()[0]
+        return weekday.endswith("day,")
     
     def get_referenced_page_urls(self) -> Iterable[str]:
         return [] # TODO: should be player URLs
