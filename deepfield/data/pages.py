@@ -225,6 +225,7 @@ class GamePage(BBRefPage):
             
             def __init__(self, pbp_table):
                 self._pbp_table = pbp_table
+                
     class DepExtractor:
         """Handles retrieving the referenced page URLs (player pages) for a
         GamePage.
@@ -254,7 +255,7 @@ class GamePage(BBRefPage):
             suffixes = []
             for player_table in self._player_tables:
                 for ptag in player_table.find_all(self._player_tag_filter,
-                                                attrs=self._player_tag_attr_filter):
+                                                  attrs=self._player_tag_attr_filter):
                     suffixes.append(ptag.a["href"])
             return suffixes
             
