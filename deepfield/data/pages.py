@@ -65,7 +65,9 @@ class SchedulePage(BBRefPage):
         return urls
 
 class GamePage(BBRefPage):
-    """A page corresponding to the play-by-play info for a game."""
+    """A page corresponding to the play-by-play info for a game, along with
+    relevant info relating to the play-by-play data.
+    """
     
     _player_tag_attr_filter = {
         "data-stat": "player",
@@ -77,14 +79,15 @@ class GamePage(BBRefPage):
         self._scorebox = self._soup.find("div", {"class": "scorebox"})
         self._scorebox_meta = self._scorebox.find("div", {"class": "scorebox_meta"})
         self._set_name()
-        self._parse_tables()
+        self._parse_player_tables()
         
-    def _parse_tables(self) -> None:
-        """Info in tables are stored in comments, so they need to be parsed
-        into soup objects themselves. Each table is preceded by a div with a
-        class of placeholder."""
+    def _parse_player_tables(self) -> None:
+        """Info in player tables are stored in comments, so they need to be
+        parsed into soup objects themselves. Each table is preceded by a div
+        with a class of placeholder.
+        """
         player_table_placeholders = self._soup.find_all("div", {"class": "placeholder"}, limit=2)
-        # 2nd sibling is the comment of interest (skip an intermediate \n):
+        # the second sibling is the comment of interest because there is an intermediate \n
         player_table_contents = [p.next_sibling.next_sibling for p in player_table_placeholders]
         self._player_tables = [BeautifulSoup(c) for c in player_table_contents]
         
