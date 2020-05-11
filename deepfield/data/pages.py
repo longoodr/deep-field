@@ -68,16 +68,15 @@ class GamePage(BBRefPage):
     """A page corresponding to the play-by-play info for a game, along with
     relevant info relating to the play-by-play data.
     """
-    
-    def __init__(self, html: str, dep_res: DependencyResolver):
-        super().__init__(html, dep_res)
-        self._query_runner = GamePage.QueryRunner(self._soup)
-        self._dep_extractor = GamePage.DepExtractor(self._soup)
         
     def _run_queries(self) -> None:
+        if not hasattr(self, "_query_runner"):
+            self._query_runner = GamePage.QueryRunner(self._soup)
         self._query_runner.run_queries()
         
     def get_referenced_page_urls(self) -> Iterable[str]:
+        if not hasattr(self, "_dep_extractor"):
+            self._dep_extractor = GamePage.DepExtractor(self._soup)
         player_suffixes = self._dep_extractor.get_player_page_suffixes()
         return [self.base_url + s for s in player_suffixes]
     
