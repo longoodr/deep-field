@@ -256,7 +256,8 @@ class GamePage(BBRefPage):
             for player_table in self._player_tables:
                 for ptag in player_table.find_all(self._player_tag_filter,
                                                   attrs=self._player_tag_attr_filter):
-                    suffixes.append(ptag.a["href"])
+                    suffix = ptag.a["href"] # /players/s/smithjo01.shtml
+                    suffixes.append(suffix)
             return suffixes
             
         @staticmethod 
