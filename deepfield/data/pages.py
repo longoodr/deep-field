@@ -3,7 +3,7 @@ from datetime import date, time, datetime
 from typing import Iterable, List, Tuple
 
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment
 from peewee import Query
 
 from deepfield.data.dbmodels import Game, Team, Venue
@@ -67,18 +67,46 @@ class SchedulePage(BBRefPage):
 class GamePage(BBRefPage):
     """A page corresponding to the play-by-play info for a game."""
     
+    _player_tag_attr_filter = {
+        "data-stat": "player",
+        "scope": "row"
+    }
+    
     def __init__(self, html: str, dep_res: DependencyResolver):
         super().__init__(html, dep_res)
         self._scorebox = self._soup.find("div", {"class": "scorebox"})
         self._scorebox_meta = self._scorebox.find("div", {"class": "scorebox_meta"})
         self._set_name()
+        self._parse_tables()
+        
+    def _parse_tables(self) -> None:
+        """Info in tables are stored in comments, so they need to be parsed
+        into soup objects themselves. Each table is preceded by a div with a
+        class of placeholder."""
+        player_table_placeholders = self._soup.find_all("div", {"class": "placeholder"}, limit=2)
+        # 2nd sibling is the comment of interest (skip an intermediate \n):
+        player_table_contents = [p.next_sibling.next_sibling for p in player_table_placeholders]
+        self._player_tables = [BeautifulSoup(c) for c in player_table_contents]
         
     def _set_name(self) -> None:
         page_url = self._soup.find("link", rel="canonical")["href"] # /.../.../name.shtml
         self._name = page_url.split("/")[-1].split(".")[0]
 
     def get_referenced_page_urls(self) -> Iterable[str]:
-        return [] # TODO: should be player URLs
+        suffixes = self._get_player_page_suffixes()
+        return [self.base_url + s for s in suffixes]
+    
+    def _get_player_page_suffixes(self):
+        suffixes = []
+        for player_table in self._player_tables:
+            for ptag in player_table.find_all(self._player_tag_filter,
+                                              attrs=self._player_tag_attr_filter):
+                suffixes.append(ptag.a["href"])
+        return suffixes
+    
+    @staticmethod 
+    def _player_tag_filter(tag) -> bool:
+        return tag.name == "th" and len(tag.attrs) == 5
     
     def _run_queries(self) -> None:
         # TODO: should add the teams, venue, game, contained plays in that order
@@ -157,6 +185,7 @@ class GamePage(BBRefPage):
         tod_div = self._scorebox_meta.find(self._tod_filter)
         if tod_div is None:
             return None
+        # "day/night game, ..."
         tod_text = tod_div.text.split()[0]
         return TimeOfDay[tod_text.upper()]
         
@@ -172,6 +201,7 @@ class GamePage(BBRefPage):
         field_div = self._scorebox_meta.find(self._field_div_filter)
         if field_div is None:
             return None
+        # "... on turf/grass"
         field_text = field_div.text.split()[-1]
         return FieldType[field_text.upper()]
         

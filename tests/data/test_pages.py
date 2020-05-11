@@ -1,5 +1,6 @@
 from datetime import date, time
 from pathlib import Path
+from typing import Iterable
 
 import pytest
 from peewee import SqliteDatabase
@@ -26,6 +27,12 @@ def teardown_module(module):
     test_db.close()
 
 class TestPage:
+            
+    base_url = "https://www.baseball-reference.com"
+    
+    @classmethod
+    def expand_urls(cls, suffixes: Iterable[str]) -> Iterable[str]:
+        return [cls.base_url + s for s in suffixes]
     
     @classmethod
     def setup_method(cls):
@@ -43,13 +50,12 @@ class TestSchedulePage(TestPage):
     page_type = SchedulePage
     
     def test_urls(self):
-        base_url = "https://www.baseball-reference.com"
         on_list_games = [
             "/boxes/KCA/KCA201604030.shtml",
             "/boxes/ANA/ANA201604040.shtml",
             "/boxes/TBA/TBA201604040.shtml",
         ]
-        on_list = [base_url + g for g in on_list_games]
+        on_list = self.expand_urls(on_list_games)
         for url in on_list:
             assert url in self.page_urls
         not_on_list = [
@@ -57,7 +63,7 @@ class TestSchedulePage(TestPage):
             "/leagues/MLB/2016-schedule.shtml",
             "/boxes/BOS/BOS201708270.shtml"
         ]
-        not_on_list = [base_url + suffix for suffix in not_on_list]
+        not_on_list = self.expand_urls(not_on_list)
         for url in not_on_list:
             assert url not in self.page_urls
 
@@ -67,7 +73,22 @@ class TestGamePage(TestPage):
     page_type = GamePage
 
     def test_urls(self):
-        pass
+        on_list = [
+            "/players/j/jayjo02.shtml",
+            "/players/t/turnetr01.shtml",
+            "/players/h/hendrky01.shtml",
+            "/players/g/gonzagi01.shtml"
+        ]
+        on_list = self.expand_urls(on_list)
+        not_on_list = [
+            "/boxes/CHN/CHN201710090.shtml",
+        ]
+        not_on_list = self.expand_urls(not_on_list)
+        for url in on_list:
+            assert url in self.page_urls
+        for url in not_on_list:
+            assert url not in self.page_urls
+        
 
     def test_queries(self):
         venue = Venue.get(Venue.name == "Nationals Park")
