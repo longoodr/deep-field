@@ -34,7 +34,6 @@ class TestPage:
     
     @classmethod
     def setup_method(cls):
-        base_path = Path(__file__).parent
         file_path = (get_res_path(cls.name)).resolve()
         with open(file_path, "r", encoding="utf-8") as page_file:
             html = page_file.read()
