@@ -100,19 +100,6 @@ class GamePage(BBRefPage):
             venue = self._add_venue()
             game = self._add_game(teams, venue)
         
-        def _add_venue(self) -> Venue:
-            name = self._get_venue_name()
-            venue, _ = Venue.get_or_create(name=name)
-            return venue
-            
-        def _get_venue_name(self) -> str:
-            venue_div = self._scorebox_meta.find(self._venue_div_filter)
-            return venue_div.text.split(": ")[1] # "Venue: <venue name>"
-        
-        @staticmethod
-        def _venue_div_filter(div) -> bool:
-            return div.text.startswith("Venue: ")
-        
         def _add_teams(self) -> List[Team]:
             teams = []
             info = self._get_team_info()
@@ -134,6 +121,19 @@ class GamePage(BBRefPage):
                 name = str(team_info.string)
                 info.append((name, abbreviation))
             return info
+                
+        def _add_venue(self) -> Venue:
+            name = self._get_venue_name()
+            venue, _ = Venue.get_or_create(name=name)
+            return venue
+            
+        def _get_venue_name(self) -> str:
+            venue_div = self._scorebox_meta.find(self._venue_div_filter)
+            return venue_div.text.split(": ")[1] # "Venue: <venue name>"
+        
+        @staticmethod
+        def _venue_div_filter(div) -> bool:
+            return div.text.startswith("Venue: ")
         
         def _add_game(self, teams: List[Team], venue: Venue) -> Game:
             fields = {
