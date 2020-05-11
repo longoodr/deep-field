@@ -80,7 +80,8 @@ class TestGamePage(TestPage):
             "/players/j/jayjo02.shtml",
             "/players/t/turnetr01.shtml",
             "/players/h/hendrky01.shtml",
-            "/players/g/gonzagi01.shtml"
+            "/players/g/gonzagi01.shtml",
+            "/players/d/daviswa01.shtml"
         ]
         not_on_list = [
             "/boxes/CHN/CHN201710090.shtml",

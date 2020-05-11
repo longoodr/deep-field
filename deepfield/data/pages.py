@@ -19,7 +19,7 @@ class Page(ABC):
     """
         
     def __init__(self, html: str, dep_res: DependencyResolver):
-        self._soup = BeautifulSoup(html)
+        self._soup = BeautifulSoup(html, "lxml")
         self._dep_res = dep_res
     
     def update_db(self) -> None:
@@ -229,7 +229,7 @@ class GamePage(BBRefPage):
             
             # the second sibling is the comment of interest because there is an intermediate \n
             player_table_contents = [p.next_sibling.next_sibling for p in player_table_placeholders]
-            self._player_tables = [BeautifulSoup(c) for c in player_table_contents]
+            self._player_tables = [BeautifulSoup(c, "lxml") for c in player_table_contents]
             
         def get_player_page_suffixes(self):
             suffixes = []
