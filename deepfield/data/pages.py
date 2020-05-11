@@ -71,8 +71,14 @@ class GamePage(BBRefPage):
         super().__init__(html, dep_res)
         self._scorebox = self._soup.find("div", {"class": "scorebox"})
         self._scorebox_meta = self._scorebox.find("div", {"class": "scorebox_meta"})
-        page_url = self._soup.find("link", rel="canonical")["href"] # /.../.../game.shtml
+        self._set_name()
+        
+    def _set_name(self) -> None:
+        page_url = self._soup.find("link", rel="canonical")["href"] # /.../.../name.shtml
         self._name = page_url.split("/")[-1].split(".")[0]
+
+    def get_referenced_page_urls(self) -> Iterable[str]:
+        return [] # TODO: should be player URLs
     
     def _run_queries(self) -> None:
         # TODO: should add the teams, venue, game, contained plays in that order
@@ -138,7 +144,7 @@ class GamePage(BBRefPage):
         lst_div = self._scorebox_meta.find(self._lst_filter)
         # Start Time: %I:%M [a.m.|p.m.] Local
         lst_text = lst_div.text.split("Time: ")[-1] # "%I:%M [a.m.|p.m.] Local"
-        lst_text = lst_text[:-1 * len(" Local")] # "%I:%M [a.m.|p.m.]"
+        lst_text = lst_text.replace(" Local", "") # "%I:%M [a.m.|p.m.]"
         lst_text = lst_text.replace(".", "").upper() # "%I:%M %p"
         dt = datetime.strptime(lst_text, "%I:%M %p")
         return dt.time()
@@ -185,6 +191,3 @@ class GamePage(BBRefPage):
     def _date_div_filter(div) -> bool:
         weekday = div.text.split()[0]
         return weekday.endswith("day,")
-    
-    def get_referenced_page_urls(self) -> Iterable[str]:
-        return [] # TODO: should be player URLs
