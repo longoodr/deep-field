@@ -1,6 +1,6 @@
 from datetime import date, time
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Type
 
 import pytest
 from peewee import SqliteDatabase
@@ -8,7 +8,7 @@ from peewee import SqliteDatabase
 from deepfield.data.dbmodels import Game, Play, Player, Team, Venue
 from deepfield.data.dependencies import IgnoreDependencies
 from deepfield.data.enums import FieldType, TimeOfDay
-from deepfield.data.pages import GamePage, SchedulePage
+from deepfield.data.pages import GamePage, Page, SchedulePage
 
 test_db = SqliteDatabase(":memory:")
 MODELS = [Game, Play, Player, Team, Venue]
@@ -29,10 +29,8 @@ def teardown_module(module):
 class TestPage:
             
     base_url = "https://www.baseball-reference.com"
-    
-    @classmethod
-    def expand_urls(cls, suffixes: Iterable[str]) -> Iterable[str]:
-        return [cls.base_url + s for s in suffixes]
+    page_type: Type[Page]
+    page_urls: Iterable[str]
     
     @classmethod
     def setup_method(cls):
@@ -43,6 +41,17 @@ class TestPage:
             page = cls.page_type(html, IgnoreDependencies())
             cls.page_urls = page.get_referenced_page_urls()
             page._run_queries()
+       
+    @classmethod
+    def expand_urls(cls, suffixes: Iterable[str]) -> Iterable[str]:
+        return [cls.base_url + s for s in suffixes]
+
+    @classmethod
+    def test_urls(cls, on_list_suffixes: Iterable[str], not_on_list_suffixes: Iterable[str]):
+        for url in cls.expand_urls(on_list_suffixes):
+            assert url in cls.page_urls
+        for url in cls.expand_urls(not_on_list_suffixes):
+            assert url not in cls.page_urls
 
 class TestSchedulePage(TestPage):
     
@@ -50,22 +59,17 @@ class TestSchedulePage(TestPage):
     page_type = SchedulePage
     
     def test_urls(self):
-        on_list_games = [
+        on_list = [
             "/boxes/KCA/KCA201604030.shtml",
             "/boxes/ANA/ANA201604040.shtml",
             "/boxes/TBA/TBA201604040.shtml",
         ]
-        on_list = self.expand_urls(on_list_games)
-        for url in on_list:
-            assert url in self.page_urls
         not_on_list = [
             "/leagues/MLB/2016-standard-batting.shtml",
             "/leagues/MLB/2016-schedule.shtml",
             "/boxes/BOS/BOS201708270.shtml"
         ]
-        not_on_list = self.expand_urls(not_on_list)
-        for url in not_on_list:
-            assert url not in self.page_urls
+        super().test_urls(on_list, not_on_list)
 
 class TestGamePage(TestPage):
     
@@ -79,16 +83,10 @@ class TestGamePage(TestPage):
             "/players/h/hendrky01.shtml",
             "/players/g/gonzagi01.shtml"
         ]
-        on_list = self.expand_urls(on_list)
         not_on_list = [
             "/boxes/CHN/CHN201710090.shtml",
         ]
-        not_on_list = self.expand_urls(not_on_list)
-        for url in on_list:
-            assert url in self.page_urls
-        for url in not_on_list:
-            assert url not in self.page_urls
-        
+        super().test_urls(on_list, not_on_list)
 
     def test_queries(self):
         venue = Venue.get(Venue.name == "Nationals Park")
