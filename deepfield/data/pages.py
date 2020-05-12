@@ -323,7 +323,8 @@ class GamePage(BBRefPage):
         def __init__(self, soup, player_tables):
             self._soup = soup
             self._pbp_table = self._get_pbp_table()
-            self._transformer = GamePage.PlayQueryRunner.PlayDataTransformer(player_tables)
+            Transformer = GamePage.PlayQueryRunner.PlayDataTransformer
+            self._transformer = Transformer(player_tables)
 
                 
         def add_plays(self, game: Game) -> None:
