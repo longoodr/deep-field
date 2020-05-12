@@ -90,7 +90,7 @@ class GamePage(BBRefPage):
         marked by divs with a class of placeholder preceding the comment of
         interest. This instantiates a soup object from a given placeholder
         marking the location of a table comment. Note the SECOND sibling is
-        the comment of interest because there is an intermediate \n.
+        the comment of interest because there is an intermediate \\n.
         """
         table_contents = ph_div.next_sibling.next_sibling
         return BeautifulSoup(table_contents, "lxml")
