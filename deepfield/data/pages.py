@@ -399,7 +399,6 @@ class GamePage(BBRefPage):
                 }
                 cls.PBP_STATS = set(cls.PBP_TO_DB_STATS.keys()).union(set(cls.PLAYERS.keys()))
                 
-                
             def extract_raw_play_data(self, play_row) -> Dict[str, str]:
                 raw_play_data: Dict[str, str] = {}
                 for play_data_pt in play_row.find_all():
