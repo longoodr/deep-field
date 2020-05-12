@@ -7,7 +7,7 @@ from peewee import SqliteDatabase
 
 from deepfield.data.dbmodels import Game, Play, Player, Team, Venue
 from deepfield.data.dependencies import IgnoreDependencies
-from deepfield.data.enums import FieldType, TimeOfDay
+from deepfield.data.enums import FieldType, OnBase, TimeOfDay
 from deepfield.data.pages import GamePage, Page, SchedulePage
 
 test_db = SqliteDatabase(":memory:")

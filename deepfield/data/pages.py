@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from datetime import date, time, datetime
-from typing import Iterable, List, Tuple
+from datetime import date, datetime, time
+from typing import Callable, Dict, Iterable, List, Set, Tuple
 
 import requests
 from bs4 import BeautifulSoup, Comment
@@ -8,7 +8,8 @@ from peewee import Query
 
 from deepfield.data.dbmodels import Game, Team, Venue
 from deepfield.data.dependencies import DependencyResolver
-from deepfield.data.enums import TimeOfDay, FieldType
+from deepfield.data.enums import FieldType, OnBase, TimeOfDay
+
 
 class Page(ABC):
     """A collection of data located on an HTML page. A page may have
@@ -128,8 +129,11 @@ class GamePage(BBRefPage):
         def __init__(self, placeholder):
             self._table = GamePage._get_table_from_placeholder(placeholder)
                 
-        def get_suffixes(self):
+        def get_suffixes(self) -> List[str]:
             return [row.a["href"] for row in self.get_rows()]
+        
+        def get_name_map(self) -> Dict[str, str]:
+            return {row.a.text.replace(u"\xa0", u" "): row.a["href"] for row in self.get_rows()}
         
         def get_rows(self):
             return self._table.find_all(
@@ -154,7 +158,6 @@ class GamePage(BBRefPage):
             self._pbp_adder = GamePage.PlayQueryRunner(self._soup, player_tables)
             
         def run_queries(self) -> None:
-            # TODO: should add the teams, venue, game, contained plays in that order
             teams = self._team_adder.add_teams()
             venue = self._venue_adder.add_venue()
             game = self._game_adder.add_game(teams, venue)
@@ -286,12 +289,83 @@ class GamePage(BBRefPage):
 
     class PlayQueryRunner:
         
+        PBP_TO_DB_STATS: Dict[str, Tuple[str, Callable]]
+        PLAYERS: Set[str]
+        PBP_STATS: Set[str]
+        INNING_CHAR_OFFSET: Dict[str, int]
+        
         def __init__(self, soup, player_tables):
             self._soup = soup
             self._pbp_table = self._get_pbp_table()
-            self._player_tables = player_tables
+            self._home_map = player_tables.home.get_name_map()
+            self._away_map = player_tables.away.get_name_map()
+            self._init_class_vars()
+            
+        # FIXME this approach won't work, as player lookups require knowledge
+        # of whether they're on the home or away team
+        def _init_lookups(self):
+            if hasattr(self, "PBP_TO_DB_STATS"):
+                return
+            self.PBP_TO_DB_STATS = {
+                "inning":               ("inning_half"  , self._inning_to_inning_half),
+                "pitches_pbp":          ("pitch_ct"     , lambda x: x),
+                "play_desc":            ("desc"         , lambda x: x),
+                "runners_on_bases_pbp": ("start_on_base", self._runners_to_on_base),
+                "outs":                 ("start_outs"   , lambda x: int(x)),
+                "batter":               ("batter_id"    , self._batter_to_id),
+                "pitcher":              ("pitcher_id"   , self._pitcher_to_id),
+            }
+            self.PLAYERS = set([
+                "batter",
+                "pitcher",
+                ])
+            self.PBP_STATS = set(self.PBP_TO_DB_STATS.keys())
+            self.INNING_CHAR_OFFSET = {
+                "t": 0,
+                "b": 1
+            }
                 
         def add_plays(self, game: Game) -> None:
+            for play_row in self._get_play_rows():
+                self._add_play(play_row)
+            
+        def _add_play(self, play_row) -> None:
+            raw_play_data = self._extract_raw_play_data(play_row)
+            new_data = self._transform_raw_play_data(raw_play_data)
+            pass
+            
+        def _extract_raw_play_data(self, play_row) -> Dict[str, str]:
+            raw_play_data: Dict[str, str] = {}
+            for play_data_pt in play_row.find_all():
+                data_stat = str(play_data_pt.get("data-stat"))
+                if data_stat in self.PBP_STATS:
+                    raw_play_data[data_stat] = play_data_pt.text.replace(u"\xa0", u" ")
+            return raw_play_data
+        
+        def _transform_raw_play_data(self, raw_play_data) -> Dict[str, str]:
+            new_data: Dict[str, str] = {}
+            for pbp_statname, (db_statname, transform_func) in self.PBP_TO_DB_STATS.items():
+                new_data[db_statname] = transform_func(raw_play_data[pbp_statname])
+            return new_data
+        
+        @classmethod
+        def _inning_to_inning_half(cls, inning: str) -> int:
+            inning_num = int(inning[1:])
+            inning_half_char = inning[0]
+            return 2 * (inning_num - 1) + cls.INNING_CHAR_OFFSET[inning_half_char]
+        
+        @staticmethod
+        def _runners_to_on_base(runners: str) -> int:
+            on_base = 0
+            for base, on_base_flag in zip(runners, [OnBase.FIRST, OnBase.SECOND, OnBase.THIRD]):
+                if not base == "-":
+                    on_base += on_base_flag.value
+            return on_base
+        
+        def _batter_to_id(self, batter_name: str) -> str:
+            pass
+        
+        def _pitcher_to_id(self, pitcher_name: str) -> str:
             pass
             
         def _get_pbp_table(self):
@@ -299,3 +373,9 @@ class GamePage(BBRefPage):
             placeholders = self._soup.find_all("div", {"class": "placeholder"}, limit=7)
             ph = placeholders[-1]
             return GamePage._get_table_from_placeholder(ph)
+        
+        def _get_play_rows(self):
+            return self._pbp_table.find_all(
+                "tr",
+                id=lambda id: id and id.startswith("event_")
+                )
