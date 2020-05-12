@@ -29,17 +29,15 @@ def teardown_module(module):
 class TestPage:
             
     base_url = "https://www.baseball-reference.com"
+    page: Page
     page_type: Type[Page]
-    page_urls: Iterable[str]
     
     @classmethod
     def setup_method(cls):
         file_path = (get_res_path(cls.name)).resolve()
         with open(file_path, "r", encoding="utf-8") as page_file:
             html = page_file.read()
-            page = cls.page_type(html, IgnoreDependencies())
-            cls.page_urls = page.get_referenced_page_urls()
-            page._run_queries()
+            cls.page = cls.page_type(html, IgnoreDependencies())
        
     @classmethod
     def expand_urls(cls, suffixes: Iterable[str]) -> Iterable[str]:
@@ -47,10 +45,11 @@ class TestPage:
 
     @classmethod
     def test_urls(cls, on_list_suffixes: Iterable[str], not_on_list_suffixes: Iterable[str]):
+        page_urls = cls.page.get_referenced_page_urls()
         for url in cls.expand_urls(on_list_suffixes):
-            assert url in cls.page_urls
+            assert url in page_urls
         for url in cls.expand_urls(not_on_list_suffixes):
-            assert url not in cls.page_urls
+            assert url not in page_urls
 
 class TestSchedulePage(TestPage):
     
@@ -89,6 +88,14 @@ class TestGamePage(TestPage):
         super().test_urls(on_list, not_on_list)
 
     def test_queries(self):
+        """TODO now that plays are being added, they need to be tested for
+        correctness; player pages also need to be inserted before the page runs
+        its queries because the plays reference player IDs. Use mock player
+        records or just do a full insert of all dependencies here? Proper unit
+        testing practices would probably encourage just hardcoding mock player
+        records...
+        """
+        self.page._run_queries()
         venue = Venue.get(Venue.name == "Nationals Park")
         home = Team.get(Team.name == "Washington Nationals" and Team.abbreviation == "WSN")
         away = Team.get(Team.name == "Chicago Cubs" and Team.abbreviation == "CHC")
