@@ -87,8 +87,6 @@ class GamePage(BBRefPage):
             player_suffixes += table.get_page_suffixes()
         return [self.base_url + s for s in player_suffixes]
     
-
-    
     """There are a few edge cases for name lookups, since canonical player
     names and the names presented in play rows vary slightly. Players known
     with middle initials and/or with Jr./Sr. title may or may not be
@@ -107,7 +105,7 @@ class GamePage(BBRefPage):
 class _PlaceholderTable(BeautifulSoup):
     """Certain tables' contents are contained within comments, and are
     marked by divs with a class of placeholder preceding the comment of
-    interest.
+    interest. Therefore, they should be instantiated by their placeholders.
     """
     
     def __init__(self, ph_div):
@@ -394,8 +392,8 @@ class _PlayDataTransformer:
         }
         # home team gets to bat in second half of inning (b)
         cls.INNING_AND_PLAYER_TO_SIDE = {
-            ("t", "batter"): "away",
-            ("b", "batter"): "home",
+            ("t", "batter") : "away",
+            ("b", "batter") : "home",
             ("t", "pitcher"): "home",
             ("b", "pitcher"): "away",
         }
