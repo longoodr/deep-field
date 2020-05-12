@@ -68,41 +68,90 @@ class GamePage(BBRefPage):
     """A page corresponding to the play-by-play info for a game, along with
     relevant info relating to the play-by-play data.
     """
+    
+    def __init__(self, html: str, dep_res: DependencyResolver):
+        super().__init__(html, dep_res)
+        self._player_tables = self.PlayerTables(self._soup)
         
     def _run_queries(self) -> None:
         if not hasattr(self, "_query_runner"):
-            self._query_runner = self.QueryRunner(self._soup)
+            self._query_runner = self.QueryRunner(self._soup, self._player_tables)
         self._query_runner.run_queries()
         
     def get_referenced_page_urls(self) -> Iterable[str]:
-        if not hasattr(self, "_dep_extractor"):
-            self._dep_extractor = self.DepExtractor(self._soup)
-        player_suffixes = self._dep_extractor.get_player_page_suffixes()
+        player_suffixes = []
+        for table in self._player_tables:
+            player_suffixes += table.get_suffixes()
         return [self.base_url + s for s in player_suffixes]
     
-    class UsesTablePlaceholders:
-        """Provides common functionality for instantiating soup for a table
-        from a comment, which is marked on the page by a div with a class of
-        placeholder. This placeholder precedes the comment of interest.
+    @staticmethod
+    def _get_table_from_placeholder(ph_div) -> BeautifulSoup:
+        """Certain tables' contents are contained within comments, and are
+        marked by divs with a class of placeholder preceding the comment of
+        interest. This instantiates a soup object from a given placeholder
+        marking the location of a table comment. Note the SECOND sibling is
+        the comment of interest because there is an intermediate \n.
         """
+        table_contents = ph_div.next_sibling.next_sibling
+        return BeautifulSoup(table_contents, "lxml")
         
-        @staticmethod
-        def get_table_from_placeholder(ph_div) -> BeautifulSoup:
-            # the second sibling is the comment of interest because there is an intermediate \n
-            table_contents = ph_div.next_sibling.next_sibling
-            return BeautifulSoup(table_contents, "lxml")
+    class PlayerTables:
+        """Manages access to the tables of away and home players for the given
+        game.
+        """
+        def __init__(self, soup):
+            # player tables are marked by first 2 placeholders on page
+            ptable_placeholders = list(soup.find_all("div", {"class": "placeholder"}, limit=2))
+            self.away = GamePage.PlayerTable(ptable_placeholders[0])
+            self.home = GamePage.PlayerTable(ptable_placeholders[1])
+            
+        def __iter__(self):
+            self._tables = [self.away, self.home]
+            self._cur = 0
+            return self
+        
+        def __next__(self):
+            if self._cur >= len(self._tables):
+                raise StopIteration
+            this_table = self._tables[self._cur]
+            self._cur += 1
+            return this_table
+        
+    class PlayerTable:
+        """Manages access to a table of players."""
+        
+        _player_tag_attr_filter = {
+            "data-stat": "player",
+            "scope": "row"
+        }
+        
+        def __init__(self, placeholder):
+            self._table = GamePage._get_table_from_placeholder(placeholder)
+                
+        def get_suffixes(self):
+            return [row.a["href"] for row in self.get_rows()]
+        
+        def get_rows(self):
+            return self._table.find_all(
+                self._player_tag_filter,
+                attrs=self._player_tag_attr_filter
+                )
+                    
+        @staticmethod 
+        def _player_tag_filter(tag) -> bool:
+            return tag.name == "th" and len(tag.attrs) == 5
     
     class QueryRunner:
         """Handles execution of queries for data contained on a GamePage."""
         
-        def __init__(self, soup):
+        def __init__(self, soup, player_tables):
             self._soup = soup
             self._scorebox = self._soup.find("div", {"class": "scorebox"})
             self._scorebox_meta = self._scorebox.find("div", {"class": "scorebox_meta"})
             self._team_adder = GamePage.TeamQueryRunner(self._scorebox)
             self._venue_adder = GamePage.VenueQueryRunner(self._scorebox_meta)
             self._game_adder = GamePage.GameQueryRunner(self._soup, self._scorebox_meta)
-            self._pbp_adder = GamePage.PlayQueryRunner(self._soup)
+            self._pbp_adder = GamePage.PlayQueryRunner(self._soup, player_tables)
             
         def run_queries(self) -> None:
             # TODO: should add the teams, venue, game, contained plays in that order
@@ -235,11 +284,12 @@ class GamePage(BBRefPage):
             weekday = div.text.split()[0]
             return weekday.endswith("day,")
 
-    class PlayQueryRunner(UsesTablePlaceholders):
+    class PlayQueryRunner:
         
-        def __init__(self, soup):
+        def __init__(self, soup, player_tables):
             self._soup = soup
             self._pbp_table = self._get_pbp_table()
+            self._player_tables = player_tables
                 
         def add_plays(self, game: Game) -> None:
             pass
@@ -248,36 +298,4 @@ class GamePage(BBRefPage):
             # pbp table placeholder is the 7th on page
             placeholders = self._soup.find_all("div", {"class": "placeholder"}, limit=7)
             ph = placeholders[-1]
-            return self.get_table_from_placeholder(ph)
-                
-    class DepExtractor(UsesTablePlaceholders):
-        """Handles retrieving the referenced page URLs (player pages) for a
-        GamePage.
-        """
-            
-        _player_tag_attr_filter = {
-            "data-stat": "player",
-            "scope": "row"
-        }
-        
-        def __init__(self, soup):
-            self._soup = soup
-            self._parse_player_tables()
-        
-        def _parse_player_tables(self) -> None:
-            # player tables are marked by first 2 placeholders on page
-            player_table_phs = self._soup.find_all("div", {"class": "placeholder"}, limit=2)
-            self._player_tables = [self.get_table_from_placeholder(ph) for ph in player_table_phs]
-            
-        def get_player_page_suffixes(self):
-            suffixes = []
-            for player_table in self._player_tables:
-                for ptag in player_table.find_all(self._player_tag_filter,
-                                                  attrs=self._player_tag_attr_filter):
-                    suffix = ptag.a["href"] # /players/s/smithjo01.shtml
-                    suffixes.append(suffix)
-            return suffixes
-            
-        @staticmethod 
-        def _player_tag_filter(tag) -> bool:
-            return tag.name == "th" and len(tag.attrs) == 5
+            return GamePage._get_table_from_placeholder(ph)
