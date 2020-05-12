@@ -325,7 +325,6 @@ class GamePage(BBRefPage):
             self._pbp_table = self._get_pbp_table()
             Transformer = GamePage.PlayQueryRunner.PlayDataTransformer
             self._transformer = Transformer(player_tables)
-
                 
         def add_plays(self, game: Game) -> None:
             for play_num, play_row in enumerate(self._get_play_rows()):
