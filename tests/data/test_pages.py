@@ -42,7 +42,7 @@ class TestPage:
 
     @classmethod
     def test_urls(cls, on_list_suffixes: Iterable[str], not_on_list_suffixes: Iterable[str]):
-        page_urls = cls.page.get_referenced_page_urls()
+        page_urls = set(cls.page.get_referenced_page_urls())
         for url in cls.expand_urls(on_list_suffixes):
             assert url in page_urls
         for url in cls.expand_urls(not_on_list_suffixes):
@@ -85,13 +85,6 @@ class TestGamePage(TestPage):
         super().test_urls(on_list, not_on_list)
 
     def test_queries(self):
-        """TODO now that plays are being added, they need to be tested for
-        correctness; player pages also need to be inserted before the page runs
-        its queries because the plays reference player IDs. Use mock player
-        records or just do a full insert of all dependencies here? Proper unit
-        testing practices would probably encourage just hardcoding mock player
-        records...
-        """
         self._insert_mock_players()
         self.page._run_queries()
         venue = Venue.get(Venue.name == "Nationals Park")
