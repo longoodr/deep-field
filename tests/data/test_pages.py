@@ -20,10 +20,8 @@ def get_res_path(name: str) -> Path:
 def setup_module(module):
     test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)
     test_db.connect()
-    test_db.create_tables(MODELS)
 
 def teardown_module(module):
-    test_db.drop_tables(MODELS)
     test_db.close()
 
 class TestPage:
@@ -34,11 +32,16 @@ class TestPage:
     
     @classmethod
     def setup_method(cls):
+        test_db.create_tables(MODELS)
         file_path = (get_res_path(cls.name)).resolve()
         with open(file_path, "r", encoding="utf-8") as page_file:
             html = page_file.read()
             cls.page = cls.page_type(html, IgnoreDependencies())
-       
+    
+    @classmethod
+    def teardown_method(cls):
+        test_db.drop_tables(MODELS)
+    
     @classmethod
     def expand_urls(cls, suffixes: Iterable[str]) -> Iterable[str]:
         return [cls.base_url + s for s in suffixes]
