@@ -9,7 +9,7 @@ from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
                                      Venue, db)
 from deepfield.data.dependencies import IgnoreDependencies
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
-from deepfield.data.pages import GamePage, Page, SchedulePage
+from deepfield.data.pages import GamePage, Page, PlayerPage, SchedulePage
 
 db.init(":memory:")
 MODELS = (Game, GamePlayer, Play, Player, Team, Venue)
@@ -65,6 +65,15 @@ class TestSchedulePage(TestPage):
             "/boxes/BOS/BOS201708270.shtml"
         ]
         super().test_urls(on_list, not_on_list)
+
+class TestPlayerPage(TestPage):
+    
+    name = "vendipa01.shtml"
+    page_type = PlayerPage
+    
+    def test_queries(self):
+        # TODO
+        pass
 
 class TestGamePage(TestPage):
     
