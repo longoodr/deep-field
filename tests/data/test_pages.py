@@ -5,10 +5,11 @@ from typing import Iterable, Type
 import pytest
 from peewee import SqliteDatabase
 
+from deepfield.data.bbref_pages import GamePage, PlayerPage, SchedulePage
 from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
                                      Venue, db)
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
-from deepfield.data.pages import GamePage, Page, PlayerPage, SchedulePage
+from deepfield.data.page_defs import Page
 
 db.init(":memory:")
 MODELS = (Game, GamePlayer, Play, Player, Team, Venue)
