@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Iterable, Type
 
 import pytest
-from peewee import SqliteDatabase
+from pytest import raises
 
 from deepfield.data.bbref_pages import (BBRefPage, GamePage, PlayerPage,
                                         SchedulePage)
@@ -98,6 +98,8 @@ class TestGamePage(TestPage):
         super().test_urls(on_list, not_on_list)
 
     def test_queries(self):
+        with raises(ValueError):
+            self.page.update_db()
         self.__insert_mock_players()
         assert not self.page._exists_in_db()
         self.page.update_db()
