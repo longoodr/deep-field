@@ -72,8 +72,13 @@ class TestPlayerPage(TestPage):
     page_type = PlayerPage
     
     def test_queries(self):
-        # TODO
-        pass
+        assert not self.page._is_already_inserted()
+        self.page.update_db()
+        assert self.page._is_already_inserted()
+        Player.get(Player.name == "Pat Venditte"
+                   and Player.name_id == "vendipa01"
+                   and Player.bats == Handedness.LEFT.value
+                   and Player.throws == Handedness.BOTH.value)
 
 class TestGamePage(TestPage):
     
