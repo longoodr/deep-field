@@ -27,12 +27,14 @@ class BBRefLink(Link):
     corresponding record in the database: "/.../.../name_id.ext"
     """
     
-    def __init__(self, url: str, link_model: Type[DeepFieldModel]):
+    def __init__(self, url: str, link_model: Type[DeepFieldModel] = None):
         super().__init__(url)
         self._link_model = link_model
         self.name_id = self.__get_name_id()
         
     def exists_in_db(self) -> bool:
+        if self._link_model is None:
+            raise TypeError("Model not defined for this link")
         expr = (self._link_model.name_id == self.name_id)
         record = self._link_model.get_or_none(expr)
         return record is not None
@@ -216,7 +218,7 @@ class _PlayerTable(_PlaceholderTable):
     @staticmethod
     def __get_name_id(row) -> str:
         page_suffix = _PlayerTable.__get_page_suffix(row)
-        return BBRefLink(page_suffix, Player).name_id
+        return BBRefLink(page_suffix).name_id
     
     @staticmethod
     def __get_page_suffix(row) -> str:
