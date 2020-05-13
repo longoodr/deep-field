@@ -7,7 +7,7 @@ import requests
 from bs4 import BeautifulSoup, Comment
 from peewee import Query
 
-from deepfield.data.dbmodels import Game, Play, Team, Venue
+from deepfield.data.dbmodels import Game, GamePlayer, Play, Player, Team, Venue
 from deepfield.data.dependencies import DependencyResolver
 from deepfield.data.enums import FieldType, OnBase, TimeOfDay
 
@@ -147,8 +147,13 @@ class _PlayerTable(_PlaceholderTable):
     def get_page_suffixes(self) -> List[str]:
         return [self._get_page_suffix(row) for row in self.get_rows()]
     
+    def get_name_ids(self) -> Iterable[str]:
+        return self.get_name_map().values()
+    
     def get_name_map(self) -> Dict[str, str]:
-        return {self._get_player_name(row): self._get_player_id(row) for row in self.get_rows()}
+        if not hasattr(self, "__name_map"):
+            self.__name_map = {self._get_player_name(row): self._get_player_name_id(row) for row in self.get_rows()}
+        return self.__name_map
     
     def get_rows(self):
         if not hasattr(self, "__rows"):
@@ -164,7 +169,7 @@ class _PlayerTable(_PlaceholderTable):
         return GamePage._get_stripped_name(canonical_name)
     
     @staticmethod
-    def _get_player_id(row) -> str:
+    def _get_player_name_id(row) -> str:
         # FIXME should return id, not name_id
         page_suffix = _PlayerTable._get_page_suffix(row)
         return page_suffix.split("/")[-1].split(".")[0] # smithjo01
@@ -187,12 +192,14 @@ class _QueryRunner:
         self._team_adder = _TeamQueryRunner(self._scorebox)
         self._venue_adder = _VenueQueryRunner(self._scorebox_meta)
         self._game_adder = _GameQueryRunner(self._soup, self._scorebox_meta)
+        self._game_player_adder = _GamePlayerQueryRunner(player_tables)
         self._pbp_adder = _PlayQueryRunner(self._soup, player_tables)
         
     def run_queries(self) -> None:
         teams = self._team_adder.add_teams()
         venue = self._venue_adder.add_venue()
         game = self._game_adder.add_game(teams, venue)
+        self._game_player_adder.add_game_players(game)
         self._pbp_adder.add_plays(game)
         
 class _TeamQueryRunner:
@@ -469,3 +476,20 @@ class _PlayDataTransformer:
     
     def _convert_to_int(self, stat: str) -> int:
         return int(stat)
+
+class _GamePlayerQueryRunner:
+    
+    def __init__(self, player_tables):
+        self._player_tables = player_tables
+        
+    def add_game_players(self, game: Game) -> None:
+        name_ids = set (self._player_tables.home.get_name_ids())
+        name_ids.update(self._player_tables.away.get_name_ids())
+        rows = []
+        # FIXME WHY WON'T THIS WORK???
+        for pid in Player.select().where(Player.name_id in name_ids):
+            rows.append((game.id, pid))
+        GamePlayer.insert_many(
+            rows,
+            fields=[GamePlayer.game_id, GamePlayer.player_id]
+            )
