@@ -39,6 +39,15 @@ class BBRefLink(Link):
         record = self._link_model.get_or_none(expr)
         return record is not None
     
+    def get_page_type(self) -> Type[BBRefPage]:
+        if "boxes" in self._url:
+            return GamePage
+        elif "players" in self._url:
+            return PlayerPage
+        elif "schedule" in self._url:
+            return SchedulePage
+        raise ValueError(f"Could not determine page type of {self}")
+    
     def __get_name_id(self) -> str:
         return self._url.split("/")[-1].split(".")[0]
     
