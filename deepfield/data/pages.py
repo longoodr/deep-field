@@ -62,6 +62,11 @@ class BBRefPage(Page):
     def __init__(self, html: str, dep_res: DependencyResolver):
         super().__init__(html, dep_res)
         self.base_url = "https://www.baseball-reference.com"
+        self._name = self._get_name()
+        
+    def _get_name(self):
+        page_suffix = self._soup.find("link", rel="canonical")["href"] # /.../.../name.shtml
+        return page_suffix.split("/")[-1].split(".")[0]
 
 class SchedulePage(BBRefPage):
     """A page containing a set of URLs corresponding to game pages."""
@@ -80,6 +85,23 @@ class SchedulePage(BBRefPage):
         for game in games:
             suffix = game.em.a["href"]
             yield self.base_url + suffix
+
+class PlayerPage(BBRefPage):
+    """A page containing info on a given player."""
+    
+    def __init__(self, html: str, dep_res: DependencyResolver):
+        super().__init__(html, dep_res)
+    
+    def get_referenced_page_urls(self):
+        """PlayerPages don't depend on anything else."""
+        return []
+    
+    def _is_already_inserted(self):
+        player_record = Player.get_or_none(Player.name_id == self._name)
+        return player_record is not None
+    
+    def _run_queries(self):
+        pass
 
 class GamePage(BBRefPage):
     """A page corresponding to the play-by-play info for a game, along with
@@ -102,12 +124,8 @@ class GamePage(BBRefPage):
             yield self.base_url + suffix
             
     def _is_already_inserted(self):
-        game_model = Game.get_or_none(Game.name_id == self._name)
-        return game_model is not None
-    
-    def _get_name(self):
-        page_suffix = self._soup.find("link", rel="canonical")["href"] # /.../.../name.shtml
-        return page_suffix.split("/")[-1].split(".")[0] # i.e. "WAS201710120"
+        game_record = Game.get_or_none(Game.name_id == self._name)
+        return game_record is not None
     
     """There are a few edge cases for name lookups, since canonical player
     names and the names presented in play rows vary slightly. Players known
