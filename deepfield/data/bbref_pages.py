@@ -486,7 +486,7 @@ class _PlayDataTransformer:
         #[t|b][0-9]+ (t1, b2, t11, etc)
         inning_num = int(inning[1:])
         inning_half_char = inning[0]
-        # 0-indexed (t1 -> 0; b1 -> 1; b2 -> 2 etc)
+        # 0-indexed (t1 -> 0; b1 -> 1; t2 -> 2 etc)
         return 2 * (inning_num - 1) + self.__INNING_CHAR_OFFSET[inning_half_char]
     
     def __runners_to_on_base(self, runners: str) -> int:
