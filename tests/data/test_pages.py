@@ -10,13 +10,10 @@ from deepfield.data.bbref_pages import (BBRefPage, GamePage, PlayerPage,
 from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
                                      Venue, db)
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
+from tests.data.test_utils import get_res_path
 
 db.init(":memory:")
 MODELS = (Game, GamePlayer, Play, Player, Team, Venue)
-
-def get_res_path(name: str) -> Path:
-    base_path = Path(__file__).parent
-    return (base_path / ("resources/" + name)).resolve()
 
 class TestPage:
             
@@ -49,7 +46,7 @@ class TestPage:
 
 class TestSchedulePage(TestPage):
     
-    name = "2016schedule.html"
+    name = "2016-schedule.html"
     page_type = SchedulePage
     
     def test_urls(self):
