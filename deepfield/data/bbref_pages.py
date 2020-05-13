@@ -24,7 +24,8 @@ class BBRefPage(Page):
 class BBRefLink(Link):
     """A link from baseball-reference.com. These links all follow a similar
     format, where the last component of the URL is the name_id for the
-    corresponding record in the database: "/.../.../name_id.ext"
+    corresponding record in the database: "/.../.../name_id.ext". Each link
+    also knows the type of the Page that it points to.
     """
     
     def __init__(self, url: str, link_model: Type[DeepFieldModel] = None):
