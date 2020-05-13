@@ -10,11 +10,10 @@ class BBRefPageFactory:
     """Creates BBRefPages from BBRefLinks."""
     
     def create_page_from_link(self, link: BBRefLink) -> BBRefPage:
-        page_type = link.get_page_type()
         html = HtmlRetriever(link).retrieve_html()
         if html is None:
             raise ValueError(f"Could not get HTML for {link}")
-        return page_type(html)
+        return link.page_type(html)
     
 class AbstractHtmlRetrievalHandler(ABC):
     """A step in the HTML retrieval process."""

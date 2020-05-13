@@ -31,6 +31,7 @@ class BBRefLink(Link):
         super().__init__(url)
         self._link_model = link_model
         self.name_id = self.__get_name_id()
+        self.page_type = self.__get_page_type()
         
     def exists_in_db(self) -> bool:
         if self._link_model is None:
@@ -39,7 +40,7 @@ class BBRefLink(Link):
         record = self._link_model.get_or_none(expr)
         return record is not None
     
-    def get_page_type(self) -> Type[BBRefPage]:
+    def __get_page_type(self) -> Type[BBRefPage]:
         if "boxes" in self._url:
             return GamePage
         elif "players" in self._url:
