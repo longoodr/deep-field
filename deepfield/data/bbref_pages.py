@@ -28,7 +28,7 @@ class BBRefLink(Link):
     """
     
     def __init__(self, url: str, link_model: Type[DeepFieldModel]):
-        self._url = url
+        super().__init__(url)
         self._link_model = link_model
         self.name_id = self.__get_name_id()
         
