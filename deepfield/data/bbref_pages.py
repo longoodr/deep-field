@@ -405,8 +405,11 @@ class _PlayQueryRunner:
         
 class _PlayDataTransformer:
     
-    __PBP_TO_DB_STATS: Dict[str, Tuple[str, Callable]]
-    __PLAYERS: Dict[str, Tuple[str, Callable]]
+    __StatTransFunc = Callable[["_PlayDataTransformer", str     ], Any]
+    __PlayerLookup  = Callable[["_PlayDataTransformer", str, str], str]
+    
+    __PBP_TO_DB_STATS: Dict[str, Tuple[str, __StatTransFunc]]
+    __PLAYERS: Dict[str, Tuple[str, __PlayerLookup]]
     __PBP_STATS: Set[str]
     __INNING_CHAR_OFFSET: Dict[str, int]
     __INNING_AND_PLAYER_TO_SIDE: Dict[Tuple[str, str], str]
@@ -417,7 +420,20 @@ class _PlayDataTransformer:
             "home": player_tables.home.get_name_to_db_ids(),
             "away": player_tables.away.get_name_to_db_ids(),
         }
-
+        
+    def extract_raw_play_data(self, play_row) -> Dict[str, str]:
+        raw_play_data: Dict[str, str] = {}
+        for play_data_pt in play_row.find_all():
+            data_stat = str(play_data_pt.get("data-stat"))
+            if data_stat in self.__PBP_STATS:
+                raw_play_data[data_stat] = play_data_pt.text.replace(u"\xa0", u" ")
+        return raw_play_data
+    
+    def transform_raw_play_data(self, raw_play_data: Dict[str, str]) -> Dict[str, Any]:
+        transformed_stats = self.__transform_stats(raw_play_data)
+        self.__insert_player_ids(raw_play_data, into_dict=transformed_stats)
+        return transformed_stats
+    
     @classmethod
     def __init_lookups(cls):
         """Initializes dicts to lookup database stat names and
@@ -452,19 +468,6 @@ class _PlayDataTransformer:
             ("b", "pitcher"): "away",
         }
         cls.__PBP_STATS = set(cls.__PBP_TO_DB_STATS.keys()).union(set(cls.__PLAYERS.keys()))
-        
-    def extract_raw_play_data(self, play_row) -> Dict[str, str]:
-        raw_play_data: Dict[str, str] = {}
-        for play_data_pt in play_row.find_all():
-            data_stat = str(play_data_pt.get("data-stat"))
-            if data_stat in self.__PBP_STATS:
-                raw_play_data[data_stat] = play_data_pt.text.replace(u"\xa0", u" ")
-        return raw_play_data
-    
-    def transform_raw_play_data(self, raw_play_data: Dict[str, str]) -> Dict[str, Any]:
-        transformed_stats = self.__transform_stats(raw_play_data)
-        self.__insert_player_ids(raw_play_data, into_dict=transformed_stats)
-        return transformed_stats
     
     def __transform_stats(self, raw_play_data: Dict[str, str]) -> Dict[str, str]:
         new_data: Dict[str, str] = {}
