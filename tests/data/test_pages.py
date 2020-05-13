@@ -5,11 +5,11 @@ from typing import Iterable, Type
 import pytest
 from peewee import SqliteDatabase
 
-from deepfield.data.bbref_pages import GamePage, PlayerPage, SchedulePage
+from deepfield.data.bbref_pages import (BBRefPage, GamePage, PlayerPage,
+                                        SchedulePage)
 from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
                                      Venue, db)
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
-from deepfield.data.page_defs import Page
 
 db.init(":memory:")
 MODELS = (Game, GamePlayer, Play, Player, Team, Venue)
@@ -20,9 +20,8 @@ def get_res_path(name: str) -> Path:
 
 class TestPage:
             
-    base_url = "https://www.baseball-reference.com"
-    page: Page
-    page_type: Type[Page]
+    page: BBRefPage
+    page_type: Type[BBRefPage]
     
     @classmethod
     def setup_method(cls):
@@ -35,18 +34,18 @@ class TestPage:
     @classmethod
     def teardown_method(cls):
         db.drop_tables(MODELS)
-    
-    @classmethod
-    def expand_urls(cls, suffixes: Iterable[str]) -> Iterable[str]:
-        return [cls.base_url + s for s in suffixes]
 
     @classmethod
     def test_urls(cls, on_list_suffixes: Iterable[str], not_on_list_suffixes: Iterable[str]):
         page_urls = set([str(link) for link in cls.page.get_links()])
-        for url in cls.expand_urls(on_list_suffixes):
+        for url in cls._expand_urls(on_list_suffixes):
             assert url in page_urls
-        for url in cls.expand_urls(not_on_list_suffixes):
+        for url in cls._expand_urls(not_on_list_suffixes):
             assert url not in page_urls
+            
+    @classmethod
+    def _expand_urls(cls, suffixes: Iterable[str]) -> Iterable[str]:
+        return [cls.page.BASE_URL + s for s in suffixes]
 
 class TestSchedulePage(TestPage):
     
@@ -99,7 +98,7 @@ class TestGamePage(TestPage):
         super().test_urls(on_list, not_on_list)
 
     def test_queries(self):
-        self._insert_mock_players()
+        self.__insert_mock_players()
         assert not self.page._exists_in_db()
         self.page.update_db()
         assert self.page._exists_in_db()
@@ -124,8 +123,8 @@ class TestGamePage(TestPage):
                 and Play.play_num == 0
                 and Play.desc == "Double to RF (Line Drive)"
                 and Play.pitch_ct == "2,(0-1) CX"
-                and Play.batter_id == self._id_of_name_id("jayjo02")
-                and Play.pitcher_id == self._id_of_name_id("gonzagi01")
+                and Play.batter_id == self.__id_of_name_id("jayjo02")
+                and Play.pitcher_id == self.__id_of_name_id("gonzagi01")
             )
         Play.get(
                 Play.game_id == game.id
@@ -135,23 +134,23 @@ class TestGamePage(TestPage):
                 and Play.play_num == 28
                 and Play.desc == "Walk; Bryant to 3B; Contreras to 2B"
                 and Play.pitch_ct == "6,(3-2) CBFBBB"
-                and Play.batter_id == self._id_of_name_id("almoral01")
-                and Play.pitcher_id == self._id_of_name_id("gonzagi01")
+                and Play.batter_id == self.__id_of_name_id("almoral01")
+                and Play.pitcher_id == self.__id_of_name_id("gonzagi01")
             )
         num_game_players = len(GamePlayer.select().where(GamePlayer.game_id == game.id))
         num_players = len(Player.select())
         assert(num_game_players == num_players)
         
-    def _insert_mock_players(self) -> None:
+    def __insert_mock_players(self) -> None:
         ptables = self.page._player_tables
         with db.atomic():
             for table in ptables:
                 pmap = table.get_name_to_name_ids()
                 for name, name_id in pmap.items():
-                    self._insert_mock_player(name, name_id)
+                    self.__insert_mock_player(name, name_id)
     
     @staticmethod    
-    def _insert_mock_player(name: str, name_id: str) -> None:
+    def __insert_mock_player(name: str, name_id: str) -> None:
         fields = {
             "name": name,
             "name_id": name_id,
@@ -161,5 +160,5 @@ class TestGamePage(TestPage):
         Player.create(**fields)
 
     @staticmethod
-    def _id_of_name_id(name_id: str) -> int:
+    def __id_of_name_id(name_id: str) -> int:
         return Player.get(Player.name_id == name_id).id

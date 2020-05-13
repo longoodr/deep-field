@@ -15,10 +15,11 @@ from deepfield.data.page_defs import InsertablePage, Link, Page
 class BBRefPage(Page):
     """A page from baseball-reference.com."""
     
+    BASE_URL = "https://www.baseball-reference.com"
+    
     def __init__(self, html: str):
         super().__init__(html)
-        self.base_url = "https://www.baseball-reference.com"
-        self.url = self._soup.find("link", rel="canonical")["href"]
+        self._url = self._soup.find("link", rel="canonical")["href"]
     
 class BBRefLink(Link):
     """A link from baseball-reference.com. These links all follow a similar
@@ -43,9 +44,7 @@ class BBRefInsertablePage(BBRefPage, InsertablePage):
     
     def __init__(self, html: str, model: Type[DeepFieldModel]):
         super().__init__(html)
-        self.base_url = "https://www.baseball-reference.com"
-        url = self._soup.find("link", rel="canonical")["href"]
-        self._link = BBRefLink(url, model)
+        self._link = BBRefLink(self._url, model)
         
     def _exists_in_db(self):
         return self._link.exists_in_db()
@@ -57,7 +56,7 @@ class SchedulePage(BBRefPage):
         games = self._soup.find_all("p", {"class": "game"})
         for game in games:
             suffix = game.em.a["href"]
-            url = self.base_url + suffix
+            url = self.BASE_URL + suffix
             yield BBRefLink(url, Game)
 
 class PlayerPage(BBRefInsertablePage):
@@ -72,20 +71,20 @@ class PlayerPage(BBRefInsertablePage):
         return []
     
     def _run_queries(self) -> None:
-        fields = self._get_handedness()
+        fields = self.__get_handedness()
         fields["name"] = self._player_info.h1.text
         fields["name_id"] = self._link.name_id
         with db.atomic():
             Player.create(**fields)
     
-    def _get_player_name(self) -> str:
+    def __get_player_name(self) -> str:
         return self._player_info.h1.text
     
-    _HANDEDNESS_MATCHER = re.compile(r"(?:Bats:|Throws:) (\w+)")
+    __HANDEDNESS_MATCHER = re.compile(r"(?:Bats:|Throws:) (\w+)")
     
-    def _get_handedness(self) -> Dict[str, Any]: # Bats, Throws
+    def __get_handedness(self) -> Dict[str, Any]: # Bats, Throws
         handedness_p = self._player_info.find_all("p", limit=2)[-1]
-        hands_text = re.findall(self._HANDEDNESS_MATCHER, handedness_p.text)
+        hands_text = re.findall(self.__HANDEDNESS_MATCHER, handedness_p.text)
         hands: Dict[str, int] = {}
         hands["bats"]   = Handedness[hands_text[0].upper()].value
         hands["throws"] = Handedness[hands_text[1].upper()].value
@@ -100,34 +99,31 @@ class GamePage(BBRefInsertablePage):
         super().__init__(html, Game)
         self._player_tables = _PlayerTables(self._soup)
         
-    def _run_queries(self) -> None:
-        if not hasattr(self, "_query_runner"):
-            self._query_runner = _GamePageQueryRunner(self._soup, self._player_tables, self._link.name_id)
-        self._query_runner.run_queries()
-        
     def get_links(self) -> Iterable[Link]:
         """For a GamePage, the referenced links are the players' pages."""
         for suffix in self._player_tables.get_page_suffixes():
-            url = self.base_url + suffix
+            url = self.BASE_URL + suffix
             yield BBRefLink(url, Player)
-            
-    def _is_already_inserted(self) -> bool:
-        game_record = Game.get_or_none(Game.name_id == self._link.name_id)
-        return game_record is not None
+        
+    def _run_queries(self) -> None:
+        if not hasattr(self, "_query_runner"):
+            self.__query_runner = _GamePageQueryRunner(self._soup, self._player_tables, self._link.name_id)
+        self.__query_runner.run_queries()
     
+class _NameStripper:
     """There are a few edge cases for name lookups, since canonical player
     names and the names presented in play rows vary slightly. Players known
     with middle initials and/or with Jr./Sr. title may or may not be
     represented in play rows with these name elements. This allows names to be
     standardized across these different presentations.
     """
-    _NAME_TITLE = re.compile(r" [J|S]r\.")
-    _MIDDLE_INITIAL = re.compile(r" \w\.")
+    __NAME_TITLE = re.compile(r" [J|S]r\.")
+    __MIDDLE_INITIAL = re.compile(r" \w\.")
 
     @classmethod
-    def _get_stripped_name(cls, name: str) -> str:
-        name_wo_mid = re.sub(cls._MIDDLE_INITIAL, "", name)
-        fully_stripped = re.sub(cls._NAME_TITLE, "", name_wo_mid)
+    def get_stripped_name(cls, name: str) -> str:
+        name_wo_mid = re.sub(cls.__MIDDLE_INITIAL, "", name)
+        fully_stripped = re.sub(cls.__NAME_TITLE, "", name_wo_mid)
         return fully_stripped
     
 class _PlaceholderTable(BeautifulSoup):
@@ -173,24 +169,19 @@ class _PlayerTables:
 class _PlayerTable(_PlaceholderTable):
     """Manages access to a table of players."""
     
-    _PLAYER_TAG_ATTR_FILTER = {
+    __PLAYER_TAG_ATTR_FILTER = {
         "data-stat": "player",
         "scope": "row"
     }
             
     def get_page_suffixes(self) -> Iterable[str]:
-        for row in self._get_rows():
-            yield self._get_page_suffix(row)
+        for row in self.__get_rows():
+            yield self.__get_page_suffix(row)
     
     def get_name_ids(self) -> Iterable[str]:
         if not hasattr(self, "__name_ids"):
-            self.__name_ids = [self._get_name_id(row) for row in self._get_rows()]
+            self.__name_ids = [self.__get_name_id(row) for row in self.__get_rows()]
         return self.__name_ids
-    
-    def get_name_to_name_ids(self) -> Dict[str, str]:
-        if not hasattr(self, "__name_to_name_ids"):
-            self.__name_to_name_ids = {self._get_player_name(row): self._get_name_id(row) for row in self._get_rows()}
-        return self.__name_to_name_ids
     
     def get_name_to_db_ids(self) -> Dict[str, int]:
         if not hasattr(self, "__name_to_db_ids"):
@@ -204,26 +195,31 @@ class _PlayerTable(_PlaceholderTable):
                                     for nid in name_ids}
         return self.__name_to_db_ids
     
-    def _get_rows(self):
+    def get_name_to_name_ids(self) -> Dict[str, str]:
+        if not hasattr(self, "__name_to_name_ids"):
+            self.__name_to_name_ids = {self.__get_player_name(row): self.__get_name_id(row) for row in self.__get_rows()}
+        return self.__name_to_name_ids
+    
+    def __get_rows(self):
         if not hasattr(self, "__rows"):
             self.__rows = self.find_all(
                 self._player_tag_filter,
-                attrs=self._PLAYER_TAG_ATTR_FILTER
+                attrs=self.__PLAYER_TAG_ATTR_FILTER
                 )
         return self.__rows
     
     @staticmethod
-    def _get_player_name(row) -> str:
+    def __get_player_name(row) -> str:
         canonical_name = row.a.text.replace(u"\xa0", u" ")
-        return GamePage._get_stripped_name(canonical_name)
+        return _NameStripper.get_stripped_name(canonical_name)
     
     @staticmethod
-    def _get_name_id(row) -> str:
-        page_suffix = _PlayerTable._get_page_suffix(row)
+    def __get_name_id(row) -> str:
+        page_suffix = _PlayerTable.__get_page_suffix(row)
         return BBRefLink(page_suffix, Player).name_id
     
     @staticmethod
-    def _get_page_suffix(row) -> str:
+    def __get_page_suffix(row) -> str:
         return row.a["href"] # /players/s/smithjo01.shtml
                 
     @staticmethod 
@@ -234,46 +230,46 @@ class _GamePageQueryRunner:
     """Handles execution of queries for data contained on a GamePage."""
     
     def __init__(self, soup, player_tables: _PlayerTables, game_name: str):
-        self._soup = soup
-        self._scorebox = self._soup.find("div", {"class": "scorebox"})
-        self._scorebox_meta = self._scorebox.find("div", {"class": "scorebox_meta"})
-        self._team_adder = _TeamQueryRunner(self._scorebox)
-        self._venue_adder = _VenueQueryRunner(self._scorebox_meta)
-        self._game_adder = _GameQueryRunner(self._soup, self._scorebox_meta, game_name)
-        self._game_player_adder = _GamePlayerQueryRunner(player_tables)
-        self._pbp_adder = _PlayQueryRunner(self._soup, player_tables)
+        self.__soup = soup
+        self.__scorebox = self.__soup.find("div", {"class": "scorebox"})
+        self.__scorebox_meta = self.__scorebox.find("div", {"class": "scorebox_meta"})
+        self.__team_adder = _TeamQueryRunner(self.__scorebox)
+        self.__venue_adder = _VenueQueryRunner(self.__scorebox_meta)
+        self.__game_adder = _GameQueryRunner(self.__soup, self.__scorebox_meta, game_name)
+        self.__game_player_adder = _GamePlayerQueryRunner(player_tables)
+        self.__pbp_adder = _PlayQueryRunner(self.__soup, player_tables)
         
     def run_queries(self) -> None:
         with db.atomic():
-            teams = self._team_adder.add_teams()
-            venue = self._venue_adder.add_venue()
-            game = self._game_adder.add_game(teams, venue)
-            self._game_player_adder.add_game_players(game)
-            self._pbp_adder.add_plays(game)
+            teams = self.__team_adder.add_teams()
+            venue = self.__venue_adder.add_venue()
+            game = self.__game_adder.add_game(teams, venue)
+            self.__game_player_adder.add_game_players(game)
+            self.__pbp_adder.add_plays(game)
         
 class _TeamQueryRunner:
     
     def __init__(self, scorebox):
-        self._scorebox = scorebox
+        self.__scorebox = scorebox
 
     def add_teams(self) -> List[Team]:
         teams = []
-        info = self._get_team_info()
+        info = self.__get_team_info()
         for name, abbreviation in info:
             team, _ = Team.get_or_create(name=name, abbreviation=abbreviation)
             teams.append(team)
         return teams
     
-    def _get_team_info(self) -> Iterable[Tuple[str, str]]:
+    def __get_team_info(self) -> Iterable[Tuple[str, str]]:
         """Returns 2 elements, which are tuples of the name and
         abbreviation for away, home teams respectively.
         """
-        team_divs = self._scorebox.find_all("div", recursive=False, limit=2)
+        team_divs = self.__scorebox.find_all("div", recursive=False, limit=2)
         for td in team_divs:
-            yield self._get_team_div_info(td)
+            yield self.__get_team_div_info(td)
     
     @staticmethod
-    def _get_team_div_info(td) -> Tuple[str, str]:
+    def __get_team_div_info(td) -> Tuple[str, str]:
         team_info = td.div.strong.a
         suffix = team_info["href"] # /teams/abbreviation/year.html
         abbreviation = suffix.split("/")[2]
@@ -283,34 +279,34 @@ class _TeamQueryRunner:
 class _VenueQueryRunner:
     
     def __init__(self, scorebox_meta):
-        self._scorebox_meta = scorebox_meta
+        self.__scorebox_meta = scorebox_meta
         
     def add_venue(self) -> Venue:
-        name = self._get_venue_name()
+        name = self.__get_venue_name()
         venue, _ = Venue.get_or_create(name=name)
         return venue
         
-    def _get_venue_name(self) -> str:
-        venue_div = self._scorebox_meta.find(self._venue_div_filter)
+    def __get_venue_name(self) -> str:
+        venue_div = self.__scorebox_meta.find(self.__venue_div_filter)
         return venue_div.text.split(": ")[1] # "Venue: <venue name>"
     
     @staticmethod
-    def _venue_div_filter(div) -> bool:
+    def __venue_div_filter(div) -> bool:
         return div.text.startswith("Venue: ")
     
 class _GameQueryRunner:
     
     def __init__(self, soup, scorebox_meta, game_name: str):
-        self._scorebox_meta = scorebox_meta
-        self._game_name = game_name
+        self.__scorebox_meta = scorebox_meta
+        self.__game_name = game_name
 
     def add_game(self, teams: List[Team], venue: Venue) -> Game:
         fields = {
-            "name_id"         : self._game_name,
-            "local_start_time": self._get_local_start_time(),
-            "time_of_day"     : self._enum_to_int(self._get_time_of_day()),
-            "field_type"      : self._enum_to_int(self._get_field_type()),
-            "date"            : self._get_date(),
+            "name_id"         : self.__game_name,
+            "local_start_time": self.__get_local_start_time(),
+            "time_of_day"     : self.__enum_to_int(self.__get_time_of_day()),
+            "field_type"      : self.__enum_to_int(self.__get_field_type()),
+            "date"            : self.__get_date(),
             "venue_id"        : venue.id,
             "away_team_id"    : teams[0].id,
             "home_team_id"    : teams[1].id,
@@ -319,13 +315,13 @@ class _GameQueryRunner:
         return game
         
     @staticmethod
-    def _enum_to_int(enum):
+    def __enum_to_int(enum):
         if enum is None:
             return None
         return enum.value
         
-    def _get_local_start_time(self) -> time:
-        lst_div = self._scorebox_meta.find(self._lst_filter)
+    def __get_local_start_time(self) -> time:
+        lst_div = self.__scorebox_meta.find(self.__lst_filter)
         # Start Time: %I:%M [a.m.|p.m.] Local
         lst_text = lst_div.text.split("Time: ")[-1] # "%I:%M [a.m.|p.m.] Local"
         lst_text = lst_text.replace(" Local", "") # "%I:%M [a.m.|p.m.]"
@@ -334,11 +330,11 @@ class _GameQueryRunner:
         return dt.time()
     
     @staticmethod
-    def _lst_filter(div) -> bool:
+    def __lst_filter(div) -> bool:
         return "Time: " in div.text
     
-    def _get_time_of_day(self) -> TimeOfDay:
-        tod_div = self._scorebox_meta.find(self._tod_filter)
+    def __get_time_of_day(self) -> TimeOfDay:
+        tod_div = self.__scorebox_meta.find(self.__tod_filter)
         if tod_div is None:
             return None
         # "day/night game, ..."
@@ -346,14 +342,14 @@ class _GameQueryRunner:
         return TimeOfDay[tod_text.upper()]
     
     @staticmethod
-    def _tod_filter(div) -> bool:
+    def __tod_filter(div) -> bool:
         for tod in ["day", "night"]:
             if div.text.lower().startswith(tod):
                 return True
         return False
     
-    def _get_field_type(self) -> FieldType:
-        field_div = self._scorebox_meta.find(self._field_div_filter)
+    def __get_field_type(self) -> FieldType:
+        field_div = self.__scorebox_meta.find(self.__field_div_filter)
         if field_div is None:
             return None
         # "... on turf/grass"
@@ -361,69 +357,69 @@ class _GameQueryRunner:
         return FieldType[field_text.upper()]
         
     @staticmethod
-    def _field_div_filter(div) -> bool:
+    def __field_div_filter(div) -> bool:
         for field in ["turf", "grass"]:
             if div.text.endswith(field):
                 return True
         return False
     
-    def _get_date(self) -> date:
-        date_div = self._scorebox_meta.find(self._date_div_filter)
+    def __get_date(self) -> date:
+        date_div = self.__scorebox_meta.find(self.__date_div_filter)
         dt = datetime.strptime(date_div.text, "%A, %B %d, %Y")
         return dt.date()
     
     @staticmethod
-    def _date_div_filter(div) -> bool:
+    def __date_div_filter(div) -> bool:
         weekday = div.text.split()[0]
         return weekday.endswith("day,")
 
 class _PlayQueryRunner:
     
     def __init__(self, soup, player_tables: _PlayerTables):
-        self._soup = soup
-        self._pbp_table = self._get_pbp_table()
-        self._transformer = _PlayDataTransformer(player_tables)
+        self.__soup = soup
+        self.__pbp_table = self.__get_pbp_table()
+        self.__transformer = _PlayDataTransformer(player_tables)
             
     def add_plays(self, game: Game) -> None:
-        Play.insert_many(self._get_play_data(game)).execute()
+        Play.insert_many(self.__get_play_data(game)).execute()
         
-    def _get_play_data(self, game: Game) -> Iterable[Dict[str, Any]]:
-        for play_num, play_row in enumerate(self._get_play_rows()):
-            raw_play_data = self._transformer.extract_raw_play_data(play_row)
-            play_data = self._transformer.transform_raw_play_data(raw_play_data)
+    def __get_play_data(self, game: Game) -> Iterable[Dict[str, Any]]:
+        for play_num, play_row in enumerate(self.__get_play_rows()):
+            raw_play_data = self.__transformer.extract_raw_play_data(play_row)
+            play_data = self.__transformer.transform_raw_play_data(raw_play_data)
             play_data["game_id"] = game.id
             play_data["play_num"] = play_num
             yield play_data
         
-    def _get_pbp_table(self) -> _PlaceholderTable:
+    def __get_pbp_table(self) -> _PlaceholderTable:
         # pbp table placeholder is the 7th on page
-        placeholders = self._soup.find_all("div", {"class": "placeholder"}, limit=7)
+        placeholders = self.__soup.find_all("div", {"class": "placeholder"}, limit=7)
         ph = placeholders[-1]
         return _PlaceholderTable(ph)
     
-    def _get_play_rows(self):
-        return self._pbp_table.find_all(
+    def __get_play_rows(self):
+        return self.__pbp_table.find_all(
             "tr",
             id=lambda id: id and id.startswith("event_")
             )
         
 class _PlayDataTransformer:
     
-    PBP_TO_DB_STATS: Dict[str, Tuple[str, Callable]]
-    PLAYERS: Dict[str, Tuple[str, Callable]]
-    PBP_STATS: Set[str]
-    INNING_CHAR_OFFSET: Dict[str, int]
-    INNING_AND_PLAYER_TO_SIDE: Dict[Tuple[str, str], str]
+    __PBP_TO_DB_STATS: Dict[str, Tuple[str, Callable]]
+    __PLAYERS: Dict[str, Tuple[str, Callable]]
+    __PBP_STATS: Set[str]
+    __INNING_CHAR_OFFSET: Dict[str, int]
+    __INNING_AND_PLAYER_TO_SIDE: Dict[Tuple[str, str], str]
     
     def __init__(self, player_tables: _PlayerTables):
-        self._init_lookups()
-        self._player_maps = {
+        self.__init_lookups()
+        self.__player_maps = {
             "home": player_tables.home.get_name_to_db_ids(),
             "away": player_tables.away.get_name_to_db_ids(),
         }
 
     @classmethod
-    def _init_lookups(cls):
+    def __init_lookups(cls):
         """Initializes dicts to lookup database stat names and
         transformation functions to translate page data to database format.
         This is a class method so it is only done once, as this would be a
@@ -432,65 +428,65 @@ class _PlayDataTransformer:
         if hasattr(cls, "PBP_TO_DB_STATS"):
             return
         # these functions can translate to db data with only raw data as input
-        cls.PBP_TO_DB_STATS = {
-            "inning":               ("inning_half"  , cls._inning_to_inning_half),
-            "pitches_pbp":          ("pitch_ct"     , cls._strip),
-            "play_desc":            ("desc"         , cls._no_transformation_needed),
-            "runners_on_bases_pbp": ("start_on_base", cls._runners_to_on_base),
-            "outs":                 ("start_outs"   , cls._convert_to_int),
+        cls.__PBP_TO_DB_STATS = {
+            "inning":               ("inning_half"  , cls.__inning_to_inning_half),
+            "pitches_pbp":          ("pitch_ct"     , cls.__strip),
+            "play_desc":            ("desc"         , cls.__no_transformation_needed),
+            "runners_on_bases_pbp": ("start_on_base", cls.__runners_to_on_base),
+            "outs":                 ("start_outs"   , cls.__convert_to_int),
         }
         # these functions require knowledge of inning half to determine if home or away player
-        cls.PLAYERS = {
-            "batter":               ("batter_id"    , cls._batter_to_id),
-            "pitcher":              ("pitcher_id"   , cls._pitcher_to_id),
+        cls.__PLAYERS = {
+            "batter":               ("batter_id"    , cls.__batter_to_id),
+            "pitcher":              ("pitcher_id"   , cls.__pitcher_to_id),
         }
-        cls.INNING_CHAR_OFFSET = {
+        cls.__INNING_CHAR_OFFSET = {
             "t": 0,
             "b": 1
         }
         # home team gets to bat in second half of inning (b)
-        cls.INNING_AND_PLAYER_TO_SIDE = {
+        cls.__INNING_AND_PLAYER_TO_SIDE = {
             ("t", "batter") : "away",
             ("b", "batter") : "home",
             ("t", "pitcher"): "home",
             ("b", "pitcher"): "away",
         }
-        cls.PBP_STATS = set(cls.PBP_TO_DB_STATS.keys()).union(set(cls.PLAYERS.keys()))
+        cls.__PBP_STATS = set(cls.__PBP_TO_DB_STATS.keys()).union(set(cls.__PLAYERS.keys()))
         
     def extract_raw_play_data(self, play_row) -> Dict[str, str]:
         raw_play_data: Dict[str, str] = {}
         for play_data_pt in play_row.find_all():
             data_stat = str(play_data_pt.get("data-stat"))
-            if data_stat in self.PBP_STATS:
+            if data_stat in self.__PBP_STATS:
                 raw_play_data[data_stat] = play_data_pt.text.replace(u"\xa0", u" ")
         return raw_play_data
     
     def transform_raw_play_data(self, raw_play_data: Dict[str, str]) -> Dict[str, Any]:
-        transformed_stats = self._transform_stats(raw_play_data)
-        self._insert_player_ids(raw_play_data, into_dict=transformed_stats)
+        transformed_stats = self.__transform_stats(raw_play_data)
+        self.__insert_player_ids(raw_play_data, into_dict=transformed_stats)
         return transformed_stats
     
-    def _transform_stats(self, raw_play_data: Dict[str, str]) -> Dict[str, str]:
+    def __transform_stats(self, raw_play_data: Dict[str, str]) -> Dict[str, str]:
         new_data: Dict[str, str] = {}
-        for pbp_statname, (db_statname, transform_func) in self.PBP_TO_DB_STATS.items():
+        for pbp_statname, (db_statname, transform_func) in self.__PBP_TO_DB_STATS.items():
             new_data[db_statname] = transform_func(self, raw_play_data[pbp_statname])
         return new_data
     
-    def _insert_player_ids(self, raw_play_data: Dict[str, str], into_dict: Dict[str, str]) -> Dict[str, str]:
+    def __insert_player_ids(self, raw_play_data: Dict[str, str], into_dict: Dict[str, str]) -> Dict[str, str]:
         inning_half_char = raw_play_data["inning"][0]
-        for player_type, (player_type_id, player_lookup_func) in self.PLAYERS.items():
+        for player_type, (player_type_id, player_lookup_func) in self.__PLAYERS.items():
             player_name = raw_play_data[player_type]
             into_dict[player_type_id] = player_lookup_func(self, player_name, inning_half_char)
         return into_dict
     
-    def _inning_to_inning_half(self, inning: str) -> int:
+    def __inning_to_inning_half(self, inning: str) -> int:
         #[t|b][0-9]+ (t1, b2, t11, etc)
         inning_num = int(inning[1:])
         inning_half_char = inning[0]
         # 0-indexed (t1 -> 0; b1 -> 1; b2 -> 2 etc)
-        return 2 * (inning_num - 1) + self.INNING_CHAR_OFFSET[inning_half_char]
+        return 2 * (inning_num - 1) + self.__INNING_CHAR_OFFSET[inning_half_char]
     
-    def _runners_to_on_base(self, runners: str) -> int:
+    def __runners_to_on_base(self, runners: str) -> int:
         #[-|1][-|2][-|3] where - means nobody on base (---, 1-3, 12-, etc)
         on_base = 0
         for base, on_base_flag in zip(runners, [OnBase.FIRST, OnBase.SECOND, OnBase.THIRD]):
@@ -498,33 +494,33 @@ class _PlayDataTransformer:
                 on_base += on_base_flag.value
         return on_base
     
-    def _batter_to_id(self, batter_name: str, inning_half_char: str) -> str:
-        return self._player_to_id(batter_name, inning_half_char, "batter")
+    def __batter_to_id(self, batter_name: str, inning_half_char: str) -> str:
+        return self.__player_to_id(batter_name, inning_half_char, "batter")
     
-    def _pitcher_to_id(self, pitcher_name: str, inning_half_char: str) -> str:
-        return self._player_to_id(pitcher_name, inning_half_char, "pitcher")
+    def __pitcher_to_id(self, pitcher_name: str, inning_half_char: str) -> str:
+        return self.__player_to_id(pitcher_name, inning_half_char, "pitcher")
     
-    def _player_to_id(self, player_name: str, inning_half_char: str, player_type: str) -> str:
-        side = self.INNING_AND_PLAYER_TO_SIDE[(inning_half_char, player_type)]
-        pmap = self._player_maps[side]
+    def __player_to_id(self, player_name: str, inning_half_char: str, player_type: str) -> str:
+        side = self.__INNING_AND_PLAYER_TO_SIDE[(inning_half_char, player_type)]
+        pmap = self.__player_maps[side]
         try:
             # first try unedited name, since there's some overhead w/ stripping
             return pmap[player_name]
         except KeyError:
-            stripped_name = GamePage._get_stripped_name(player_name)
+            stripped_name = _NameStripper.get_stripped_name(player_name)
             return pmap[stripped_name]
         
         # if all attempts fail, there's a new edge case that needs to be
         # considered
         raise KeyError(player_name)
         
-    def _strip(self, stat: str) -> str:
+    def __strip(self, stat: str) -> str:
         return stat.strip()
     
-    def _no_transformation_needed(self, stat: str) -> str:
+    def __no_transformation_needed(self, stat: str) -> str:
         return stat
     
-    def _convert_to_int(self, stat: str) -> int:
+    def __convert_to_int(self, stat: str) -> int:
         return int(stat)
 
 class _GamePlayerQueryRunner:
@@ -536,10 +532,10 @@ class _GamePlayerQueryRunner:
         
     def add_game_players(self, game: Game) -> None:
         GamePlayer.insert_many(
-            self._get_rows(game),
+            self.__get_rows(game),
             fields=[GamePlayer.game_id, GamePlayer.player_id]
             ).execute()
 
-    def _get_rows(self, game: Game) -> Iterable[Tuple[int, int]]:
+    def __get_rows(self, game: Game) -> Iterable[Tuple[int, int]]:
         for pid in Player.select(Player.id).where(Player.name_id.in_(self._name_ids)):
             yield (game.id, pid.id)
