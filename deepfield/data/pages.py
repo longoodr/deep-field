@@ -10,7 +10,7 @@ from peewee import Query
 from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
                                      Venue, db)
 from deepfield.data.dependencies import DependencyResolver
-from deepfield.data.enums import FieldType, OnBase, TimeOfDay
+from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
 
 
 class Page(ABC):
@@ -62,10 +62,10 @@ class BBRefPage(Page):
     def __init__(self, html: str, dep_res: DependencyResolver):
         super().__init__(html, dep_res)
         self.base_url = "https://www.baseball-reference.com"
-        self._name = self._get_name()
+        self._name_id = self._get_name_id()
         
-    def _get_name(self):
-        page_suffix = self._soup.find("link", rel="canonical")["href"] # /.../.../name.shtml
+    def _get_name_id(self) -> str:
+        page_suffix = self._soup.find("link", rel="canonical")["href"] # /.../.../name_id.shtml
         return page_suffix.split("/")[-1].split(".")[0]
 
 class SchedulePage(BBRefPage):
@@ -77,7 +77,7 @@ class SchedulePage(BBRefPage):
     def _run_queries(self) -> None:
         return
     
-    def _is_already_inserted(self):
+    def _is_already_inserted(self) -> bool:
         return True
     
     def get_referenced_page_urls(self) -> Iterable[str]:
@@ -91,17 +91,35 @@ class PlayerPage(BBRefPage):
     
     def __init__(self, html: str, dep_res: DependencyResolver):
         super().__init__(html, dep_res)
+        self._player_info = self._soup.find("div", {"itemtype": "https://schema.org/Person"})
     
-    def get_referenced_page_urls(self):
+    def get_referenced_page_urls(self) -> Iterable[str]:
         """PlayerPages don't depend on anything else."""
         return []
     
-    def _is_already_inserted(self):
-        player_record = Player.get_or_none(Player.name_id == self._name)
+    def _is_already_inserted(self) -> bool:
+        player_record = Player.get_or_none(Player.name_id == self._name_id)
         return player_record is not None
     
-    def _run_queries(self):
-        pass
+    def _run_queries(self) -> None:
+        fields = self._get_handedness()
+        fields["name"] = self._player_info.h1.text
+        fields["name_id"] = self._name_id
+        with db.atomic():
+            Player.create(**fields)
+    
+    def _get_player_name(self) -> str:
+        return self._player_info.h1.text
+    
+    _HANDEDNESS_MATCHER = re.compile(r"(?:Bats:|Throws:) (\w+)")
+    
+    def _get_handedness(self) -> Dict[str, Any]: # Bats, Throws
+        handedness_p = self._player_info.find_all("p", limit=2)[-1]
+        hands_text = re.findall(self._HANDEDNESS_MATCHER, handedness_p.text)
+        hands: Dict[str, int] = {}
+        hands["bats"]   = Handedness[hands_text[0].upper()].value
+        hands["throws"] = Handedness[hands_text[1].upper()].value
+        return hands
 
 class GamePage(BBRefPage):
     """A page corresponding to the play-by-play info for a game, along with
@@ -111,11 +129,10 @@ class GamePage(BBRefPage):
     def __init__(self, html: str, dep_res: DependencyResolver):
         super().__init__(html, dep_res)
         self._player_tables = _PlayerTables(self._soup)
-        self._name = self._get_name()
         
     def _run_queries(self) -> None:
         if not hasattr(self, "_query_runner"):
-            self._query_runner = _QueryRunner(self._soup, self._player_tables, self._name)
+            self._query_runner = _GamePageQueryRunner(self._soup, self._player_tables, self._name_id)
         self._query_runner.run_queries()
         
     def get_referenced_page_urls(self) -> Iterable[str]:
@@ -123,8 +140,8 @@ class GamePage(BBRefPage):
         for suffix in self._player_tables.get_page_suffixes():
             yield self.base_url + suffix
             
-    def _is_already_inserted(self):
-        game_record = Game.get_or_none(Game.name_id == self._name)
+    def _is_already_inserted(self) -> bool:
+        game_record = Game.get_or_none(Game.name_id == self._name_id)
         return game_record is not None
     
     """There are a few edge cases for name lookups, since canonical player
@@ -242,7 +259,7 @@ class _PlayerTable(_PlaceholderTable):
     def _player_tag_filter(tag) -> bool:
         return tag.name == "th" and len(tag.attrs) == 5
 
-class _QueryRunner:
+class _GamePageQueryRunner:
     """Handles execution of queries for data contained on a GamePage."""
     
     def __init__(self, soup, player_tables: _PlayerTables, game_name: str):
