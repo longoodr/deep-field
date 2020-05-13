@@ -260,15 +260,19 @@ class _TeamQueryRunner:
     
     def _get_team_info(self) -> Iterable[Tuple[str, str]]:
         """Returns 2 elements, which are tuples of the name and
-        abbreviation for away, home teams respectively
+        abbreviation for away, home teams respectively.
         """
         team_divs = self._scorebox.find_all("div", recursive=False, limit=2)
         for td in team_divs:
-            team_info = td.div.strong.a
-            suffix = team_info["href"] # /teams/abbreviation/year.html
-            abbreviation = suffix.split("/")[2]
-            name = str(team_info.string)
-            yield (name, abbreviation)
+            yield self._get_team_div_info(td)
+    
+    @staticmethod
+    def _get_team_div_info(td) -> Tuple[str, str]:
+        team_info = td.div.strong.a
+        suffix = team_info["href"] # /teams/abbreviation/year.html
+        abbreviation = suffix.split("/")[2]
+        name = str(team_info.string)
+        return name, abbreviation
     
 class _VenueQueryRunner:
     
