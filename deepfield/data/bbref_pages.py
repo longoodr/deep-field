@@ -30,14 +30,14 @@ class BBRefLink(Link):
     def __init__(self, url: str, link_model: Type[DeepFieldModel]):
         self._url = url
         self._link_model = link_model
-        self.name_id = self._get_name_id()
+        self.name_id = self.__get_name_id()
         
     def exists_in_db(self) -> bool:
         expr = self._link_model.name_id == self.name_id
         record = self._link_model.get_or_none(expr)
         return record is not None
     
-    def _get_name_id(self) -> str:
+    def __get_name_id(self) -> str:
         return self._url.split("/")[-1].split(".")[0]
     
 class BBRefInsertablePage(BBRefPage, InsertablePage):
