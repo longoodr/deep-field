@@ -145,17 +145,31 @@ class _PlayerTable(_PlaceholderTable):
     }
             
     def get_page_suffixes(self) -> List[str]:
-        return [self._get_page_suffix(row) for row in self.get_rows()]
+        return [self._get_page_suffix(row) for row in self._get_rows()]
     
     def get_name_ids(self) -> Iterable[str]:
-        return self.get_name_map().values()
+        if not hasattr(self, "__name_ids"):
+            self.__name_ids = [self._get_name_id(row) for row in self._get_rows()]
+        return self.__name_ids
     
-    def get_name_map(self) -> Dict[str, str]:
-        if not hasattr(self, "__name_map"):
-            self.__name_map = {self._get_player_name(row): self._get_player_name_id(row) for row in self.get_rows()}
-        return self.__name_map
+    def get_name_to_name_ids(self) -> Dict[str, str]:
+        if not hasattr(self, "__name_to_name_ids"):
+            self.__name_to_name_ids = {self._get_player_name(row): self._get_name_id(row) for row in self._get_rows()}
+        return self.__name_to_name_ids
     
-    def get_rows(self):
+    def get_name_to_db_ids(self) -> Dict[str, int]:
+        if not hasattr(self, "__name_to_db_ids"):
+            name_ids = set(self.get_name_ids())
+            name_ids_to_name = {nid: name for name, nid
+                                in self.get_name_to_name_ids().items()}
+            db_players = Player.select(Player.id, Player.name_id)\
+                .where(Player.name_id.in_(name_ids))
+            name_ids_to_db_ids = {p.name_id: p.id for p in db_players}
+            self.__name_to_db_ids = {name_ids_to_name[nid]: name_ids_to_db_ids[nid]
+                                    for nid in name_ids}
+        return self.__name_to_db_ids
+    
+    def _get_rows(self):
         if not hasattr(self, "__rows"):
             self.__rows = self.find_all(
                 self._player_tag_filter,
@@ -169,8 +183,7 @@ class _PlayerTable(_PlaceholderTable):
         return GamePage._get_stripped_name(canonical_name)
     
     @staticmethod
-    def _get_player_name_id(row) -> str:
-        # FIXME should return id, not name_id
+    def _get_name_id(row) -> str:
         page_suffix = _PlayerTable._get_page_suffix(row)
         return page_suffix.split("/")[-1].split(".")[0] # smithjo01
     
@@ -185,7 +198,7 @@ class _PlayerTable(_PlaceholderTable):
 class _QueryRunner:
     """Handles execution of queries for data contained on a GamePage."""
     
-    def __init__(self, soup, player_tables):
+    def __init__(self, soup, player_tables: _PlayerTables):
         self._soup = soup
         self._scorebox = self._soup.find("div", {"class": "scorebox"})
         self._scorebox_meta = self._scorebox.find("div", {"class": "scorebox_meta"})
@@ -329,7 +342,7 @@ class _GameQueryRunner:
 
 class _PlayQueryRunner:
     
-    def __init__(self, soup, player_tables):
+    def __init__(self, soup, player_tables: _PlayerTables):
         self._soup = soup
         self._pbp_table = self._get_pbp_table()
         self._transformer = _PlayDataTransformer(player_tables)
@@ -365,11 +378,11 @@ class _PlayDataTransformer:
     INNING_CHAR_OFFSET: Dict[str, int]
     INNING_AND_PLAYER_TO_SIDE: Dict[Tuple[str, str], str]
     
-    def __init__(self, player_tables):
+    def __init__(self, player_tables: _PlayerTables):
         self._init_lookups()
         self._player_maps = {
-            "home": player_tables.home.get_name_map(),
-            "away": player_tables.away.get_name_map(),
+            "home": player_tables.home.get_name_to_db_ids(),
+            "away": player_tables.away.get_name_to_db_ids(),
         }
 
     @classmethod
@@ -479,17 +492,17 @@ class _PlayDataTransformer:
 
 class _GamePlayerQueryRunner:
     
-    def __init__(self, player_tables):
+    def __init__(self, player_tables: _PlayerTables):
         self._player_tables = player_tables
         
     def add_game_players(self, game: Game) -> None:
-        name_ids = set (self._player_tables.home.get_name_ids())
-        name_ids.update(self._player_tables.away.get_name_ids())
-        rows = []
-        # FIXME WHY WON'T THIS WORK???
-        for pid in Player.select().where(Player.name_id in name_ids):
-            rows.append((game.id, pid))
         GamePlayer.insert_many(
-            rows,
+            self._get_rows(game),
             fields=[GamePlayer.game_id, GamePlayer.player_id]
             )
+
+    def _get_rows(self, game: Game) -> Iterable[Tuple[int, int]]:
+        name_ids =  set(self._player_tables.home.get_name_ids())
+        name_ids.update(self._player_tables.away.get_name_ids())
+        for pid in Player.select(Player.id).where(Player.name_id.in_(name_ids)):
+            yield (game.id, pid.id)

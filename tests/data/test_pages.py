@@ -113,7 +113,6 @@ class TestGamePage(TestPage):
                 and Game.home_team_id == home.id
                 and Game.away_team_id == away.id
             )
-        # FIXME players should use ids, not name_ids
         play = Play.get(
                 Play.game_id == game.id
                 and Play.inning_half == 0
@@ -122,8 +121,8 @@ class TestGamePage(TestPage):
                 and Play.play_num == 0
                 and Play.desc == "Double to RF (Line Drive)"
                 and Play.pitch_ct == "2,(0-1) CX"
-                and Play.batter_id == "jayjo02"
-                and Play.pitcher_id == "gonzagi01"
+                and Play.batter_id == self._id_of_name_id("jayjo02")
+                and Play.pitcher_id == self._id_of_name_id("gonzagi01")
             )
         Play.get(
                 Play.game_id == game.id
@@ -133,19 +132,20 @@ class TestGamePage(TestPage):
                 and Play.play_num == 28
                 and Play.desc == "Walk; Bryant to 3B; Contreras to 2B"
                 and Play.pitch_ct == "6,(3-2) CBFBBB"
-                and Play.batter_id == "almoral01"
-                and Play.pitcher_id == "gonzagi01"
+                and Play.batter_id == self._id_of_name_id("almoral01")
+                and Play.pitcher_id == self._id_of_name_id("gonzagi01")
             )
         
     def _insert_mock_players(self) -> None:
         ptables = self.page._player_tables
         with test_db.atomic():
             for table in ptables:
-                pmap = table.get_name_map()
+                pmap = table.get_name_to_name_ids()
                 for name, name_id in pmap.items():
                     self._insert_mock_player(name, name_id)
-        
-    def _insert_mock_player(self, name: str, name_id: str) -> None:
+    
+    @staticmethod    
+    def _insert_mock_player(name: str, name_id: str) -> None:
         fields = {
             "name": name,
             "name_id": name_id,
@@ -153,3 +153,7 @@ class TestGamePage(TestPage):
             "throws": Handedness.RIGHT.value,
         }
         Player.create(**fields)
+
+    @staticmethod
+    def _id_of_name_id(name_id: str) -> int:
+        return Player.get(Player.name_id == name_id).id
