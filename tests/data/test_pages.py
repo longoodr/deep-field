@@ -7,7 +7,6 @@ from peewee import SqliteDatabase
 
 from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
                                      Venue, db)
-from deepfield.data.dependencies import IgnoreDependencies
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.data.pages import GamePage, Page, PlayerPage, SchedulePage
 
@@ -30,7 +29,7 @@ class TestPage:
         file_path = (get_res_path(cls.name)).resolve()
         with open(file_path, "r", encoding="utf-8") as page_file:
             html = page_file.read()
-            cls.page = cls.page_type(html, IgnoreDependencies())
+            cls.page = cls.page_type(html)
     
     @classmethod
     def teardown_method(cls):
@@ -42,7 +41,7 @@ class TestPage:
 
     @classmethod
     def test_urls(cls, on_list_suffixes: Iterable[str], not_on_list_suffixes: Iterable[str]):
-        page_urls = set(cls.page.get_referenced_page_urls())
+        page_urls = set([str(link) for link in cls.page.get_links()])
         for url in cls.expand_urls(on_list_suffixes):
             assert url in page_urls
         for url in cls.expand_urls(not_on_list_suffixes):
@@ -72,9 +71,9 @@ class TestPlayerPage(TestPage):
     page_type = PlayerPage
     
     def test_queries(self):
-        assert not self.page._is_already_inserted()
+        assert not self.page._exists_in_db()
         self.page.update_db()
-        assert self.page._is_already_inserted()
+        assert self.page._exists_in_db()
         Player.get(Player.name == "Pat Venditte"
                    and Player.name_id == "vendipa01"
                    and Player.bats == Handedness.LEFT.value
@@ -100,9 +99,9 @@ class TestGamePage(TestPage):
 
     def test_queries(self):
         self._insert_mock_players()
-        assert not self.page._is_already_inserted()
+        assert not self.page._exists_in_db()
         self.page.update_db()
-        assert self.page._is_already_inserted()
+        assert self.page._exists_in_db()
         venue = Venue.get(Venue.name == "Nationals Park")
         home = Team.get(Team.name == "Washington Nationals" and Team.abbreviation == "WSN")
         away = Team.get(Team.name == "Chicago Cubs" and Team.abbreviation == "CHC")

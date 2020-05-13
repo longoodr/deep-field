@@ -1,40 +1,61 @@
 import re
 from abc import ABC, abstractmethod
 from datetime import date, datetime, time
-from typing import Any, Callable, Dict, Iterable, List, Set, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Set, Tuple, Type
 
 import requests
 from bs4 import BeautifulSoup, Comment
 from peewee import Query
 
-from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
-                                     Venue, db)
-from deepfield.data.dependencies import DependencyResolver
+from deepfield.data.dbmodels import (DeepFieldModel, Game, GamePlayer, Play,
+                                     Player, Team, Venue, db)
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
 
 
+class Link(ABC):
+    """A page located at a URL that can determine if itself already exists in 
+    the database or not.
+    """
+    
+    def __init__(self, url: str):
+        self._url = url
+    
+    @abstractmethod
+    def exists_in_db(self) -> bool:
+        """Returns whether this page already exists in the database."""
+        pass
+    
+    def __str__(self):
+        return self._url
+
 class Page(ABC):
-    """A collection of data located on an HTML page. A page may have
-    dependencies on pages located at URLs. This induces a dependency DAG which
-    can be traversed via DFS by a scraper. The page will refuse to insert its
-    data unless all these dependencies are resolved by the given
-    DependencyResolver.
+    """A collection of data located on an HTML page that references other pages
+    via links.
     """
         
-    def __init__(self, html: str, dep_res: DependencyResolver):
+    def __init__(self, html: str):
         self._soup = BeautifulSoup(html, "lxml")
-        self._dep_res = dep_res
+    
+    @abstractmethod
+    def get_links(self) -> Iterable[Link]:
+        """Enumerates all referenced links on this page."""
+        pass
+    
+class InsertablePage(Page):
+    """A page containing data that can be inserted into the database. All
+    referenced links are treated as dependencies of this page.
+    """
     
     def update_db(self) -> None:
         """Inserts all models on this page into the database. This method
         requires all dependent pages to already exist in the database. If the
         page already exists in the database, this won't do anything.
         """
-        if self._is_already_inserted():
+        if self._exists_in_db():
             return
-        for url in self.get_referenced_page_urls():
-            if not self._dep_res.is_url_resolved(url):
-                raise ValueError(f"Dependency for {url} not resolved")
+        for link in self.get_links():
+            if not link.exists_in_db():
+                raise ValueError(f"Dependency for {link} not resolved")
         self._run_queries()
         
     @abstractmethod
@@ -45,66 +66,73 @@ class Page(ABC):
         pass
     
     @abstractmethod
-    def get_referenced_page_urls(self) -> Iterable[str]:
-        """Enumerates all referenced URLs that data on this page depend on."""
-        pass
-    
-    @abstractmethod
-    def _is_already_inserted(self) -> bool:
-        """Returns whether this page already exists in the database; if True,
-        the page won't update the database when asked to.
-        """
+    def _exists_in_db(self) -> bool:
+        """Returns whether this page already exists in the database."""
         pass
 
 class BBRefPage(Page):
-    """A page from baseball-reference.com"""
+    """A page from baseball-reference.com."""
     
-    def __init__(self, html: str, dep_res: DependencyResolver):
-        super().__init__(html, dep_res)
+    def __init__(self, html: str):
+        super().__init__(html)
         self.base_url = "https://www.baseball-reference.com"
-        self._name_id = self._get_name_id()
+        self.url = self._soup.find("link", rel="canonical")["href"]
+    
+class BBRefLink(Link):
+    """A link from baseball-reference.com. These links all follow a similar
+    format, where the last component of the URL is the name_id for the
+    corresponding record in the database: "/.../.../name_id.ext"
+    """
+    
+    def __init__(self, url: str, link_model: Type[DeepFieldModel]):
+        self._url = url
+        self._link_model = link_model
+        self.name_id = self._get_name_id()
         
+    def exists_in_db(self) -> bool:
+        expr = self._link_model.name_id == self.name_id
+        record = self._link_model.get_or_none(expr)
+        return record is not None
+    
     def _get_name_id(self) -> str:
-        page_suffix = self._soup.find("link", rel="canonical")["href"] # /.../.../name_id.shtml
-        return page_suffix.split("/")[-1].split(".")[0]
+        return self._url.split("/")[-1].split(".")[0]
+    
+class BBRefInsertablePage(BBRefPage, InsertablePage):
+    
+    def __init__(self, html: str, model: Type[DeepFieldModel]):
+        super().__init__(html)
+        self.base_url = "https://www.baseball-reference.com"
+        url = self._soup.find("link", rel="canonical")["href"]
+        self._link = BBRefLink(url, model)
+        
+    def _exists_in_db(self):
+        return self._link.exists_in_db()
 
 class SchedulePage(BBRefPage):
     """A page containing a set of URLs corresponding to game pages."""
     
-    """Note that a SchedulePage has no data to be inserted, so there are no
-    queries and the page is already inserted by default.
-    """
-    def _run_queries(self) -> None:
-        return
-    
-    def _is_already_inserted(self) -> bool:
-        return True
-    
-    def get_referenced_page_urls(self) -> Iterable[str]:
+    def get_links(self) -> Iterable[Link]:
         games = self._soup.find_all("p", {"class": "game"})
         for game in games:
             suffix = game.em.a["href"]
-            yield self.base_url + suffix
+            url = self.base_url + suffix
+            yield BBRefLink(url, Game)
 
-class PlayerPage(BBRefPage):
+class PlayerPage(BBRefInsertablePage):
     """A page containing info on a given player."""
     
-    def __init__(self, html: str, dep_res: DependencyResolver):
-        super().__init__(html, dep_res)
+    def __init__(self, html: str):
+        super().__init__(html, Player)
         self._player_info = self._soup.find("div", {"itemtype": "https://schema.org/Person"})
     
-    def get_referenced_page_urls(self) -> Iterable[str]:
+    def get_links(self) -> Iterable[Link]:
         """PlayerPages don't depend on anything else."""
         return []
-    
-    def _is_already_inserted(self) -> bool:
-        player_record = Player.get_or_none(Player.name_id == self._name_id)
-        return player_record is not None
     
     def _run_queries(self) -> None:
         fields = self._get_handedness()
         fields["name"] = self._player_info.h1.text
-        fields["name_id"] = self._name_id
+        fields["name_id"] = self._link.name_id
         with db.atomic():
             Player.create(**fields)
     
@@ -121,27 +149,28 @@ class PlayerPage(BBRefPage):
         hands["throws"] = Handedness[hands_text[1].upper()].value
         return hands
 
-class GamePage(BBRefPage):
+class GamePage(BBRefInsertablePage):
     """A page corresponding to the play-by-play info for a game, along with
     relevant info relating to the play-by-play data.
     """
     
-    def __init__(self, html: str, dep_res: DependencyResolver):
-        super().__init__(html, dep_res)
+    def __init__(self, html: str):
+        super().__init__(html, Game)
         self._player_tables = _PlayerTables(self._soup)
         
     def _run_queries(self) -> None:
         if not hasattr(self, "_query_runner"):
-            self._query_runner = _GamePageQueryRunner(self._soup, self._player_tables, self._name_id)
+            self._query_runner = _GamePageQueryRunner(self._soup, self._player_tables, self._link.name_id)
         self._query_runner.run_queries()
         
-    def get_referenced_page_urls(self) -> Iterable[str]:
-        """For a GamePage, the referenced URLs are just the players' pages."""
+    def get_links(self) -> Iterable[Link]:
+        """For a GamePage, the referenced links are the players' pages."""
         for suffix in self._player_tables.get_page_suffixes():
-            yield self.base_url + suffix
+            url = self.base_url + suffix
+            yield BBRefLink(url, Player)
             
     def _is_already_inserted(self) -> bool:
-        game_record = Game.get_or_none(Game.name_id == self._name_id)
+        game_record = Game.get_or_none(Game.name_id == self._link.name_id)
         return game_record is not None
     
     """There are a few edge cases for name lookups, since canonical player
@@ -249,7 +278,7 @@ class _PlayerTable(_PlaceholderTable):
     @staticmethod
     def _get_name_id(row) -> str:
         page_suffix = _PlayerTable._get_page_suffix(row)
-        return page_suffix.split("/")[-1].split(".")[0] # smithjo01
+        return BBRefLink(page_suffix, Player).name_id
     
     @staticmethod
     def _get_page_suffix(row) -> str:
