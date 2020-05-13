@@ -1,7 +1,7 @@
 from peewee import (CharField, DateField, FixedCharField, ForeignKeyField,
                     Model, SmallIntegerField, SqliteDatabase, TimeField)
 
-db = SqliteDatabase('stats.db')
+db = SqliteDatabase(None)
 
 class DeepFieldModel(Model):
     class Meta:
@@ -44,5 +44,3 @@ class Play(DeepFieldModel):
     pitch_ct = CharField(null=True)
     batter_id = ForeignKeyField(Player)
     pitcher_id = ForeignKeyField(Player)
-
-db.create_tables([Game, Venue, Team, Player, Play])

@@ -5,24 +5,17 @@ from typing import Iterable, Type
 import pytest
 from peewee import SqliteDatabase
 
-from deepfield.data.dbmodels import Game, Play, Player, Team, Venue
+from deepfield.data.dbmodels import Game, Play, Player, Team, Venue, db
 from deepfield.data.dependencies import IgnoreDependencies
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.data.pages import GamePage, Page, SchedulePage
 
-test_db = SqliteDatabase(":memory:")
+db.init(":memory:")
 MODELS = [Game, Play, Player, Team, Venue]
 
 def get_res_path(name: str) -> Path:
     base_path = Path(__file__).parent
     return (base_path / ("resources/" + name)).resolve()
-
-def setup_module(module):
-    test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)
-    test_db.connect()
-
-def teardown_module(module):
-    test_db.close()
 
 class TestPage:
             
@@ -32,7 +25,7 @@ class TestPage:
     
     @classmethod
     def setup_method(cls):
-        test_db.create_tables(MODELS)
+        db.create_tables(MODELS)
         file_path = (get_res_path(cls.name)).resolve()
         with open(file_path, "r", encoding="utf-8") as page_file:
             html = page_file.read()
@@ -40,7 +33,7 @@ class TestPage:
     
     @classmethod
     def teardown_method(cls):
-        test_db.drop_tables(MODELS)
+        db.drop_tables(MODELS)
     
     @classmethod
     def expand_urls(cls, suffixes: Iterable[str]) -> Iterable[str]:
@@ -138,7 +131,7 @@ class TestGamePage(TestPage):
         
     def _insert_mock_players(self) -> None:
         ptables = self.page._player_tables
-        with test_db.atomic():
+        with db.atomic():
             for table in ptables:
                 pmap = table.get_name_to_name_ids()
                 for name, name_id in pmap.items():
