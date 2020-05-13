@@ -18,6 +18,7 @@ class InningHalf(Enum):
     BTM = 1
 
 class OnBase(IntFlag):
+    EMPTY = 0
     FIRST = 1
     SECOND = 2
     THIRD = 4
