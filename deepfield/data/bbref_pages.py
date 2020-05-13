@@ -33,7 +33,7 @@ class BBRefLink(Link):
         self.name_id = self.__get_name_id()
         
     def exists_in_db(self) -> bool:
-        expr = self._link_model.name_id == self.name_id
+        expr = (self._link_model.name_id == self.name_id)
         record = self._link_model.get_or_none(expr)
         return record is not None
     
