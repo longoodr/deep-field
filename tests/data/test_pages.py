@@ -5,13 +5,14 @@ from typing import Iterable, Type
 import pytest
 from peewee import SqliteDatabase
 
-from deepfield.data.dbmodels import Game, Play, Player, Team, Venue, db
+from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
+                                     Venue, db)
 from deepfield.data.dependencies import IgnoreDependencies
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.data.pages import GamePage, Page, SchedulePage
 
 db.init(":memory:")
-MODELS = [Game, Play, Player, Team, Venue]
+MODELS = (Game, GamePlayer, Play, Player, Team, Venue)
 
 def get_res_path(name: str) -> Path:
     base_path = Path(__file__).parent
@@ -128,6 +129,9 @@ class TestGamePage(TestPage):
                 and Play.batter_id == self._id_of_name_id("almoral01")
                 and Play.pitcher_id == self._id_of_name_id("gonzagi01")
             )
+        num_game_players = len(GamePlayer.select().where(GamePlayer.game_id == game.id))
+        num_players = len(Player.select())
+        assert(num_game_players == num_players)
         
     def _insert_mock_players(self) -> None:
         ptables = self.page._player_tables

@@ -7,7 +7,8 @@ import requests
 from bs4 import BeautifulSoup, Comment
 from peewee import Query
 
-from deepfield.data.dbmodels import Game, GamePlayer, Play, Player, Team, Venue
+from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
+                                     Venue, db)
 from deepfield.data.dependencies import DependencyResolver
 from deepfield.data.enums import FieldType, OnBase, TimeOfDay
 
@@ -209,11 +210,12 @@ class _QueryRunner:
         self._pbp_adder = _PlayQueryRunner(self._soup, player_tables)
         
     def run_queries(self) -> None:
-        teams = self._team_adder.add_teams()
-        venue = self._venue_adder.add_venue()
-        game = self._game_adder.add_game(teams, venue)
-        self._game_player_adder.add_game_players(game)
-        self._pbp_adder.add_plays(game)
+        with db.atomic():
+            teams = self._team_adder.add_teams()
+            venue = self._venue_adder.add_venue()
+            game = self._game_adder.add_game(teams, venue)
+            self._game_player_adder.add_game_players(game)
+            self._pbp_adder.add_plays(game)
         
 class _TeamQueryRunner:
     
@@ -228,19 +230,17 @@ class _TeamQueryRunner:
             teams.append(team)
         return teams
     
-    def _get_team_info(self) -> List[Tuple[str, str]]:
-        """Returns a 2 element list, which contains tuples of the name and
+    def _get_team_info(self) -> Iterable[Tuple[str, str]]:
+        """Returns 2 elements, which are tuples of the name and
         abbreviation for away, home teams respectively
         """
         team_divs = self._scorebox.find_all("div", recursive=False, limit=2)
-        info: List[Tuple[str, str]] = []
         for td in team_divs:
             team_info = td.div.strong.a
             suffix = team_info["href"] # /teams/abbreviation/year.html
             abbreviation = suffix.split("/")[2]
             name = str(team_info.string)
-            info.append((name, abbreviation))
-        return info
+            yield (name, abbreviation)
     
 class _VenueQueryRunner:
     
@@ -348,15 +348,15 @@ class _PlayQueryRunner:
         self._transformer = _PlayDataTransformer(player_tables)
             
     def add_plays(self, game: Game) -> None:
-        for play_num, play_row in enumerate(self._get_play_rows()):
-            self._add_play(play_row, play_num, game)
+        Play.insert_many(self._get_play_data(game)).execute()
         
-    def _add_play(self, play_row, play_num: int, game: Game) -> None:
-        raw_play_data = self._transformer.extract_raw_play_data(play_row)
-        play_data = self._transformer.transform_raw_play_data(raw_play_data)
-        play_data["game_id"] = game.id
-        play_data["play_num"] = play_num
-        Play.get_or_create(**play_data)
+    def _get_play_data(self, game: Game) -> Iterable[Dict[str, Any]]:
+        for play_num, play_row in enumerate(self._get_play_rows()):
+            raw_play_data = self._transformer.extract_raw_play_data(play_row)
+            play_data = self._transformer.transform_raw_play_data(raw_play_data)
+            play_data["game_id"] = game.id
+            play_data["play_num"] = play_num
+            yield play_data
         
     def _get_pbp_table(self) -> _PlaceholderTable:
         # pbp table placeholder is the 7th on page
@@ -493,16 +493,16 @@ class _PlayDataTransformer:
 class _GamePlayerQueryRunner:
     
     def __init__(self, player_tables: _PlayerTables):
-        self._player_tables = player_tables
+        name_ids =  set(player_tables.home.get_name_ids())
+        name_ids.update(player_tables.away.get_name_ids())
+        self._name_ids = name_ids
         
     def add_game_players(self, game: Game) -> None:
         GamePlayer.insert_many(
             self._get_rows(game),
             fields=[GamePlayer.game_id, GamePlayer.player_id]
-            )
+            ).execute()
 
     def _get_rows(self, game: Game) -> Iterable[Tuple[int, int]]:
-        name_ids =  set(self._player_tables.home.get_name_ids())
-        name_ids.update(self._player_tables.away.get_name_ids())
-        for pid in Player.select(Player.id).where(Player.name_id.in_(name_ids)):
+        for pid in Player.select(Player.id).where(Player.name_id.in_(self._name_ids)):
             yield (game.id, pid.id)
