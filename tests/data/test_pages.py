@@ -7,7 +7,7 @@ from peewee import SqliteDatabase
 
 from deepfield.data.dbmodels import Game, Play, Player, Team, Venue
 from deepfield.data.dependencies import IgnoreDependencies
-from deepfield.data.enums import FieldType, OnBase, TimeOfDay
+from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.data.pages import GamePage, Page, SchedulePage
 
 test_db = SqliteDatabase(":memory:")
@@ -98,11 +98,12 @@ class TestGamePage(TestPage):
         testing practices would probably encourage just hardcoding mock player
         records...
         """
+        self._insert_mock_players()
         self.page._run_queries()
         venue = Venue.get(Venue.name == "Nationals Park")
         home = Team.get(Team.name == "Washington Nationals" and Team.abbreviation == "WSN")
         away = Team.get(Team.name == "Chicago Cubs" and Team.abbreviation == "CHC")
-        Game.get(
+        game = Game.get(
                 Game.name_id == "WAS201710120"
                 and Game.local_start_time == time(20, 8)
                 and Game.time_of_day == TimeOfDay.NIGHT.value
@@ -112,3 +113,43 @@ class TestGamePage(TestPage):
                 and Game.home_team_id == home.id
                 and Game.away_team_id == away.id
             )
+        # FIXME players should use ids, not name_ids
+        play = Play.get(
+                Play.game_id == game.id
+                and Play.inning_half == 0
+                and Play.start_outs == 0
+                and Play.start_on_base == OnBase.EMPTY.value
+                and Play.play_num == 0
+                and Play.desc == "Double to RF (Line Drive)"
+                and Play.pitch_ct == "2,(0-1) CX"
+                and Play.batter_id == "jayjo02"
+                and Play.pitcher_id == "gonzagi01"
+            )
+        Play.get(
+                Play.game_id == game.id
+                and Play.inning_half == 4
+                and Play.start_outs == 1
+                and Play.start_on_base == (OnBase.FIRST | OnBase.SECOND).value
+                and Play.play_num == 28
+                and Play.desc == "Walk; Bryant to 3B; Contreras to 2B"
+                and Play.pitch_ct == "6,(3-2) CBFBBB"
+                and Play.batter_id == "almoral01"
+                and Play.pitcher_id == "gonzagi01"
+            )
+        
+    def _insert_mock_players(self) -> None:
+        ptables = self.page._player_tables
+        with test_db.atomic():
+            for table in ptables:
+                pmap = table.get_name_map()
+                for name, name_id in pmap.items():
+                    self._insert_mock_player(name, name_id)
+        
+    def _insert_mock_player(self, name: str, name_id: str) -> None:
+        fields = {
+            "name": name,
+            "name_id": name_id,
+            "bats": Handedness.RIGHT.value,
+            "throws": Handedness.RIGHT.value,
+        }
+        Player.create(**fields)

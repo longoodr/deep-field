@@ -165,6 +165,7 @@ class _PlayerTable(_PlaceholderTable):
     
     @staticmethod
     def _get_player_id(row) -> str:
+        # FIXME should return id, not name_id
         page_suffix = _PlayerTable._get_page_suffix(row)
         return page_suffix.split("/")[-1].split(".")[0] # smithjo01
     
@@ -376,7 +377,7 @@ class _PlayDataTransformer:
         # these functions can translate to db data with only raw data as input
         cls.PBP_TO_DB_STATS = {
             "inning":               ("inning_half"  , cls._inning_to_inning_half),
-            "pitches_pbp":          ("pitch_ct"     , cls._no_transformation_needed),
+            "pitches_pbp":          ("pitch_ct"     , cls._strip),
             "play_desc":            ("desc"         , cls._no_transformation_needed),
             "runners_on_bases_pbp": ("start_on_base", cls._runners_to_on_base),
             "outs":                 ("start_outs"   , cls._convert_to_int),
@@ -459,6 +460,9 @@ class _PlayDataTransformer:
         # if all attempts fail, there's a new edge case that needs to be
         # considered
         raise KeyError(player_name)
+        
+    def _strip(self, stat: str) -> str:
+        return stat.strip()
     
     def _no_transformation_needed(self, stat: str) -> str:
         return stat
