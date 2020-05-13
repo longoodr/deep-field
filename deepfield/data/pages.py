@@ -27,8 +27,11 @@ class Page(ABC):
     
     def update_db(self) -> None:
         """Inserts all models on this page into the database. This method
-        requires all dependent pages to already exist in the database.
+        requires all dependent pages to already exist in the database. If the
+        page already exists in the database, this won't do anything.
         """
+        if self._is_already_inserted():
+            return
         for url in self.get_referenced_page_urls():
             if not self._dep_res.is_url_resolved(url):
                 raise ValueError(f"Dependency for {url} not resolved")
@@ -36,14 +39,21 @@ class Page(ABC):
         
     @abstractmethod
     def _run_queries(self) -> None:
-        """Enumerates all queries that need to be executed to properly insert
-        this page into the database.
+        """Runs all queries that need to be executed to properly insert this
+        page into the database.
         """
         pass
     
     @abstractmethod
     def get_referenced_page_urls(self) -> Iterable[str]:
-        """Enumerates all referenced URLs that models on this page depend on."""
+        """Enumerates all referenced URLs that data on this page depend on."""
+        pass
+    
+    @abstractmethod
+    def _is_already_inserted(self) -> bool:
+        """Returns whether this page already exists in the database; if True,
+        the page won't update the database when asked to.
+        """
         pass
 
 class BBRefPage(Page):
@@ -56,16 +66,20 @@ class BBRefPage(Page):
 class SchedulePage(BBRefPage):
     """A page containing a set of URLs corresponding to game pages."""
     
+    """Note that a SchedulePage has no data to be inserted, so there are no
+    queries and the page is already inserted by default.
+    """
     def _run_queries(self) -> None:
         return
     
+    def _is_already_inserted(self):
+        return True
+    
     def get_referenced_page_urls(self) -> Iterable[str]:
-        urls = []
         games = self._soup.find_all("p", {"class": "game"})
         for game in games:
             suffix = game.em.a["href"]
-            urls.append(self.base_url + suffix)
-        return urls
+            yield self.base_url + suffix
 
 class GamePage(BBRefPage):
     """A page corresponding to the play-by-play info for a game, along with
@@ -75,18 +89,25 @@ class GamePage(BBRefPage):
     def __init__(self, html: str, dep_res: DependencyResolver):
         super().__init__(html, dep_res)
         self._player_tables = _PlayerTables(self._soup)
+        self._name = self._get_name()
         
     def _run_queries(self) -> None:
         if not hasattr(self, "_query_runner"):
-            self._query_runner = _QueryRunner(self._soup, self._player_tables)
+            self._query_runner = _QueryRunner(self._soup, self._player_tables, self._name)
         self._query_runner.run_queries()
         
     def get_referenced_page_urls(self) -> Iterable[str]:
         """For a GamePage, the referenced URLs are just the players' pages."""
-        player_suffixes = []
-        for table in self._player_tables:
-            player_suffixes += table.get_page_suffixes()
-        return [self.base_url + s for s in player_suffixes]
+        for suffix in self._player_tables.get_page_suffixes():
+            yield self.base_url + suffix
+            
+    def _is_already_inserted(self):
+        game_model = Game.get_or_none(Game.name_id == self._name)
+        return game_model is not None
+    
+    def _get_name(self):
+        page_suffix = self._soup.find("link", rel="canonical")["href"] # /.../.../name.shtml
+        return page_suffix.split("/")[-1].split(".")[0] # i.e. "WAS201710120"
     
     """There are a few edge cases for name lookups, since canonical player
     names and the names presented in play rows vary slightly. Players known
@@ -124,6 +145,12 @@ class _PlayerTables:
         ptable_placeholders = list(soup.find_all("div", {"class": "placeholder"}, limit=2))
         self.away = _PlayerTable(ptable_placeholders[0])
         self.home = _PlayerTable(ptable_placeholders[1])
+    
+    def get_page_suffixes(self) -> Iterable[str]:
+        for suffix in self.away.get_page_suffixes():
+            yield suffix
+        for suffix in self.home.get_page_suffixes():
+            yield suffix
         
     def __iter__(self):
         self._tables = [self.away, self.home]
@@ -145,8 +172,9 @@ class _PlayerTable(_PlaceholderTable):
         "scope": "row"
     }
             
-    def get_page_suffixes(self) -> List[str]:
-        return [self._get_page_suffix(row) for row in self._get_rows()]
+    def get_page_suffixes(self) -> Iterable[str]:
+        for row in self._get_rows():
+            yield self._get_page_suffix(row)
     
     def get_name_ids(self) -> Iterable[str]:
         if not hasattr(self, "__name_ids"):
@@ -199,13 +227,13 @@ class _PlayerTable(_PlaceholderTable):
 class _QueryRunner:
     """Handles execution of queries for data contained on a GamePage."""
     
-    def __init__(self, soup, player_tables: _PlayerTables):
+    def __init__(self, soup, player_tables: _PlayerTables, game_name: str):
         self._soup = soup
         self._scorebox = self._soup.find("div", {"class": "scorebox"})
         self._scorebox_meta = self._scorebox.find("div", {"class": "scorebox_meta"})
         self._team_adder = _TeamQueryRunner(self._scorebox)
         self._venue_adder = _VenueQueryRunner(self._scorebox_meta)
-        self._game_adder = _GameQueryRunner(self._soup, self._scorebox_meta)
+        self._game_adder = _GameQueryRunner(self._soup, self._scorebox_meta, game_name)
         self._game_player_adder = _GamePlayerQueryRunner(player_tables)
         self._pbp_adder = _PlayQueryRunner(self._soup, player_tables)
         
@@ -262,14 +290,13 @@ class _VenueQueryRunner:
     
 class _GameQueryRunner:
     
-    def __init__(self, soup, scorebox_meta):
+    def __init__(self, soup, scorebox_meta, game_name: str):
         self._scorebox_meta = scorebox_meta
-        page_url = soup.find("link", rel="canonical")["href"] # /.../.../name.shtml
-        self._name = page_url.split("/")[-1].split(".")[0]
+        self._game_name = game_name
 
     def add_game(self, teams: List[Team], venue: Venue) -> Game:
         fields = {
-            "name_id"         : self._name,
+            "name_id"         : self._game_name,
             "local_start_time": self._get_local_start_time(),
             "time_of_day"     : self._enum_to_int(self._get_time_of_day()),
             "field_type"      : self._enum_to_int(self._get_field_type()),
