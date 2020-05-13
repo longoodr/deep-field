@@ -86,7 +86,9 @@ class TestGamePage(TestPage):
 
     def test_queries(self):
         self._insert_mock_players()
-        self.page._run_queries()
+        assert not self.page._is_already_inserted()
+        self.page.update_db()
+        assert self.page._is_already_inserted()
         venue = Venue.get(Venue.name == "Nationals Park")
         home = Team.get(Team.name == "Washington Nationals" and Team.abbreviation == "WSN")
         away = Team.get(Team.name == "Chicago Cubs" and Team.abbreviation == "CHC")
