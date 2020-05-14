@@ -2,7 +2,7 @@ import pytest
 
 from deepfield.data.bbref_pages import (BBRefLink, GamePage, PlayerPage,
                                         SchedulePage)
-from deepfield.data.scraper import BBRefPageFactory, HtmlCache
+from deepfield.data.scraper import PageFactory, HtmlCache
 import tests.data.test_utils
 
 RES_URLS = [
@@ -15,7 +15,7 @@ class TestBBRefPageFactory:
     
     def test_page_types(self):
         for url, page_type in zip(RES_URLS, [GamePage, SchedulePage, PlayerPage]):
-            assert type(BBRefPageFactory.create_page_from_url(url)) == page_type
+            assert type(PageFactory.create_page_from_url(url)) == page_type
 
 class TestCache:
     

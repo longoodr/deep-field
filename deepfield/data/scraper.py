@@ -7,17 +7,18 @@ from typing import Dict, Iterable, Optional, Set, Tuple, Type
 import requests
 from requests.exceptions import HTTPError
 
+from deepfield.data.page_defs import Page, InsertablePage
 from deepfield.data.bbref_pages import (BBRefLink, BBRefPage, GamePage,
                                         PlayerPage, SchedulePage)
 from deepfield.data.dbmodels import Game, Player
 from pathlib import Path
 
-
-class BBRefPageFactory:
-    """Creates BBRefPages from BBRefLinks."""
+    
+class PageFactory:
+    """Creates pages from links."""
     
     @staticmethod
-    def create_page_from_url(url: str) -> BBRefPage:
+    def create_page_from_url(url: str) -> Page:
         link = BBRefLink(url)
         html = _HtmlRetriever(link).retrieve_html()
         if html is None:
