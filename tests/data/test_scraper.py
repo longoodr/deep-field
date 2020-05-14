@@ -12,7 +12,6 @@ class TestBBRefPageFactory:
         for url, page_type in [
             ("https://www.baseball-reference.com/boxes/WAS/WAS201710120.shtml"   , GamePage),
             ("https://www.baseball-reference.com/leagues/MLB/2016-schedule.shtml", SchedulePage),
-            ("https://www.baseball-reference.com/players/v/vendipa01.shtml", PlayerPage)
+            ("https://www.baseball-reference.com/players/v/vendipa01.shtml"      , PlayerPage)
         ]:
-            link = BBRefLink(url)
-            assert type(BBRefPageFactory().create_page_from_link(link)) == page_type
+            assert type(BBRefPageFactory().create_page_from_url(url)) == page_type

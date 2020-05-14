@@ -1,5 +1,10 @@
 from abc import ABC, abstractmethod
+from time import sleep
+from time import time as get_cur_time
 from typing import Iterable, Optional, Type
+
+import requests
+from requests.exceptions import HTTPError
 
 from deepfield.data.bbref_pages import (BBRefLink, BBRefPage, GamePage,
                                         PlayerPage, SchedulePage)
@@ -9,7 +14,8 @@ from deepfield.data.dbmodels import Game, Player
 class BBRefPageFactory:
     """Creates BBRefPages from BBRefLinks."""
     
-    def create_page_from_link(self, link: BBRefLink) -> BBRefPage:
+    def create_page_from_url(self, url: str) -> BBRefPage:
+        link = BBRefLink(url)
         html = HtmlRetriever(link).retrieve_html()
         if html is None:
             raise ValueError(f"Could not get HTML for {link}")
@@ -30,13 +36,35 @@ class CachedHandler(AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link from local cache."""
 
     def retrieve_html(self) -> Optional[str]:
-        raise NotImplementedError
+        return None
     
 class WebHandler(AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link from the web."""
     
+    # baseball-reference.com's robots.txt specifies a crawl delay of 3 seconds
+    __CRAWL_DELAY = 3
+    __last_pull_time = 0.0
+    
     def retrieve_html(self) -> Optional[str]:
-        raise NotImplementedError
+        self.__wait_until_can_pull()
+        self.__set_last_pull_time()
+        response = requests.get(str(self._link))
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError:
+            return None
+        return response.text
+    
+    def __wait_until_can_pull(self) -> None:
+        t = get_cur_time()
+        if self.__last_pull_time <= t - self.__CRAWL_DELAY:
+            return
+        secs_to_wait = max(0, self.__last_pull_time + self.__CRAWL_DELAY - t)
+        sleep(secs_to_wait)
+        
+    @classmethod
+    def __set_last_pull_time(cls):
+        cls.__last_pull_time = get_cur_time()
     
 class HtmlRetriever(AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link."""
