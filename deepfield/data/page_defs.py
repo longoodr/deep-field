@@ -42,6 +42,11 @@ class Page(ABC):
         """Enumerates all referenced links on this page."""
         pass
     
+    def __hash__(self):
+        if not hasattr(self, "_hash"):
+            self._hash = hash(str(self._soup))
+        return self._hash
+    
 class InsertablePage(Page):
     """A page containing data that can be inserted into the database. All
     referenced links are treated as dependencies of this page.
