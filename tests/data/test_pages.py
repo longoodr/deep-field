@@ -5,26 +5,28 @@ from typing import Iterable, Type
 import pytest
 from pytest import raises
 
-from deepfield.data.bbref_pages import BBRefLink, BBRefPage, GamePage, PlayerPage, SchedulePage
+import tests.data.test_utils
+from deepfield.data.bbref_pages import (BBRefLink, BBRefPage, GamePage,
+                                        PlayerPage, SchedulePage)
 from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
                                      Venue, db)
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
-import tests.data.test_utils
-from deepfield.data.scraper import HtmlCache
+from deepfield.data.scraper import HtmlCache, PageFactory
 
 db.init(":memory:")
 MODELS = (Game, GamePlayer, Play, Player, Team, Venue)
 
 class TestPage:
             
+    name: str
     page: BBRefPage
     page_type: Type[BBRefPage]
     
     @classmethod
     def setup_method(cls):
         db.create_tables(MODELS)
-        test_resources = HtmlCache.get()
-        html = test_resources.find_html(BBRefLink(cls.name))
+        cls.test_resources = HtmlCache.get()
+        html = cls.test_resources.find_html(BBRefLink(cls.name))
         cls.page = cls.page_type(html)
     
     @classmethod
@@ -43,10 +45,24 @@ class TestPage:
     def _expand_urls(cls, suffixes: Iterable[str]) -> Iterable[str]:
         return [cls.page.BASE_URL + s for s in suffixes]
 
+    def _test_hash_eq(self, other_name: str):
+        link = BBRefLink(self.name)
+        p1 = PageFactory.create_page_from_link(link)
+        p2 = PageFactory.create_page_from_link(link)
+        assert hash(p1) == hash(p2)
+        assert p1 == p2
+        game_link = BBRefLink(other_name)
+        p3 = PageFactory.create_page_from_link(game_link)
+        assert hash(p1) != hash(p3)
+        assert p1 != p3
+
 class TestSchedulePage(TestPage):
     
     name = "2016-schedule.shtml"
     page_type = SchedulePage
+    
+    def test_hash_eq(self):
+        self._test_hash_eq(TestGamePage.name)
     
     def test_urls(self):
         on_list = [
@@ -66,6 +82,9 @@ class TestPlayerPage(TestPage):
     name = "vendipa01.shtml"
     page_type = PlayerPage
     
+    def test_hash_eq(self):
+        self._test_hash_eq(TestGamePage.name)
+    
     def test_queries(self):
         assert not self.page._exists_in_db()
         self.page.update_db()
@@ -79,6 +98,9 @@ class TestGamePage(TestPage):
     
     name = "WAS201710120.shtml"
     page_type = GamePage
+
+    def test_hash_eq(self):
+        self._test_hash_eq(TestSchedulePage.name)
 
     def test_urls(self):
         on_list = [
