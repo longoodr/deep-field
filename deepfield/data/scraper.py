@@ -127,14 +127,18 @@ class HtmlCache(_AbstractHtmlCache):
     corresponding to the different types of pages.
     """
     
-    @staticmethod
-    def get() -> "HtmlCache":
-        project_root = Path(__file__).parents[2] # data -> deepfield -> deep-field
-        if "TESTING" in os.environ:
-            root = (project_root / os.path.join("tests", "data", "resources")).resolve()
-        else:
-            root = (project_root / os.path.join("deepfield", "data", "pages")).resolve()
-        return HtmlCache(str(root))
+    _instance: "HtmlCache"
+    
+    @classmethod
+    def get(cls) -> "HtmlCache":
+        if not hasattr(cls, "_instance"):
+            project_root = Path(__file__).parents[2] # data -> deepfield -> deep-field
+            if "TESTING" in os.environ:
+                root = (project_root / os.path.join("tests", "data", "resources")).resolve()
+            else:
+                root = (project_root / os.path.join("deepfield", "data", "pages")).resolve()
+            cls._instance = HtmlCache(str(root))
+        return cls._instance
     
     __PAGE_TYPES = [
         GamePage,

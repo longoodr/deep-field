@@ -19,8 +19,14 @@ class TestBBRefPageFactory:
 
 class TestCache:
     
+    def test_singleton(self):
+        c1 = HtmlCache.get()
+        c2 = HtmlCache.get()
+        assert c1 is c2
+    
     def test_find_html_in_cache(self):
         cache = HtmlCache.get()
+        
         for url in RES_URLS:
             assert cache.find_html(BBRefLink(url)) is not None
             
