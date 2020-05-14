@@ -35,7 +35,26 @@ class _AbstractHtmlRetrievalHandler(ABC):
 class _CachedHandler(_AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link from local cache."""
 
+    """
+    TODO
+    1. Determine cache location based on TESTING environment variable.
+    
+    2. Lazy load cache directories: if they don't exist, then only create
+        them whenever a page needs to be inserted into it.
+        
+        Structure:
+            cache
+            |__GamePage
+            |__PlayerPage
+            |__SchedulePage
+    
+    3. Make WebHandlers insert their scraped pages into the cache.
+    """
+
     def retrieve_html(self) -> Optional[str]:
+        """TODO Look up link in cache subfolder depending on link type. Return
+        None if not found or if any folders do not exist.
+        """
         return None
     
 class _WebHandler(_AbstractHtmlRetrievalHandler):
