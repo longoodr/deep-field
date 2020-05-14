@@ -17,10 +17,13 @@ from deepfield.data.page_defs import InsertablePage, Link, Page
 class ScrapeNode:
     """A node in the page dependency graph. The nodes are traversed via DFS."""
     
-    _cached_nodes: Dict[Page, ScrapeNode] = {}
+    _cached_nodes: Dict[Page, "ScrapeNode"] = {}
     
     @classmethod
-    def __new__(cls, page: Page):
+    def from_page(cls, page: Page):
+        """Factory method to create proper ScrapeNode subclass from page. Use
+        this over the constructor.
+        """
         if page in cls._cached_nodes:
             return cls._cached_nodes[page]
         new_node: ScrapeNode
@@ -34,14 +37,16 @@ class ScrapeNode:
     def __init__(self, page: Page):
         self._page = page
 
-    def get_children(self) -> Iterable["ScrapeNode"]:
+    def scrape(self) -> int:
+        """Scrapes the page corresponding to this node. Returns the total
+        number of pages that were scraped during the process."""
+        num_scraped = 0
         for link in self._page.get_links():
+            if link.exists_in_db():
+                continue
             page = PageFactory.create_page_from_link(link)
-            yield ScrapeNode(page)
-        
-    def visit(self):
-        for child in self.get_children():
-            child.visit()
+            num_scraped += ScrapeNode.from_page(page).scrape()
+        return num_scraped + 1
             
 class InsertableScrapeNode(ScrapeNode):
     """A node in the page dependency graph that performs database insertion
@@ -51,9 +56,10 @@ class InsertableScrapeNode(ScrapeNode):
     def __init__(self, page: InsertablePage):
         self._page = page
         
-    def visit(self):
-        super().visit()
+    def scrape(self) -> int:
+        num_scraped = super().scrape()
         self._page.update_db()
+        return num_scraped
 
 class PageFactory:
     """Creates pages from links."""
@@ -120,7 +126,9 @@ class _WebHandler(_AbstractHtmlRetrievalHandler):
             response.raise_for_status()
         except requests.exceptions.HTTPError:
             return None
-        return response.text
+        html = response.text
+        HtmlCache.get().insert_html(html, self._link)
+        return html
     
     def __wait_until_can_pull(self) -> None:
         t = get_cur_time()
@@ -155,7 +163,7 @@ class _AbstractHtmlCache(ABC):
         return os.path.join(self._root, rel_path)
 
     def _get_file_html(self, filename: str) -> str:
-        with open(self._full_path(filename), 'r') as html_file:
+        with open(self._full_path(filename), 'r', encoding="utf-8") as html_file:
             return html_file.read()
 
     @staticmethod
@@ -208,20 +216,25 @@ class HtmlCache(_AbstractHtmlCache):
 class _HtmlFolder(_AbstractHtmlCache):
     """A folder containing HTML pages."""
     
+    def __init__(self, root: str):
+        super().__init__(root)
+        contained_files = [f for f in os.listdir(self._root)
+                           if os.path.isfile(self._full_path(f))]
+        self._contained_files = set(contained_files)
+    
     def find_html(self, link: Link) -> Optional[str]:
         if not os.path.isdir(self._root):
             return None
-        
-        # XXX O(n) lookup time; consider caching contents in set
-        # (How to handle set updating efficiently? Recreation from scratch
-        # would be SLOW but that's what os.listdir() forces)
-        for f in os.listdir(self._root):
-            if self._get_filename(link) == f:
-                return self._get_file_html(f)
+        filename = self._get_filename(link)
+        if filename in self._contained_files:
+            return self._get_file_html(filename)
         return None
     
     def insert_html(self, html: str, link: Link) -> None:
         if not os.path.isdir(self._root):
             os.mkdir(self._root)
-        with open(self._get_filename(link), 'w') as html_file:
+        filename = self._get_filename(link)
+        filepath = self._full_path(filename)
+        with open(filepath, 'w', encoding="utf-8") as html_file:
             html_file.write(html)
+        self._contained_files.add(filename)

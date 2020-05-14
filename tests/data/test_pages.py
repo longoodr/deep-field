@@ -43,11 +43,13 @@ class TestPage:
         link2 = BBRefLink(self.name)
         p1 = PageFactory.create_page_from_link(link)
         p2 = PageFactory.create_page_from_link(link)
+        assert hash(link) == hash(link2)
         assert link == link2
         assert hash(p1) == hash(p2)
         assert p1 == p2
         game_link = BBRefLink(other_name)
         p3 = PageFactory.create_page_from_link(game_link)
+        assert hash(link) != hash(game_link)
         assert link != game_link
         assert hash(p1) != hash(p3)
         assert p1 != p3
