@@ -33,6 +33,63 @@ class _AbstractHtmlRetrievalHandler(ABC):
     def retrieve_html(self) -> Optional[str]:
         """Returns HTML if successful, or None if not."""
         pass
+    
+class _HtmlRetriever(_AbstractHtmlRetrievalHandler):
+    """Retrieves HTML associated with the given link."""
+    
+    __HANDLER_SEQUENCE: Iterable[Type["_AbstractHtmlRetrievalHandler"]]
+    
+    def __init__(self, link: BBRefLink):
+        super().__init__(link)
+        self.__init_handler_seq()
+        
+    @classmethod
+    def __init_handler_seq(cls) -> None:
+        cls.__HANDLER_SEQUENCE = [
+            _CachedHandler,
+            _WebHandler
+        ]
+        
+    def retrieve_html(self) -> Optional[str]:
+        for handler_type in self.__HANDLER_SEQUENCE:
+            html = handler_type(self._link).retrieve_html()
+            if html is not None:
+                return html
+        return None
+    
+class _CachedHandler(_AbstractHtmlRetrievalHandler):
+    """Retrieves HTML associated with the given link from local cache."""
+
+    def retrieve_html(self) -> Optional[str]:
+        return HtmlCache.get().find_html(self._link)
+    
+class _WebHandler(_AbstractHtmlRetrievalHandler):
+    """Retrieves HTML associated with the given link from the web."""
+    
+    # baseball-reference.com's robots.txt specifies a crawl delay of 3 seconds
+    __CRAWL_DELAY = 3
+    __last_pull_time = 0.0
+    
+    def retrieve_html(self) -> Optional[str]:
+        self.__wait_until_can_pull()
+        self.__set_last_pull_time()
+        response = requests.get(str(self._link))
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError:
+            return None
+        return response.text
+    
+    def __wait_until_can_pull(self) -> None:
+        t = get_cur_time()
+        if self.__last_pull_time <= t - self.__CRAWL_DELAY:
+            return
+        secs_to_wait = max(0, self.__last_pull_time + self.__CRAWL_DELAY - t)
+        sleep(secs_to_wait)
+        
+    @classmethod
+    def __set_last_pull_time(cls):
+        cls.__last_pull_time = get_cur_time()
 
 class _AbstractHtmlCache(ABC):
     """A cache containing HTML pages."""
@@ -63,7 +120,7 @@ class _AbstractHtmlCache(ABC):
     def _get_filename(link: BBRefLink) -> str:
         """Gets the filename for the given link."""
         return link.name_id + ".shtml"
-
+    
 class HtmlCache(_AbstractHtmlCache):
     """A folder containing subfolders of HTML pages, each containing the HTML
     corresponding to the different types of pages.
@@ -122,55 +179,3 @@ class _HtmlFolder(_AbstractHtmlCache):
             os.mkdir(self._root)
         with open(self._get_filename(link), 'w') as html_file:
             html_file.write(html)
-
-class _CachedHandler(_AbstractHtmlRetrievalHandler):
-    """Retrieves HTML associated with the given link from local cache."""
-
-    def retrieve_html(self) -> Optional[str]:
-        return HtmlCache.get().find_html(self._link)
-    
-class _WebHandler(_AbstractHtmlRetrievalHandler):
-    """Retrieves HTML associated with the given link from the web."""
-    
-    # baseball-reference.com's robots.txt specifies a crawl delay of 3 seconds
-    __CRAWL_DELAY = 3
-    __last_pull_time = 0.0
-    
-    def retrieve_html(self) -> Optional[str]:
-        self.__wait_until_can_pull()
-        self.__set_last_pull_time()
-        response = requests.get(str(self._link))
-        try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError:
-            return None
-        return response.text
-    
-    def __wait_until_can_pull(self) -> None:
-        t = get_cur_time()
-        if self.__last_pull_time <= t - self.__CRAWL_DELAY:
-            return
-        secs_to_wait = max(0, self.__last_pull_time + self.__CRAWL_DELAY - t)
-        sleep(secs_to_wait)
-        
-    @classmethod
-    def __set_last_pull_time(cls):
-        cls.__last_pull_time = get_cur_time()
-    
-class _HtmlRetriever(_AbstractHtmlRetrievalHandler):
-    """Retrieves HTML associated with the given link."""
-    
-    __HANDLER_SEQUENCE = [
-        _CachedHandler,
-        _WebHandler
-    ]
-    
-    def __init__(self, link: BBRefLink):
-        super().__init__(link)
-        
-    def retrieve_html(self) -> Optional[str]:
-        for handler_type in self.__HANDLER_SEQUENCE:
-            html = handler_type(self._link).retrieve_html()
-            if html is not None:
-                return html
-        return None
