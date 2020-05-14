@@ -3,7 +3,7 @@ import pytest
 import tests.data.test_utils as test_utils
 from deepfield.data.bbref_pages import (BBRefLink, GamePage, PlayerPage,
                                         SchedulePage)
-from deepfield.data.scraper import (HtmlCache, InsertableScrapeNode,
+from deepfield.data.scraping import (HtmlCache, InsertableScrapeNode,
                                     PageFactory, ScrapeNode)
 
 RES_URLS = [

@@ -19,15 +19,19 @@ class BBRefPage(Page):
     
     def __init__(self, html: str):
         super().__init__(html)
-        self._url = self._soup.find("link", rel="canonical")["href"]
+        url = self._soup.find("link", rel="canonical")["href"]
+        self._link = BBRefLink(url)
         
     def __hash__(self):
-        return hash(self._url)
+        return hash(self._link)
     
     def __eq__(self, other) -> bool:
         return (self.__class__ == other.__class__
-                and self._url == other._url
+                and self._link == other._link
             )
+        
+    def __str__(self) -> str:
+        return str(self._link.name_id)
     
 class BBRefLink(Link):
     """A link from baseball-reference.com. These links all follow a similar
@@ -36,11 +40,11 @@ class BBRefLink(Link):
     also knows the type of the Page that it points to.
     """
     
-    def __init__(self, url: str, link_model: Type[DeepFieldModel] = None):
+    def __init__(self, url: str):
         super().__init__(url)
-        self._link_model = link_model
         self.name_id = self._get_name_id()
         self.page_type = self._get_page_type()
+        self._link_model = self.__get_link_model()
         
     def exists_in_db(self) -> bool:
         if self._link_model is None:
@@ -61,11 +65,19 @@ class BBRefLink(Link):
             return SchedulePage
         raise ValueError(f"Could not determine page type of {self}")
     
+    __TYPE_TO_MODEL = {
+        "GamePage"    : Game,
+        "PlayerPage"  : Player,
+        "SchedulePage": None
+    }
+    
+    def __get_link_model(self) -> Type[DeepFieldModel]:
+        return self.__TYPE_TO_MODEL[self.page_type.__name__]
+    
 class BBRefInsertablePage(BBRefPage, InsertablePage):
     
     def __init__(self, html: str, model: Type[DeepFieldModel]):
         super().__init__(html)
-        self._link = BBRefLink(self._url, model)
         
     def _exists_in_db(self):
         return self._link.exists_in_db()
@@ -78,7 +90,7 @@ class SchedulePage(BBRefPage):
         for game in games:
             suffix = game.em.a["href"]
             url = self.BASE_URL + suffix
-            yield BBRefLink(url, Game)
+            yield BBRefLink(url)
 
 class PlayerPage(BBRefInsertablePage):
     """A page containing info on a given player."""
@@ -124,7 +136,7 @@ class GamePage(BBRefInsertablePage):
         """For a GamePage, the referenced links are the players' pages."""
         for suffix in self._player_tables.get_page_suffixes():
             url = self.BASE_URL + suffix
-            yield BBRefLink(url, Player)
+            yield BBRefLink(url)
         
     def _run_queries(self) -> None:
         if not hasattr(self, "_query_runner"):

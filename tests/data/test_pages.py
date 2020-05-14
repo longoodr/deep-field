@@ -11,7 +11,7 @@ from deepfield.data.bbref_pages import (BBRefLink, BBRefPage, GamePage,
 from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
                                      Venue, db)
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
-from deepfield.data.scraper import HtmlCache, PageFactory
+from deepfield.data.scraping import HtmlCache, PageFactory
 
 
 class TestPage:

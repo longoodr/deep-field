@@ -4,7 +4,7 @@ from pathlib import Path
 from deepfield.data.bbref_pages import BBRefLink, GamePage
 from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
                                      Venue, db)
-from deepfield.data.scraper import HtmlCache
+from deepfield.data.scraping import HtmlCache
 from deepfield.data.enums import Handedness
 
 _MODELS = (Game, GamePlayer, Play, Player, Team, Venue)

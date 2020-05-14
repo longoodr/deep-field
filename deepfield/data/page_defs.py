@@ -51,6 +51,10 @@ class Page(ABC):
         """Enumerates all referenced links on this page."""
         pass
     
+    @abstractmethod
+    def __str__(self) -> str:
+        pass
+    
     def __hash__(self):
         if not hasattr(self, "_hash"):
             self._hash = hash(str(self._soup))

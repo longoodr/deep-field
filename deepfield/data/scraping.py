@@ -1,3 +1,4 @@
+import logging
 import os
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -13,6 +14,8 @@ from deepfield.data.bbref_pages import (BBRefPage, GamePage, PlayerPage,
 from deepfield.data.dbmodels import Game, Player
 from deepfield.data.page_defs import InsertablePage, Link, Page
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class ScrapeNode:
     """A node in the page dependency graph. The nodes are traversed via DFS."""
@@ -41,13 +44,19 @@ class ScrapeNode:
         """Scrapes the page corresponding to this node. Returns the total
         number of pages that were scraped during the process.
         """
+        logger.info(f"Starting scrape for {self._page}")
+        num_scraped = self._visit_children()
+        logger.info(f"Finished scraping {self._page}")
+        return num_scraped + 1
+        
+    def _visit_children(self) -> int:
         num_scraped = 0
         for link in self._page.get_links():
             if link.exists_in_db():
                 continue
             page = PageFactory.create_page_from_link(link)
             num_scraped += ScrapeNode.from_page(page).scrape()
-        return num_scraped + 1
+        return num_scraped
             
 class InsertableScrapeNode(ScrapeNode):
     """A node in the page dependency graph that performs database insertion
@@ -58,9 +67,11 @@ class InsertableScrapeNode(ScrapeNode):
         self._page = page
         
     def scrape(self) -> int:
-        num_scraped = super().scrape()
+        logger.info(f"Starting scrape for {self._page}")
+        num_scraped = self._visit_children()
         self._page.update_db()
-        return num_scraped
+        logger.info(f"Finished scraping {self._page}")
+        return num_scraped + 1
 
 class PageFactory:
     """Creates pages from links."""
