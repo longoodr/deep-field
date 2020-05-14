@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Iterable
+from typing import Iterable, Type
 
 from bs4 import BeautifulSoup
 
@@ -17,7 +17,16 @@ class Link(ABC):
         """Returns whether this page already exists in the database."""
         pass
     
-    def __str__(self):
+    @abstractmethod
+    def _get_page_type(self) -> Type["Page"]:
+        """Returns the type of page this link corresponds to."""
+        pass
+    
+    def _get_name_id(self) -> str:
+        """Returns a unique identifier for the corresponding page."""
+        return self._url.split("/")[-1].split(".")[0]
+    
+    def __str__(self) -> str:
         return self._url
 
 class Page(ABC):

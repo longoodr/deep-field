@@ -31,8 +31,8 @@ class BBRefLink(Link):
     def __init__(self, url: str, link_model: Type[DeepFieldModel] = None):
         super().__init__(url)
         self._link_model = link_model
-        self.name_id = self.__get_name_id()
-        self.page_type = self.__get_page_type()
+        self.name_id = self._get_name_id()
+        self.page_type = self._get_page_type()
         
     def exists_in_db(self) -> bool:
         if self._link_model is None:
@@ -44,7 +44,7 @@ class BBRefLink(Link):
     __PLAYER_NAME_ID_MATCHER = re.compile(r"^\w+\d\d$")
     __GAME_NAME_ID_MATCHER   = re.compile(r"[A-Z]{3}\d{9}")
     
-    def __get_page_type(self) -> Type[BBRefPage]:
+    def _get_page_type(self) -> Type[BBRefPage]:
         if re.fullmatch(self.__GAME_NAME_ID_MATCHER, self.name_id):
             return GamePage
         elif re.match(self.__PLAYER_NAME_ID_MATCHER, self.name_id):
@@ -52,9 +52,6 @@ class BBRefLink(Link):
         elif "schedule" in self._url:
             return SchedulePage
         raise ValueError(f"Could not determine page type of {self}")
-    
-    def __get_name_id(self) -> str:
-        return self._url.split("/")[-1].split(".")[0]
     
 class BBRefInsertablePage(BBRefPage, InsertablePage):
     
