@@ -39,7 +39,8 @@ class ScrapeNode:
 
     def scrape(self) -> int:
         """Scrapes the page corresponding to this node. Returns the total
-        number of pages that were scraped during the process."""
+        number of pages that were scraped during the process.
+        """
         num_scraped = 0
         for link in self._page.get_links():
             if link.exists_in_db():
