@@ -162,21 +162,20 @@ class _PlayerTables:
         self.home = _PlayerTable(ptable_placeholders[1])
     
     def get_page_suffixes(self) -> Iterable[str]:
-        for suffix in self.away.get_page_suffixes():
-            yield suffix
-        for suffix in self.home.get_page_suffixes():
-            yield suffix
+        for table in self:
+            for suffix in table.get_page_suffixes():
+                yield suffix
         
     def __iter__(self):
-        self._tables = [self.away, self.home]
-        self._cur = 0
+        self.__tables = [self.away, self.home]
+        self.__cur = 0
         return self
     
     def __next__(self):
-        if self._cur >= len(self._tables):
+        if self.__cur >= len(self.__tables):
             raise StopIteration
-        this_table = self._tables[self._cur]
-        self._cur += 1
+        this_table = self.__tables[self.__cur]
+        self.__cur += 1
         return this_table
     
 class _PlayerTable(_PlaceholderTable):
