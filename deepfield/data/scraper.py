@@ -17,13 +17,19 @@ from deepfield.data.page_defs import InsertablePage, Link, Page
 class ScrapeNode:
     """A node in the page dependency graph. The nodes are traversed via DFS."""
     
-    # TODO nodes should be cached based on pages so duplicate nodes are not
-    # created
+    _cached_nodes: Dict[Page, ScrapeNode] = {}
+    
     @classmethod
     def __new__(cls, page: Page):
+        if page in cls._cached_nodes:
+            return cls._cached_nodes[page]
+        new_node: ScrapeNode
         if isinstance(page, InsertablePage):
-            return InsertableScrapeNode(page)
-        return ScrapeNode(page)
+            new_node = InsertableScrapeNode(page)
+        else:
+            new_node = ScrapeNode(page)
+        cls._cached_nodes[page] = new_node
+        return new_node
     
     def __init__(self, page: Page):
         self._page = page
