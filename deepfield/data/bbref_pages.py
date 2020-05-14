@@ -20,6 +20,14 @@ class BBRefPage(Page):
     def __init__(self, html: str):
         super().__init__(html)
         self._url = self._soup.find("link", rel="canonical")["href"]
+        
+    def __hash__(self):
+        return hash(self._url)
+    
+    def __eq__(self, other) -> bool:
+        return (self.__class__ == other.__class__
+                and self._url == other._url
+            )
     
 class BBRefLink(Link):
     """A link from baseball-reference.com. These links all follow a similar
