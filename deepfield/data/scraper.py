@@ -14,6 +14,41 @@ from deepfield.data.dbmodels import Game, Player
 from deepfield.data.page_defs import InsertablePage, Link, Page
 
 
+class ScrapeNode:
+    """A node in the page dependency graph. The nodes are traversed via DFS."""
+    
+    # TODO nodes should be cached based on pages so duplicate nodes are not
+    # created
+    @classmethod
+    def __new__(cls, page: Page):
+        if isinstance(page, InsertablePage):
+            return InsertableScrapeNode(page)
+        return ScrapeNode(page)
+    
+    def __init__(self, page: Page):
+        self._page = page
+
+    def get_children(self) -> Iterable["ScrapeNode"]:
+        for link in self._page.get_links():
+            page = PageFactory.create_page_from_link(link)
+            yield ScrapeNode(page)
+        
+    def visit(self):
+        for child in self.get_children():
+            child.visit()
+            
+class InsertableScrapeNode(ScrapeNode):
+    """A node in the page dependency graph that performs database insertion
+    once all its children have been visited.
+    """
+    
+    def __init__(self, page: InsertablePage):
+        self._page = page
+        
+    def visit(self):
+        super().visit()
+        self._page.update_db()
+
 class PageFactory:
     """Creates pages from links."""
     
