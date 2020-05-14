@@ -415,17 +415,66 @@ class _PlayQueryRunner:
             "tr",
             id=lambda id: id and id.startswith("event_")
             )
+
+class _GamePlayerQueryRunner:
+    
+    def __init__(self, player_tables: _PlayerTables):
+        name_ids =  set(player_tables.home.get_name_ids())
+        name_ids.update(player_tables.away.get_name_ids())
+        self._name_ids = name_ids
+        
+    def add_game_players(self, game: Game) -> None:
+        GamePlayer.insert_many(
+            self.__get_rows(game),
+            fields=[GamePlayer.game_id, GamePlayer.player_id]
+            ).execute()
+
+    def __get_rows(self, game: Game) -> Iterable[Tuple[int, int]]:
+        for pid in Player.select(Player.id).where(Player.name_id.in_(self._name_ids)):
+            yield (game.id, pid.id)
         
 class _PlayDataTransformer:
+    """Transforms data contained in play rows to data that is ready for
+    insertion into the Play database table.
+    """
     
-    __StatTransFunc = Callable[["_PlayDataTransformer", str     ], Any]
-    __PlayerLookup  = Callable[["_PlayDataTransformer", str, str], str]
+    __INNING_CHAR_OFFSET = {
+            "t": 0,
+            "b": 1
+        }
     
-    __PBP_TO_DB_STATS: Dict[str, Tuple[str, __StatTransFunc]]
-    __PLAYERS: Dict[str, Tuple[str, __PlayerLookup]]
+    # Home team gets to bat last, i.e. in second half of inning (b).
+    __INNING_AND_PLAYER_TO_SIDE = {
+        ("t", "batter") : "away",
+        ("b", "batter") : "home",
+        ("t", "pitcher"): "home",
+        ("b", "pitcher"): "away",
+    }
+    
+    # These instance methods can translate to db data with only raw data (arg)
+    # as input.
+    __RawStatTranslation = Callable[["_PlayDataTransformer", str     ], Any]
+    
+    # These instance methods require knowledge of inning half (2nd str arg) to 
+    # determine if home or away player for id lookup.
+    __PlayerLookup  = Callable[["_PlayDataTransformer", str, str], int]
+    
+    """
+    THE FOLLOWING CLASS VARS ARE INSTANTIATED IN A CLASS METHOD AND NOT HERE.
+    
+    Each of the translation/lookup functions are not defined yet at this point,
+    so they can't be instantiated here.
+    """
+    
+    # Matches each raw stat name to its db stat name and translation function.
+    __PBP_TO_DB_STATS: Dict[str, Tuple[str, __RawStatTranslation]]
+    
+    # Matches each player raw name_id to the db field for the player id, along
+    # with the lookup function to translate name_id to player id.
+    __PLAYERS:         Dict[str, Tuple[str, __PlayerLookup      ]]
+    
+    # "data-stat" names to extract from each player row.
     __PBP_STATS: Set[str]
-    __INNING_CHAR_OFFSET: Dict[str, int]
-    __INNING_AND_PLAYER_TO_SIDE: Dict[Tuple[str, str], str]
     
     def __init__(self, player_tables: _PlayerTables):
         self.__init_lookups()
@@ -434,9 +483,33 @@ class _PlayDataTransformer:
             "away": player_tables.away.get_name_to_db_ids(),
         }
         
+    @classmethod
+    def __init_lookups(cls):
+        """Initializes dicts to lookup database stat names and
+        transformation functions to translate page data to database format.
+        """
+        if hasattr(cls, "PBP_TO_DB_STATS"):
+            return
+        
+        cls.__PBP_TO_DB_STATS = {
+            "inning":               ("inning_half"  , cls.__inning_to_inning_half),
+            "pitches_pbp":          ("pitch_ct"     , cls.__strip),
+            "play_desc":            ("desc"         , cls.__no_transformation_needed),
+            "runners_on_bases_pbp": ("start_on_base", cls.__runners_to_on_base),
+            "outs":                 ("start_outs"   , cls.__convert_to_int),
+        }
+        
+        cls.__PLAYERS = {
+            "batter":               ("batter_id"    , cls.__batter_to_id),
+            "pitcher":              ("pitcher_id"   , cls.__pitcher_to_id),
+        }
+        cls.__PBP_STATS = set(cls.__PBP_TO_DB_STATS.keys()).union(set(cls.__PLAYERS.keys()))
+        
     def extract_raw_play_data(self, play_row) -> Dict[str, str]:
         raw_play_data: Dict[str, str] = {}
         for play_data_pt in play_row.find_all():
+            # each row (tr) has tags (th, td) with "data-stat" attributes; the
+            # values of these attributes are the names of the contained stats
             data_stat = str(play_data_pt.get("data-stat"))
             if data_stat in self.__PBP_STATS:
                 raw_play_data[data_stat] = play_data_pt.text.replace(u"\xa0", u" ")
@@ -447,48 +520,13 @@ class _PlayDataTransformer:
         self.__insert_player_ids(raw_play_data, into_dict=transformed_stats)
         return transformed_stats
     
-    @classmethod
-    def __init_lookups(cls):
-        """Initializes dicts to lookup database stat names and
-        transformation functions to translate page data to database format.
-        This is a class method so it is only done once, as this would be a
-        bit expensive to do for every page.
-        """
-        if hasattr(cls, "PBP_TO_DB_STATS"):
-            return
-        # these functions can translate to db data with only raw data as input
-        cls.__PBP_TO_DB_STATS = {
-            "inning":               ("inning_half"  , cls.__inning_to_inning_half),
-            "pitches_pbp":          ("pitch_ct"     , cls.__strip),
-            "play_desc":            ("desc"         , cls.__no_transformation_needed),
-            "runners_on_bases_pbp": ("start_on_base", cls.__runners_to_on_base),
-            "outs":                 ("start_outs"   , cls.__convert_to_int),
-        }
-        # these functions require knowledge of inning half to determine if home or away player
-        cls.__PLAYERS = {
-            "batter":               ("batter_id"    , cls.__batter_to_id),
-            "pitcher":              ("pitcher_id"   , cls.__pitcher_to_id),
-        }
-        cls.__INNING_CHAR_OFFSET = {
-            "t": 0,
-            "b": 1
-        }
-        # home team gets to bat in second half of inning (b)
-        cls.__INNING_AND_PLAYER_TO_SIDE = {
-            ("t", "batter") : "away",
-            ("b", "batter") : "home",
-            ("t", "pitcher"): "home",
-            ("b", "pitcher"): "away",
-        }
-        cls.__PBP_STATS = set(cls.__PBP_TO_DB_STATS.keys()).union(set(cls.__PLAYERS.keys()))
-    
-    def __transform_stats(self, raw_play_data: Dict[str, str]) -> Dict[str, str]:
-        new_data: Dict[str, str] = {}
+    def __transform_stats(self, raw_play_data: Dict[str, str]) -> Dict[str, Any]:
+        new_data: Dict[str, Any] = {}
         for pbp_statname, (db_statname, transform_func) in self.__PBP_TO_DB_STATS.items():
             new_data[db_statname] = transform_func(self, raw_play_data[pbp_statname])
         return new_data
     
-    def __insert_player_ids(self, raw_play_data: Dict[str, str], into_dict: Dict[str, str]) -> Dict[str, str]:
+    def __insert_player_ids(self, raw_play_data: Dict[str, str], into_dict: Dict[str, Any]) -> Dict[str, str]:
         inning_half_char = raw_play_data["inning"][0]
         for player_type, (player_type_id, player_lookup_func) in self.__PLAYERS.items():
             player_name = raw_play_data[player_type]
@@ -510,13 +548,13 @@ class _PlayDataTransformer:
                 on_base += on_base_flag.value
         return on_base
     
-    def __batter_to_id(self, batter_name: str, inning_half_char: str) -> str:
+    def __batter_to_id(self, batter_name: str, inning_half_char: str) -> int:
         return self.__player_to_id(batter_name, inning_half_char, "batter")
     
-    def __pitcher_to_id(self, pitcher_name: str, inning_half_char: str) -> str:
+    def __pitcher_to_id(self, pitcher_name: str, inning_half_char: str) -> int:
         return self.__player_to_id(pitcher_name, inning_half_char, "pitcher")
     
-    def __player_to_id(self, player_name: str, inning_half_char: str, player_type: str) -> str:
+    def __player_to_id(self, player_name: str, inning_half_char: str, player_type: str) -> int:
         side = self.__INNING_AND_PLAYER_TO_SIDE[(inning_half_char, player_type)]
         pmap = self.__player_maps[side]
         try:
@@ -538,20 +576,3 @@ class _PlayDataTransformer:
     
     def __convert_to_int(self, stat: str) -> int:
         return int(stat)
-
-class _GamePlayerQueryRunner:
-    
-    def __init__(self, player_tables: _PlayerTables):
-        name_ids =  set(player_tables.home.get_name_ids())
-        name_ids.update(player_tables.away.get_name_ids())
-        self._name_ids = name_ids
-        
-    def add_game_players(self, game: Game) -> None:
-        GamePlayer.insert_many(
-            self.__get_rows(game),
-            fields=[GamePlayer.game_id, GamePlayer.player_id]
-            ).execute()
-
-    def __get_rows(self, game: Game) -> Iterable[Tuple[int, int]]:
-        for pid in Player.select(Player.id).where(Player.name_id.in_(self._name_ids)):
-            yield (game.id, pid.id)
