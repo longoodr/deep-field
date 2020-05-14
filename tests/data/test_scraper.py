@@ -26,7 +26,6 @@ class TestCache:
     
     def test_find_html_in_cache(self):
         cache = HtmlCache.get()
-        
         for url in RES_URLS:
             assert cache.find_html(BBRefLink(url)) is not None
             
