@@ -5,7 +5,7 @@ from typing import Iterable, Type
 import pytest
 from pytest import raises
 
-import tests.data.test_utils
+import tests.data.test_utils as test_utils
 from deepfield.data.bbref_pages import (BBRefLink, BBRefPage, GamePage,
                                         PlayerPage, SchedulePage)
 from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
@@ -13,8 +13,6 @@ from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.data.scraper import HtmlCache, PageFactory
 
-db.init(":memory:")
-MODELS = (Game, GamePlayer, Play, Player, Team, Venue)
 
 class TestPage:
             
@@ -24,14 +22,9 @@ class TestPage:
     
     @classmethod
     def setup_method(cls):
-        db.create_tables(MODELS)
-        cls.test_resources = HtmlCache.get()
-        html = cls.test_resources.find_html(BBRefLink(cls.name))
+        test_utils.clean_db()
+        html = test_utils.resources.find_html(BBRefLink(cls.name))
         cls.page = cls.page_type(html)
-    
-    @classmethod
-    def teardown_method(cls):
-        db.drop_tables(MODELS)
 
     @classmethod
     def test_urls(cls, on_list_suffixes: Iterable[str], not_on_list_suffixes: Iterable[str]):
@@ -118,7 +111,7 @@ class TestGamePage(TestPage):
     def test_queries(self):
         with raises(ValueError):
             self.page.update_db()
-        self.__insert_mock_players()
+        test_utils.insert_mock_players(self.page)
         assert not self.page._exists_in_db()
         self.page.update_db()
         assert self.page._exists_in_db()
@@ -160,24 +153,6 @@ class TestGamePage(TestPage):
         num_game_players = len(GamePlayer.select().where(GamePlayer.game_id == game.id))
         num_players = len(Player.select())
         assert(num_game_players == num_players)
-        
-    def __insert_mock_players(self) -> None:
-        ptables = self.page._player_tables
-        with db.atomic():
-            for table in ptables:
-                pmap = table.get_name_to_name_ids()
-                for name, name_id in pmap.items():
-                    self.__insert_mock_player(name, name_id)
-    
-    @staticmethod    
-    def __insert_mock_player(name: str, name_id: str) -> None:
-        fields = {
-            "name": name,
-            "name_id": name_id,
-            "bats": Handedness.RIGHT.value,
-            "throws": Handedness.RIGHT.value,
-        }
-        Player.create(**fields)
 
     @staticmethod
     def __id_of_name_id(name_id: str) -> int:

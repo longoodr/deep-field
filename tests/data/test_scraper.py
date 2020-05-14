@@ -3,7 +3,7 @@ import pytest
 from deepfield.data.bbref_pages import (BBRefLink, GamePage, PlayerPage,
                                         SchedulePage)
 from deepfield.data.scraper import PageFactory, HtmlCache
-import tests.data.test_utils
+import tests.data.test_utils as test_utils
 
 RES_URLS = [
     "https://www.baseball-reference.com/boxes/WAS/WAS201710120.shtml",
