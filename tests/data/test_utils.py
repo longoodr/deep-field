@@ -33,4 +33,5 @@ def _insert_mock_player(name: str, name_id: str) -> None:
         "bats": Handedness.RIGHT.value,
         "throws": Handedness.RIGHT.value,
     }
-    Player.create(**fields)
+    if Player.get_or_none(Player.name_id == name_id) is None:
+        Player.create(**fields)
