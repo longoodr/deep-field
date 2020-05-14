@@ -15,7 +15,7 @@ class TestBBRefPageFactory:
     
     def test_page_types(self):
         for url, page_type in zip(RES_URLS, [GamePage, SchedulePage, PlayerPage]):
-            assert type(BBRefPageFactory().create_page_from_url(url)) == page_type
+            assert type(BBRefPageFactory.create_page_from_url(url)) == page_type
 
 class TestCache:
     

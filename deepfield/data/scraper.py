@@ -16,7 +16,8 @@ from pathlib import Path
 class BBRefPageFactory:
     """Creates BBRefPages from BBRefLinks."""
     
-    def create_page_from_url(self, url: str) -> BBRefPage:
+    @staticmethod
+    def create_page_from_url(url: str) -> BBRefPage:
         link = BBRefLink(url)
         html = _HtmlRetriever(link).retrieve_html()
         if html is None:
