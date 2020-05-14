@@ -1,5 +1,6 @@
 import os
 from abc import ABC, abstractmethod
+from pathlib import Path
 from time import sleep
 from time import time as get_cur_time
 from typing import Dict, Iterable, Optional, Set, Tuple, Type
@@ -7,19 +8,17 @@ from typing import Dict, Iterable, Optional, Set, Tuple, Type
 import requests
 from requests.exceptions import HTTPError
 
-from deepfield.data.page_defs import Page, InsertablePage
-from deepfield.data.bbref_pages import (BBRefLink, BBRefPage, GamePage,
-                                        PlayerPage, SchedulePage)
+from deepfield.data.bbref_pages import (BBRefPage, GamePage, PlayerPage,
+                                        SchedulePage)
 from deepfield.data.dbmodels import Game, Player
-from pathlib import Path
+from deepfield.data.page_defs import InsertablePage, Link, Page
 
-    
+
 class PageFactory:
     """Creates pages from links."""
     
     @staticmethod
-    def create_page_from_url(url: str) -> Page:
-        link = BBRefLink(url)
+    def create_page_from_link(link: Link) -> Page:
         html = _HtmlRetriever(link).retrieve_html()
         if html is None:
             raise ValueError(f"Could not get HTML for {link}")
@@ -28,7 +27,7 @@ class PageFactory:
 class _AbstractHtmlRetrievalHandler(ABC):
     """A step in the HTML retrieval process."""
     
-    def __init__(self, link: BBRefLink):
+    def __init__(self, link: Link):
         self._link = link
     
     @abstractmethod
@@ -41,7 +40,7 @@ class _HtmlRetriever(_AbstractHtmlRetrievalHandler):
     
     __HANDLER_SEQUENCE: Iterable[Type["_AbstractHtmlRetrievalHandler"]]
     
-    def __init__(self, link: BBRefLink):
+    def __init__(self, link: Link):
         super().__init__(link)
         self.__init_handler_seq()
         
@@ -100,12 +99,12 @@ class _AbstractHtmlCache(ABC):
         self._root = root
         
     @abstractmethod
-    def find_html(self, link: BBRefLink) -> Optional[str]:
+    def find_html(self, link: Link) -> Optional[str]:
         """Returns HTML if cache lookup successful, or None if not."""
         pass
     
     @abstractmethod
-    def insert_html(self, html: str, link: BBRefLink) -> None:
+    def insert_html(self, html: str, link: Link) -> None:
         """Inserts the given HTML to the cache, with the name being determined
         by the given link.
         """
@@ -119,7 +118,7 @@ class _AbstractHtmlCache(ABC):
             return html_file.read()
 
     @staticmethod
-    def _get_filename(link: BBRefLink) -> str:
+    def _get_filename(link: Link) -> str:
         """Gets the filename for the given link."""
         return link.name_id + ".shtml"
     
@@ -155,11 +154,11 @@ class HtmlCache(_AbstractHtmlCache):
             cache_root = self._full_path(page_type.__name__)
             self.__caches[page_type.__name__] = _HtmlFolder(cache_root)
     
-    def find_html(self, link: BBRefLink) -> Optional[str]:
+    def find_html(self, link: Link) -> Optional[str]:
         page_type = link.page_type.__name__
         return self.__caches[page_type].find_html(link)
     
-    def insert_html(self, html: str, link: BBRefLink) -> None:
+    def insert_html(self, html: str, link: Link) -> None:
         if not os.path.isdir(self._root):
             os.mkdir(self._root)
         page_type = link.page_type.__name__
@@ -168,7 +167,7 @@ class HtmlCache(_AbstractHtmlCache):
 class _HtmlFolder(_AbstractHtmlCache):
     """A folder containing HTML pages."""
     
-    def find_html(self, link: BBRefLink) -> Optional[str]:
+    def find_html(self, link: Link) -> Optional[str]:
         if not os.path.isdir(self._root):
             return None
         
@@ -180,7 +179,7 @@ class _HtmlFolder(_AbstractHtmlCache):
                 return self._get_file_html(f)
         return None
     
-    def insert_html(self, html: str, link: BBRefLink) -> None:
+    def insert_html(self, html: str, link: Link) -> None:
         if not os.path.isdir(self._root):
             os.mkdir(self._root)
         with open(self._get_filename(link), 'w') as html_file:
