@@ -3,7 +3,6 @@ from typing import Iterable, Type
 
 from bs4 import BeautifulSoup
 
-
 class Link(ABC):
     """A page located at a URL that can determine if itself already exists in 
     the database or not.
@@ -28,6 +27,16 @@ class Link(ABC):
     
     def __str__(self) -> str:
         return self._url
+    
+    def __hash__(self):
+        if not hasattr(self, "_hash"):
+            self._hash = hash(str(self._url))
+        return self._hash
+    
+    def __eq__(self, other):
+        return (self.__class__ == other.__class__ 
+                and str(self._url) ==  str(other._url)    
+            )
 
 class Page(ABC):
     """A collection of data located on an HTML page that references other pages
@@ -49,7 +58,7 @@ class Page(ABC):
     
     def __eq__(self, other) -> bool:
         return (self.__class__ == other.__class__ 
-                and str(self._soup) ==  str(self._soup)    
+                and str(self._soup) == str(other._soup)    
             )
     
 class InsertablePage(Page):
