@@ -25,4 +25,10 @@ class TestCache:
             assert cache.find_html(BBRefLink(url)) is not None
             
     def test_find_html_not_in_cache(self):
-        pass
+        cache = HtmlCache.get()
+        for url in [
+            "ANA199742069.shtml",
+            "1997-schedule.shtml",
+            "burdege01.shtml"
+        ]:
+            assert cache.find_html(BBRefLink(url)) is None
