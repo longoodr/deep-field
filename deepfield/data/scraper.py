@@ -16,12 +16,12 @@ class BBRefPageFactory:
     
     def create_page_from_url(self, url: str) -> BBRefPage:
         link = BBRefLink(url)
-        html = HtmlRetriever(link).retrieve_html()
+        html = _HtmlRetriever(link).retrieve_html()
         if html is None:
             raise ValueError(f"Could not get HTML for {link}")
         return link.page_type(html)
     
-class AbstractHtmlRetrievalHandler(ABC):
+class _AbstractHtmlRetrievalHandler(ABC):
     """A step in the HTML retrieval process."""
     
     def __init__(self, link: BBRefLink):
@@ -31,14 +31,14 @@ class AbstractHtmlRetrievalHandler(ABC):
     def retrieve_html(self) -> Optional[str]:
         """Returns HTML if successful, or None if not."""
         pass
- 
-class CachedHandler(AbstractHtmlRetrievalHandler):
+
+class _CachedHandler(_AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link from local cache."""
 
     def retrieve_html(self) -> Optional[str]:
         return None
     
-class WebHandler(AbstractHtmlRetrievalHandler):
+class _WebHandler(_AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link from the web."""
     
     # baseball-reference.com's robots.txt specifies a crawl delay of 3 seconds
@@ -66,12 +66,12 @@ class WebHandler(AbstractHtmlRetrievalHandler):
     def __set_last_pull_time(cls):
         cls.__last_pull_time = get_cur_time()
     
-class HtmlRetriever(AbstractHtmlRetrievalHandler):
+class _HtmlRetriever(_AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link."""
     
     __HANDLER_SEQUENCE = [
-        CachedHandler,
-        WebHandler
+        _CachedHandler,
+        _WebHandler
     ]
     
     def __init__(self, link: BBRefLink):
