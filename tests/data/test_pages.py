@@ -5,12 +5,12 @@ from typing import Iterable, Type
 import pytest
 from pytest import raises
 
-from deepfield.data.bbref_pages import (BBRefPage, GamePage, PlayerPage,
-                                        SchedulePage)
+from deepfield.data.bbref_pages import BBRefLink, BBRefPage, GamePage, PlayerPage, SchedulePage
 from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
                                      Venue, db)
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
-from tests.data.test_utils import get_res_path
+import tests.data.test_utils
+from deepfield.data.scraper import HtmlCache
 
 db.init(":memory:")
 MODELS = (Game, GamePlayer, Play, Player, Team, Venue)
@@ -23,10 +23,9 @@ class TestPage:
     @classmethod
     def setup_method(cls):
         db.create_tables(MODELS)
-        file_path = (get_res_path(cls.name)).resolve()
-        with open(file_path, "r", encoding="utf-8") as page_file:
-            html = page_file.read()
-            cls.page = cls.page_type(html)
+        test_resources = HtmlCache.get()
+        html = test_resources.find_html(BBRefLink(cls.name))
+        cls.page = cls.page_type(html)
     
     @classmethod
     def teardown_method(cls):
@@ -46,7 +45,7 @@ class TestPage:
 
 class TestSchedulePage(TestPage):
     
-    name = "2016-schedule.html"
+    name = "2016-schedule.shtml"
     page_type = SchedulePage
     
     def test_urls(self):

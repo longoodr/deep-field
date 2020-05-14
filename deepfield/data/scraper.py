@@ -1,7 +1,8 @@
+import os
 from abc import ABC, abstractmethod
 from time import sleep
 from time import time as get_cur_time
-from typing import Iterable, Optional, Type
+from typing import Dict, Iterable, Optional, Set, Tuple, Type
 
 import requests
 from requests.exceptions import HTTPError
@@ -9,6 +10,7 @@ from requests.exceptions import HTTPError
 from deepfield.data.bbref_pages import (BBRefLink, BBRefPage, GamePage,
                                         PlayerPage, SchedulePage)
 from deepfield.data.dbmodels import Game, Player
+from pathlib import Path
 
 
 class BBRefPageFactory:
@@ -31,6 +33,95 @@ class _AbstractHtmlRetrievalHandler(ABC):
     def retrieve_html(self) -> Optional[str]:
         """Returns HTML if successful, or None if not."""
         pass
+
+class _AbstractHtmlCache(ABC):
+    """A cache containing HTML pages."""
+    
+    def __init__(self, root: str):
+        self._root = root
+        
+    @abstractmethod
+    def find_html(self, link: BBRefLink) -> Optional[str]:
+        """Returns HTML if cache lookup successful, or None if not."""
+        pass
+    
+    @abstractmethod
+    def insert_html(self, html: str, link: BBRefLink) -> None:
+        """Inserts the given HTML to the cache, with the name being determined
+        by the given link.
+        """
+        pass
+    
+    def _full_path(self, rel_path: str) -> str:
+        return os.path.join(self._root, rel_path)
+
+    def _get_file_html(self, filename: str) -> str:
+        with open(self._full_path(filename), 'r') as html_file:
+            return html_file.read()
+
+    @staticmethod
+    def _get_filename(link: BBRefLink) -> str:
+        """Gets the filename for the given link."""
+        return link.name_id + ".shtml"
+
+class HtmlCache(_AbstractHtmlCache):
+    """A folder containing subfolders of HTML pages, each containing the HTML
+    corresponding to the different types of pages.
+    """
+    
+    @staticmethod
+    def get() -> "HtmlCache":
+        project_root = Path(__file__).parents[2] # data -> deepfield -> deep-field
+        if "TESTING" in os.environ:
+            root = (project_root / os.path.join("tests", "data", "resources")).resolve()
+        else:
+            root = (project_root / os.path.join("deepfield", "data", "pages")).resolve()
+        return HtmlCache(str(root))
+    
+    __PAGE_TYPES = [
+        GamePage,
+        PlayerPage,
+        SchedulePage
+    ]
+    
+    def __init__(self, root: str):
+        """DO NOT CALL THIS EXTERNALLY!!! Use get() instead."""
+        super().__init__(root)
+        self.__caches: Dict[Type[BBRefPage], _AbstractHtmlCache] = {}
+        for page_type in self.__PAGE_TYPES:
+            cache_root = self._full_path(page_type.__name__)
+            self.__caches[page_type.__name__] = _HtmlFolder(cache_root)
+    
+    def find_html(self, link: BBRefLink) -> Optional[str]:
+        page_type = link.page_type.__name__
+        return self.__caches[page_type].find_html(link)
+    
+    def insert_html(self, html: str, link: BBRefLink) -> None:
+        if not os.path.isdir(self._root):
+            os.mkdir(self._root)
+        page_type = link.page_type.__name__
+        self.__caches[page_type].insert_html(html, link)
+
+class _HtmlFolder(_AbstractHtmlCache):
+    """A folder containing HTML pages."""
+    
+    def find_html(self, link: BBRefLink) -> Optional[str]:
+        if not os.path.isdir(self._root):
+            return None
+        
+        # XXX O(n) lookup time; consider caching contents in set
+        # (How to handle set updating efficiently? Recreation from scratch
+        # would be SLOW but that's what os.listdir() forces)
+        for f in os.listdir(self._root):
+            if self._get_filename(link) == f:
+                return self._get_file_html(f)
+        return None
+    
+    def insert_html(self, html: str, link: BBRefLink) -> None:
+        if not os.path.isdir(self._root):
+            os.mkdir(self._root)
+        with open(self._get_filename(link), 'w') as html_file:
+            html_file.write(html)
 
 class _CachedHandler(_AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link from local cache."""

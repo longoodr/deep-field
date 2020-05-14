@@ -41,10 +41,13 @@ class BBRefLink(Link):
         record = self._link_model.get_or_none(expr)
         return record is not None
     
+    __PLAYER_NAME_ID_MATCHER = re.compile(r"^\w+\d\d$")
+    __GAME_NAME_ID_MATCHER   = re.compile(r"[A-Z]{3}\d{9}")
+    
     def __get_page_type(self) -> Type[BBRefPage]:
-        if "boxes" in self._url:
+        if re.fullmatch(self.__GAME_NAME_ID_MATCHER, self.name_id):
             return GamePage
-        elif "players" in self._url:
+        elif re.match(self.__PLAYER_NAME_ID_MATCHER, self.name_id):
             return PlayerPage
         elif "schedule" in self._url:
             return SchedulePage
