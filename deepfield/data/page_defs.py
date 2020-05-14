@@ -47,6 +47,11 @@ class Page(ABC):
             self._hash = hash(str(self._soup))
         return self._hash
     
+    def __eq__(self, other) -> bool:
+        return (self.__class__ == other.__class__ 
+                and str(self._soup) ==  str(self._soup)    
+            )
+    
 class InsertablePage(Page):
     """A page containing data that can be inserted into the database. All
     referenced links are treated as dependencies of this page.
