@@ -216,7 +216,12 @@ class HtmlCache(_AbstractHtmlCache):
     @classmethod
     def get(cls) -> "HtmlCache":
         if not hasattr(cls, "_instance"):
-            project_root = Path(__file__).parents[2] # data -> deepfield -> deep-field
+            # ensure in right spot: data -> deepfield -> deep-field
+            parents = Path(__file__).parents
+            for actual, expected in zip(parents, ["data", "deepfield", "deep-field"]):
+                if actual.name != expected:
+                    raise RuntimeError("HtmlCache def not found with right parent folder structure")
+            project_root = parents[2]
             if "TESTING" in os.environ:
                 root = (project_root / os.path.join("tests", "data", "resources")).resolve()
             else:
