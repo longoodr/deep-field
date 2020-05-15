@@ -5,7 +5,7 @@ from typing import Iterable, Type
 import pytest
 from pytest import raises
 
-import tests.data.test_utils as test_utils
+import tests.data.test_env as test_env
 from deepfield.data.bbref_pages import (BBRefLink, BBRefPage, GamePage,
                                         PlayerPage, SchedulePage)
 from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
@@ -55,8 +55,8 @@ class TestPage:
     
     @classmethod
     def setup_method(cls):
-        test_utils.clean_db()
-        html = test_utils.resources.find_html(BBRefLink(cls.name))
+        test_env.clean_db()
+        html = test_env.resources.find_html(BBRefLink(cls.name))
         cls.page = cls.page_type(html)
 
     @classmethod
@@ -149,7 +149,7 @@ class TestGamePage(TestPage):
     def test_queries(self):
         with raises(ValueError):
             self.page.update_db()
-        test_utils.insert_mock_players(self.page)
+        insert_mock_players(self.page)
         assert not self.page._exists_in_db()
         self.page.update_db()
         assert self.page._exists_in_db()
@@ -195,3 +195,21 @@ class TestGamePage(TestPage):
     @staticmethod
     def __id_of_name_id(name_id: str) -> int:
         return Player.get(Player.name_id == name_id).id
+
+def insert_mock_players(page: GamePage) -> None:
+    ptables = page._player_tables
+    with db.atomic():
+        for table in ptables:
+            pmap = table.get_name_to_name_ids()
+            for name, name_id in pmap.items():
+                _insert_mock_player(name, name_id)
+
+def _insert_mock_player(name: str, name_id: str) -> None:
+    fields = {
+        "name": name,
+        "name_id": name_id,
+        "bats": Handedness.RIGHT.value,
+        "throws": Handedness.RIGHT.value,
+    }
+    if Player.get_or_none(Player.name_id == name_id) is None:
+        Player.create(**fields)
