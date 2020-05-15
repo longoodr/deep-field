@@ -1,6 +1,7 @@
 import re
 from datetime import date, datetime, time
-from typing import Any, Callable, Dict, Iterable, List, Set, Tuple, Type
+from typing import (Any, Callable, Dict, Iterable, List, Optional, Set, Tuple,
+                    Type)
 
 import requests
 from bs4 import BeautifulSoup, Comment
@@ -63,13 +64,13 @@ class BBRefLink(Link):
             return SchedulePage
         raise ValueError(f"Could not determine page type of {self}")
     
-    __TYPE_TO_MODEL = {
+    __TYPE_TO_MODEL: Dict[str, Optional[Type[DeepFieldModel]]] = {
         "GamePage"    : Game,
         "PlayerPage"  : Player,
         "SchedulePage": None
     }
     
-    def __get_link_model(self) -> Type[DeepFieldModel]:
+    def __get_link_model(self) -> Optional[Type[DeepFieldModel]]:
         return self.__TYPE_TO_MODEL[self.page_type.__name__]
     
 class BBRefInsertablePage(BBRefPage, InsertablePage):
@@ -363,7 +364,7 @@ class _GameQueryRunner:
     def __lst_filter(div) -> bool:
         return "Time: " in div.text
     
-    def __get_time_of_day(self) -> TimeOfDay:
+    def __get_time_of_day(self) -> Optional[TimeOfDay]:
         tod_div = self.__scorebox_meta.find(self.__tod_filter)
         if tod_div is None:
             return None
@@ -378,7 +379,7 @@ class _GameQueryRunner:
                 return True
         return False
     
-    def __get_field_type(self) -> FieldType:
+    def __get_field_type(self) -> Optional[FieldType]:
         field_div = self.__scorebox_meta.find(self.__field_div_filter)
         if field_div is None:
             return None
