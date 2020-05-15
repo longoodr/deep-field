@@ -10,6 +10,8 @@ class Link(ABC):
     
     def __init__(self, url: str):
         self._url = url
+        self.name_id = self._get_name_id()
+        self.page_type = self._get_page_type()
     
     @abstractmethod
     def exists_in_db(self) -> bool:

@@ -42,8 +42,6 @@ class BBRefLink(Link):
     
     def __init__(self, url: str):
         super().__init__(url)
-        self.name_id = self._get_name_id()
-        self.page_type = self._get_page_type()
         self._link_model = self.__get_link_model()
         
     def exists_in_db(self) -> bool:
