@@ -26,6 +26,5 @@ class TestScrapeNode:
         for game, expected_scrape_num in zip(games, [39, 1]):
             link = BBRefLink("WAS201710120.shtml")
             page = Page.from_link(link)
-            #test_env.insert_mock_players(page)
             node = ScrapeNode.from_page(page)
             assert node.scrape() == expected_scrape_num
