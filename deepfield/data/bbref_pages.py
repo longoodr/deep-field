@@ -87,9 +87,13 @@ class SchedulePage(BBRefPage):
     def get_links(self) -> Iterable[Link]:
         games = self._soup.find_all("p", {"class": "game"})
         for game in games:
-            suffix = game.em.a["href"]
-            url = self.BASE_URL + suffix
-            yield BBRefLink(url)
+            try:
+                suffix = game.em.a["href"]
+                url = self.BASE_URL + suffix
+                yield BBRefLink(url)
+            except AttributeError:
+                # no link to boxscore exists (future game?)
+                continue
 
 class PlayerPage(BBRefInsertablePage):
     """A page containing info on a given player."""
