@@ -134,10 +134,7 @@ class _WebHandler(_AbstractHtmlRetrievalHandler):
         self.__wait_until_can_pull()
         self.__set_last_pull_time()
         response = requests.get(str(self._link))
-        try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError:
-            return None
+        response.raise_for_status()
         html = response.text
         HtmlCache.get().insert_html(html, self._link)
         return html
