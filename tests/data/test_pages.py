@@ -11,8 +11,41 @@ from deepfield.data.bbref_pages import (BBRefLink, BBRefPage, GamePage,
 from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
                                      Venue, db)
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
-from deepfield.data.scraping import HtmlCache, PageFactory
+from deepfield.data.pages import HtmlCache, Page
 
+RES_URLS = [
+    "https://www.baseball-reference.com/boxes/WAS/WAS201710120.shtml",
+    "https://www.baseball-reference.com/leagues/MLB/2016-schedule.shtml",
+    "https://www.baseball-reference.com/players/v/vendipa01.shtml"
+]
+
+class TestPageFromLink:
+    
+    def test_page_types(self):
+        for url, page_type in zip(RES_URLS, [GamePage, SchedulePage, PlayerPage]):
+            link = BBRefLink(url)
+            assert type(Page.from_link(link)) == page_type
+
+class TestCache:
+    
+    def test_singleton(self):
+        c1 = HtmlCache.get()
+        c2 = HtmlCache.get()
+        assert c1 is c2
+    
+    def test_find_html_in_cache(self):
+        cache = HtmlCache.get()
+        for url in RES_URLS:
+            assert cache.find_html(BBRefLink(url)) is not None
+            
+    def test_find_html_not_in_cache(self):
+        cache = HtmlCache.get()
+        for url in [
+            "ANA199742069.shtml",
+            "1997-schedule.shtml",
+            "burdege01.shtml"
+        ]:
+            assert cache.find_html(BBRefLink(url)) is None
 
 class TestPage:
             
@@ -41,14 +74,14 @@ class TestPage:
     def _test_hash_eq(self, other_name: str):
         link = BBRefLink(self.name)
         link2 = BBRefLink(self.name)
-        p1 = PageFactory.create_page_from_link(link)
-        p2 = PageFactory.create_page_from_link(link)
+        p1 = Page.from_link(link)
+        p2 = Page.from_link(link)
         assert hash(link) == hash(link2)
         assert link == link2
         assert hash(p1) == hash(p2)
         assert p1 == p2
         game_link = BBRefLink(other_name)
-        p3 = PageFactory.create_page_from_link(game_link)
+        p3 = Page.from_link(game_link)
         assert hash(link) != hash(game_link)
         assert link != game_link
         assert hash(p1) != hash(p3)

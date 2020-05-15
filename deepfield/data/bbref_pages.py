@@ -9,7 +9,7 @@ from peewee import Query
 from deepfield.data.dbmodels import (DeepFieldModel, Game, GamePlayer, Play,
                                      Player, Team, Venue, db)
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
-from deepfield.data.page_defs import InsertablePage, Link, Page
+from deepfield.data.pages import InsertablePage, Link, Page
 
 
 class BBRefPage(Page):
