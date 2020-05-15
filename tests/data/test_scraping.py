@@ -4,7 +4,7 @@ import tests.data.test_env as test_env
 from deepfield.data.bbref_pages import (BBRefLink, GamePage, PlayerPage,
                                         SchedulePage)
 from deepfield.data.pages import HtmlCache, Page
-from deepfield.data.scraping import InsertableScrapeNode, ScrapeNode
+from deepfield.data.nodes import InsertableScrapeNode, ScrapeNode
 
 class TestScrapeNode:
     
