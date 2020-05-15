@@ -44,3 +44,11 @@ class Play(DeepFieldModel):
     pitch_ct = CharField(null=True)
     batter_id = ForeignKeyField(Player)
     pitcher_id = ForeignKeyField(Player)
+
+_MODELS = (Game, GamePlayer, Play, Player, Team, Venue)
+
+def create_tables():
+    db.create_tables(_MODELS)
+    
+def drop_tables():
+    db.drop_tables(_MODELS)

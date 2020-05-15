@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from time import sleep
 from time import time as get_cur_time
-from typing import Dict, Iterable, Optional, Type
+from typing import Callable, Dict, Iterable, Optional, Type
 
 import requests
 from bs4 import BeautifulSoup
@@ -52,8 +52,8 @@ class Page(ABC):
     """
     
     @staticmethod
-    def from_link(link: Link) -> "Page":
-        html = _HtmlRetriever(link).retrieve_html()
+    def from_link(link: Link, cachable: bool = True) -> "Page":
+        html = _HtmlRetriever(link, cachable).retrieve_html()
         if html is None:
             raise ValueError(f"Could not get HTML for {link}")
         return link.page_type(html)
@@ -123,26 +123,37 @@ class _AbstractHtmlRetrievalHandler(ABC):
 class _HtmlRetriever(_AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link."""
     
-    _HANDLER_SEQUENCE: Iterable[Type["_AbstractHtmlRetrievalHandler"]]
+    Handler = Callable[["_HtmlRetriever"], Optional[str]]
+    _HANDLER_SEQUENCE: Iterable[Handler]
     
-    def __init__(self, link: Link):
+    def __init__(self, link: Link, cachable: bool = True):
         super().__init__(link)
         self.__init_handler_seq()
+        self._cachable = cachable
         
     @classmethod
     def __init_handler_seq(cls) -> None:
         if not hasattr(cls, "_HANDLER_SEQUENCE"):
             cls._HANDLER_SEQUENCE = [
-                _CachedHandler,
-                _WebHandler
+                cls._run_cached_handler,
+                cls._run_web_handler
             ]
         
     def retrieve_html(self) -> Optional[str]:
-        for handler_type in self._HANDLER_SEQUENCE:
-            html = handler_type(self._link).retrieve_html()
+        for handler in self._HANDLER_SEQUENCE:
+            html = handler(self)
             if html is not None:
                 return html
         return None
+    
+    def _run_cached_handler(self) -> Optional[str]:
+        if self._cachable:
+            return _CachedHandler(self._link).retrieve_html()
+        return None
+    
+    def _run_web_handler(self) -> Optional[str]:
+        return _WebHandler(self._link, self._cachable).retrieve_html()
+    
     
 class _CachedHandler(_AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link from local cache."""
@@ -152,6 +163,10 @@ class _CachedHandler(_AbstractHtmlRetrievalHandler):
     
 class _WebHandler(_AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link from the web."""
+    
+    def __init__(self, link: Link, cache_insert: bool = True):
+        super().__init__(link)
+        self.__insert = cache_insert
     
     # baseball-reference.com's robots.txt specifies a crawl delay of 3 seconds
     __CRAWL_DELAY = 3
@@ -163,7 +178,8 @@ class _WebHandler(_AbstractHtmlRetrievalHandler):
         response = requests.get(str(self._link))
         response.raise_for_status()
         html = response.text
-        HtmlCache.get().insert_html(html, self._link)
+        if self.__insert:
+            HtmlCache.get().insert_html(html, self._link)
         return html
     
     def __wait_until_can_pull(self) -> None:
@@ -256,9 +272,6 @@ class HtmlCache(_AbstractHtmlCache):
 
 class _HtmlFolder(_AbstractHtmlCache):
     """A folder containing HTML pages."""
-    
-    def __init__(self, root: str):
-        super().__init__(root)
     
     def find_html(self, link: Link) -> Optional[str]:
         if not os.path.isdir(self._root):
