@@ -258,13 +258,12 @@ class _HtmlFolder(_AbstractHtmlCache):
     
     def __init__(self, root: str):
         super().__init__(root)
-        contained_files = [f for f in os.listdir(self._root)
-                           if os.path.isfile(self._full_path(f))]
-        self._contained_files = set(contained_files)
     
     def find_html(self, link: Link) -> Optional[str]:
         if not os.path.isdir(self._root):
             return None
+        if not hasattr(self, "_contained_files"):
+            self.__init_contained_files()
         filename = self._get_filename(link)
         if filename in self._contained_files:
             return self._get_file_html(filename)
@@ -278,3 +277,8 @@ class _HtmlFolder(_AbstractHtmlCache):
         with open(filepath, 'w', encoding="utf-8") as html_file:
             html_file.write(html)
         self._contained_files.add(filename)
+
+    def __init_contained_files(self) -> None:
+        contained_files = [f for f in os.listdir(self._root)
+                           if os.path.isfile(self._full_path(f))]
+        self._contained_files = set(contained_files)
