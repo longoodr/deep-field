@@ -123,7 +123,7 @@ class _AbstractHtmlRetrievalHandler(ABC):
 class _HtmlRetriever(_AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link."""
     
-    __HANDLER_SEQUENCE: Iterable[Type["_AbstractHtmlRetrievalHandler"]]
+    _HANDLER_SEQUENCE: Iterable[Type["_AbstractHtmlRetrievalHandler"]]
     
     def __init__(self, link: Link):
         super().__init__(link)
@@ -131,13 +131,14 @@ class _HtmlRetriever(_AbstractHtmlRetrievalHandler):
         
     @classmethod
     def __init_handler_seq(cls) -> None:
-        cls.__HANDLER_SEQUENCE = [
-            _CachedHandler,
-            _WebHandler
-        ]
+        if not hasattr(cls, "_HANDLER_SEQUENCE"):
+            cls._HANDLER_SEQUENCE = [
+                _CachedHandler,
+                _WebHandler
+            ]
         
     def retrieve_html(self) -> Optional[str]:
-        for handler_type in self.__HANDLER_SEQUENCE:
+        for handler_type in self._HANDLER_SEQUENCE:
             html = handler_type(self._link).retrieve_html()
             if html is not None:
                 return html
