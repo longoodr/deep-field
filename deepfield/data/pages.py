@@ -133,7 +133,7 @@ class _PageRetriever:
             if html is not None:
                 try:
                     return self._link.page_type(html)
-                except:
+                except Exception:
                     logger.warning(
                         f"{handler.__name__} returned malformed HTML for link {self._link}")
         raise ValueError(f"HTML could not be retrieved for {self._link}")

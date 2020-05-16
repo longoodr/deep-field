@@ -48,7 +48,7 @@ class ScrapeNode:
             try:
                 page = Page.from_link(link)
                 num_scraped += ScrapeNode.from_page(page).scrape()
-            except:
+            except Exception:
                 logger.exception(f"Could not scrape {page}, skipping.")
         return num_scraped
             

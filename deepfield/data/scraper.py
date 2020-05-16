@@ -30,8 +30,11 @@ def main(args: argparse.Namespace) -> None:
     config_logging()
     db.init("stats.db")
     create_tables()
-    for y in get_years(args.year, args.no_earlier):
-        scrape_year(y)
+    try:
+        for y in get_years(args.year, args.no_earlier):
+            scrape_year(y)
+    except KeyboardInterrupt:
+        logger.info("Ending scrape")
     
 def scrape_year(year: int) -> None:
     sched_url = f"https://www.baseball-reference.com/leagues/MLB/{year}-schedule.shtml"
