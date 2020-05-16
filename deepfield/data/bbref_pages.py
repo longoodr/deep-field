@@ -590,10 +590,6 @@ class _PlayDataTransformer:
             stripped_name = _NameStripper.get_stripped_name(player_name)
             return pmap[stripped_name]
         
-        # if all attempts fail, there's a new edge case that needs to be
-        # considered
-        raise KeyError(player_name)
-        
     def __strip(self, stat: str) -> str:
         return stat.strip()
     
