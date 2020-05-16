@@ -1,6 +1,8 @@
 from peewee import (CharField, DateField, FixedCharField, ForeignKeyField,
                     Model, SmallIntegerField, SqliteDatabase, TimeField)
 
+MAX_SQL_VARS = 999
+
 db = SqliteDatabase(None)
 
 class DeepFieldModel(Model):
@@ -21,6 +23,8 @@ class Player(DeepFieldModel):
     throws = SmallIntegerField()
 
 class Game(DeepFieldModel):
+    NUM_FIELDS = 8
+    
     name_id = FixedCharField(12, unique=True)
     local_start_time = TimeField("%H:%M", null=True)
     time_of_day = SmallIntegerField(null=True)

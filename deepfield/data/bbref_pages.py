@@ -1,3 +1,4 @@
+import math
 import re
 from datetime import date, datetime, time
 from typing import (Any, Callable, Dict, Iterable, List, Optional, Set, Tuple,
@@ -5,10 +6,10 @@ from typing import (Any, Callable, Dict, Iterable, List, Optional, Set, Tuple,
 
 import requests
 from bs4 import BeautifulSoup, Comment
-from peewee import Query
+from peewee import Query, chunked
 
-from deepfield.data.dbmodels import (DeepFieldModel, Game, Play, Player, Team,
-                                     Venue, db)
+from deepfield.data.dbmodels import (MAX_SQL_VARS, DeepFieldModel, Game, Play,
+                                     Player, Team, Venue, db)
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.data.pages import InsertablePage, Link, Page
 
@@ -429,13 +430,16 @@ class _GameQueryRunner:
 
 class _PlayQueryRunner:
     
+    __ROWS_PER_BATCH = math.floor(MAX_SQL_VARS / Game.NUM_FIELDS)
+    
     def __init__(self, soup, player_tables: _PlayerTables):
         self.__soup = soup
         self.__pbp_table = self.__get_pbp_table()
         self.__transformer = _PlayDataTransformer(player_tables)
             
     def add_plays(self, game: Game) -> None:
-        Play.insert_many(self.__get_play_data(game)).execute()
+        for batch in chunked(self.__get_play_data(game), self.__ROWS_PER_BATCH): 
+            Play.insert_many(batch).execute()
         
     def __get_play_data(self, game: Game) -> Iterable[Dict[str, Any]]:
         for play_num, play_row in enumerate(self.__get_play_rows()):
@@ -446,7 +450,6 @@ class _PlayQueryRunner:
             yield play_data
         
     def __get_pbp_table(self) -> _PlaceholderTable:
-        # pbp table placeholder is the 7th on page
         ph = self.__soup.find(_PlaceholderDivFilter("play_by_play"))
         return _PlaceholderTable(ph)
     
