@@ -375,10 +375,12 @@ class _GameQueryRunner:
             return None
         return enum.value
         
-    def __get_local_start_time(self) -> time:
+    def __get_local_start_time(self) -> Optional[time]:
         lst_div = self.__scorebox_meta.find(self.__lst_filter)
         # Start Time: %I:%M [a.m.|p.m.] Local
         lst_text = lst_div.text.split("Time: ")[-1] # "%I:%M [a.m.|p.m.] Local"
+        if lst_text.split()[-1] != "Local":
+            return None
         lst_text = lst_text.replace(" Local", "") # "%I:%M [a.m.|p.m.]"
         lst_text = lst_text.replace(".", "").upper() # "%I:%M %p"
         dt = datetime.strptime(lst_text, "%I:%M %p")
