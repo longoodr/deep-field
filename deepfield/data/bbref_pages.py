@@ -250,7 +250,7 @@ class _PlayerTable(_PlaceholderTable):
         if self.__name_to_db_ids is None:
             name_ids = set(self.get_name_ids())
             name_ids_to_name = {nid: name for name, nid
-                                in self.get_name_to_name_ids().items()}
+                                in self.get_name_name_ids()}
             db_players = Player.select(Player.id, Player.name_id)\
                 .where(Player.name_id.in_(name_ids))
             name_ids_to_db_ids = {p.name_id: p.id for p in db_players}
@@ -260,13 +260,9 @@ class _PlayerTable(_PlaceholderTable):
                 }
         return self.__name_to_db_ids
     
-    def get_name_to_name_ids(self) -> Dict[str, str]:
-        if self._PlayerTable__name_to_name_ids is None:
-            self.__name_to_name_ids = {
-                    self.__get_player_name(row): self.__get_name_id(row)
-                    for row in self.__get_rows()
-                }
-        return self.__name_to_name_ids
+    def get_name_name_ids(self) -> Iterable[Tuple[str, str]]:
+        for row in self.__get_rows():
+            yield (self.__get_player_name(row), self.__get_name_id(row))
     
     def __get_rows(self):
         if self.__rows is None:

@@ -19,8 +19,7 @@ def insert_mock_players(page: GamePage) -> None:
     ptables = page._player_tables
     with db.atomic():
         for table in ptables:
-            pmap = table.get_name_to_name_ids()
-            for name, name_id in pmap.items():
+            for name, name_id in table.get_name_name_ids():
                 _insert_mock_player(name, name_id)
 
 def _insert_mock_player(name: str, name_id: str) -> None:
