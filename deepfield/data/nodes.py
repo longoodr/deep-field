@@ -43,8 +43,11 @@ class ScrapeNode:
         for link in self._page.get_links():
             if link.exists_in_db():
                 continue
-            page = Page.from_link(link)
-            num_scraped += ScrapeNode.from_page(page).scrape()
+            try:
+                page = Page.from_link(link)
+                num_scraped += ScrapeNode.from_page(page).scrape()
+            except:
+                logger.exception(f"Could not scrape {page}, skipping.")
         return num_scraped
             
 class InsertableScrapeNode(ScrapeNode):
