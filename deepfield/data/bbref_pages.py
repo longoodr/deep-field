@@ -246,18 +246,20 @@ class _PlayerTable(_PlaceholderTable):
                                for row in self.__get_rows()]
         return self.__name_ids
     
-    def get_name_to_db_ids(self) -> Dict[str, int]:
+    def get_name_to_db_ids(self) -> Dict[str, Tuple[int]]:
+        """Returns a mapping from names to database IDs found for that name.
+        If there are multiple names for the same player, the IDs will appear in
+        the order that they occur in the player table.
+        """
         if self.__name_to_db_ids is None:
             name_ids = set(self.get_name_ids())
-            name_ids_to_name = {nid: name for name, nid
-                                in self.get_name_name_ids()}
-            db_players = Player.select(Player.id, Player.name_id)\
+            db_players = Player.select(Player.name, Player.id, Player.name_id)\
                 .where(Player.name_id.in_(name_ids))
-            name_ids_to_db_ids = {p.name_id: p.id for p in db_players}
-            self.__name_to_db_ids = {
-                    name_ids_to_name[nid]: name_ids_to_db_ids[nid]
-                    for nid in name_ids
-                }
+            self.__name_to_db_ids = {nid: [] for nid in name_ids}
+            for p in db_players:
+                self.__name_to_db_ids[p.name_id].append(p.id)
+            self.__name_to_db_ids = {nid: tuple(ids)
+                                     for nid, ids in self.__name_to_db_ids.items()}
         return self.__name_to_db_ids
     
     def get_name_name_ids(self) -> Iterable[Tuple[str, str]]:
@@ -460,6 +462,7 @@ class _PlayQueryRunner:
         self.__soup = soup
         self.__pbp_table = self.__get_pbp_table()
         self.__transformer = _PlayDataTransformer(player_tables)
+        self.__player_tables = player_tables
             
     def add_plays(self, game: Game) -> None:
         for batch in chunked(self.__get_play_data(game), self.__ROWS_PER_BATCH): 
@@ -505,9 +508,10 @@ class _PlayDataTransformer:
     # as input.
     __RawStatTranslation = Callable[["_PlayDataTransformer", str], Any]
     
-    # These instance methods require knowledge of inning half (2nd str arg) to 
-    # determine if home or away player for id lookup.
-    __PlayerLookup = Callable[["_PlayDataTransformer", str, str], int]
+    # These instance methods require knowledge of inning half (2nd str arg) to
+    # determine if home or away player for id lookup. They require appearances
+    # to disambiguate among players with the same name.
+    __PlayerLookup = Callable[["_PlayDataTransformer", str, str, "_PlayerAppearances"], int]
     
     """
     THE FOLLOWING CLASS VARS ARE INSTANTIATED IN A CLASS METHOD AND NOT HERE.
@@ -571,10 +575,13 @@ class _PlayDataTransformer:
         return raw_play_data
     
     def transform_raw_play_data(self,
-                                raw_play_data: Dict[str, str]
+                                raw_play_data: Dict[str, str],
+                                appearances: "_PlayerAppearances",
                                 ) -> Dict[str, Any]:
         transformed_stats = self.__transform_stats(raw_play_data)
-        self.__insert_player_ids(raw_play_data, into_dict=transformed_stats)
+        self.__insert_player_ids(raw_play_data,
+                                 appearances,
+                                 into_dict=transformed_stats)
         return transformed_stats
     
     def __transform_stats(self,
@@ -588,6 +595,8 @@ class _PlayDataTransformer:
     
     def __insert_player_ids(self,
                             raw_play_data: Dict[str, str],
+                            appearances: "_PlayerAppearances",
+                            *,
                             into_dict: Dict[str, Any]
                             ) -> Dict[str, str]:
         inning_half_char = raw_play_data["inning"][0]
@@ -595,7 +604,10 @@ class _PlayDataTransformer:
                 in self.__PLAYERS.items():
             player_name = raw_play_data[player_type]
             into_dict[player_type_id] = \
-                    player_lookup_func(self, player_name, inning_half_char)
+                    player_lookup_func(self,
+                                       player_name,
+                                       inning_half_char,
+                                       appearances)
         return into_dict
     
     def __inning_to_inning_half(self, inning: str) -> int:
@@ -614,25 +626,44 @@ class _PlayDataTransformer:
                 on_base += on_base_flag.value
         return on_base
     
-    def __batter_to_id(self, batter_name: str, inning_half_char: str) -> int:
-        return self.__player_to_id(batter_name, inning_half_char, "batter")
+    def __batter_to_id(self,
+                       batter_name: str,
+                       inning_half_char: str,
+                       appearances: "_PlayerAppearances"
+                       ) -> int:
+        return self.__player_to_id(batter_name, inning_half_char, "batter", appearances)
     
-    def __pitcher_to_id(self, pitcher_name: str, inning_half_char: str) -> int:
-        return self.__player_to_id(pitcher_name, inning_half_char, "pitcher")
+    def __pitcher_to_id(self,
+                        pitcher_name: str,
+                        inning_half_char: str,
+                        appearances: "_PlayerAppearances"
+                        ) -> int:
+        return self.__player_to_id(pitcher_name, inning_half_char, "pitcher", appearances)
     
     def __player_to_id(self,
                        player_name: str,
                        inning_half_char:str,
-                       player_type: str
+                       player_type: str,
+                       appearances: "_PlayerAppearances"
                        ) -> int:
         side = self.__INNING_AND_PLAYER_TO_SIDE[(inning_half_char, player_type)]
         pmap = self.__player_maps[side]
         try:
             # first try unedited name, since there's some overhead w/ stripping
-            return pmap[player_name]
+            appear_no = appearances.get_appearances(side, player_name, player_type)
+            return self.__get_id(pmap, player_name, appear_no)
         except KeyError:
             stripped_name = _NameStripper.get_stripped_name(player_name)
-            return pmap[stripped_name]
+            appear_no = appearances.get_appearances(side, stripped_name, player_type)
+            return self.__get_id(pmap, stripped_name, appear_no)
+    
+    @staticmethod
+    def __get_id(pmap, name: str, appear_no: int):
+        # assume that a subsequent appearance cycles to the next ID found for 
+        # that name
+        ids = pmap[name]
+        id_index = appear_no % len(ids)
+        return ids[id_index]
         
     def __strip(self, stat: str) -> str:
         return stat.strip()
@@ -642,3 +673,50 @@ class _PlayDataTransformer:
     
     def __convert_to_int(self, stat: str) -> int:
         return int(stat)
+    
+class _PlayerAppearances:
+    """Maps home and away player names to the number of times they have
+    continuously appeared in the game. Appearances are counted separately for
+    batting appearances and pitcher appearances. 
+    
+    This is used to determine which ID to infer from a name with multiple IDs
+    (i.e. 2 players with the same name on the same team)
+    
+    For batters, this increments for every plate appearance, but for pitchers,
+    this only increments when they are switched out. This is because 2 pitchers
+    with the same name only switch between each other when they retire, but for
+    batters, it is necessary for the other player with the same name to bat
+    before the original player appears again at the plate.
+    """
+    
+    __Appearances = Dict[str, int] # {"batter": #, "pitcher": #}
+    __AppearancesForSide = Dict[str, __Appearances] # apps_4_side[name] -> appearances
+    __map: Dict[str, __AppearancesForSide] # map[side][name] -> appearances
+    
+    def __init__(self, player_tables: _PlayerTables):
+        self.__map = {
+            "away": self.__get_start_appearances(player_tables.away),
+            "home": self.__get_start_appearances(player_tables.home),
+        }
+    
+    @staticmethod
+    def __get_start_appearances(ptable: _PlayerTable) -> __AppearancesForSide:
+        start_appearances = {}
+        for name, _ in ptable.get_name_name_ids():
+            start_appearances[name] = {"batter": 0, "pitcher": 0}
+        return start_appearances
+    
+    def get_appearances(self,
+                        side: str,
+                        name: str,
+                        batter_or_pitcher: str
+                        ) -> int:
+        return self.__map[side][name][batter_or_pitcher]
+    
+    def inc_appearances(self,
+                        side: str,
+                        name: str,
+                        batter_or_pitcher: str
+                        ) -> None:
+        self.__map[side][name][batter_or_pitcher] += 1
+        
