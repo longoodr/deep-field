@@ -30,10 +30,6 @@ class Game(DeepFieldModel):
     home_team_id = ForeignKeyField(Team)
     away_team_id = ForeignKeyField(Team)
     
-class GamePlayer(DeepFieldModel):
-    game_id = ForeignKeyField(Game)
-    player_id = ForeignKeyField(Player)
-    
 class Play(DeepFieldModel):
     game_id = ForeignKeyField(Game)
     inning_half = SmallIntegerField()
@@ -45,7 +41,7 @@ class Play(DeepFieldModel):
     batter_id = ForeignKeyField(Player)
     pitcher_id = ForeignKeyField(Player)
 
-_MODELS = (Game, GamePlayer, Play, Player, Team, Venue)
+_MODELS = (Game, Play, Player, Team, Venue)
 
 def create_tables():
     db.create_tables(_MODELS)

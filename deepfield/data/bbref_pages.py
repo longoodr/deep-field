@@ -7,8 +7,8 @@ import requests
 from bs4 import BeautifulSoup, Comment
 from peewee import Query
 
-from deepfield.data.dbmodels import (DeepFieldModel, Game, GamePlayer, Play,
-                                     Player, Team, Venue, db)
+from deepfield.data.dbmodels import (DeepFieldModel, Game, Play, Player, Team,
+                                     Venue, db)
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.data.pages import InsertablePage, Link, Page
 
@@ -286,7 +286,6 @@ class _GamePageQueryRunner:
         self.__team_adder = _TeamQueryRunner(self.__scorebox)
         self.__venue_adder = _VenueQueryRunner(self.__scorebox_meta)
         self.__game_adder = _GameQueryRunner(self.__soup, self.__scorebox_meta, game_name)
-        self.__game_player_adder = _GamePlayerQueryRunner(player_tables)
         self.__pbp_adder = _PlayQueryRunner(self.__soup, player_tables)
         
     def run_queries(self) -> None:
@@ -294,7 +293,6 @@ class _GamePageQueryRunner:
             teams = self.__team_adder.add_teams()
             venue = self.__venue_adder.add_venue()
             game = self.__game_adder.add_game(teams, venue)
-            self.__game_player_adder.add_game_players(game)
             self.__pbp_adder.add_plays(game)
         
 class _TeamQueryRunner:
@@ -452,23 +450,6 @@ class _PlayQueryRunner:
             "tr",
             id=lambda id: id and id.startswith("event_")
             )
-
-class _GamePlayerQueryRunner:
-    
-    def __init__(self, player_tables: _PlayerTables):
-        name_ids =  set(player_tables.home.get_name_ids())
-        name_ids.update(player_tables.away.get_name_ids())
-        self._name_ids = name_ids
-        
-    def add_game_players(self, game: Game) -> None:
-        GamePlayer.insert_many(
-            self.__get_rows(game),
-            fields=[GamePlayer.game_id, GamePlayer.player_id]
-            ).execute()
-
-    def __get_rows(self, game: Game) -> Iterable[Tuple[int, int]]:
-        for pid in Player.select(Player.id).where(Player.name_id.in_(self._name_ids)):
-            yield (game.id, pid.id)
         
 class _PlayDataTransformer:
     """Transforms data contained in play rows to data that is ready for

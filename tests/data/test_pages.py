@@ -8,7 +8,7 @@ from pytest import raises
 import tests.data.test_env as test_env
 from deepfield.data.bbref_pages import (BBRefLink, BBRefPage, GamePage,
                                         PlayerPage, SchedulePage)
-from deepfield.data.dbmodels import (Game, GamePlayer, Play, Player, Team,
+from deepfield.data.dbmodels import (Game, Play, Player, Team,
                                      Venue, db)
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.data.pages import HtmlCache, Page
@@ -188,9 +188,6 @@ class TestGamePage(TestPage):
                 and Play.batter_id == self.__id_of_name_id("almoral01")
                 and Play.pitcher_id == self.__id_of_name_id("gonzagi01")
             )
-        num_game_players = len(GamePlayer.select().where(GamePlayer.game_id == game.id))
-        num_players = len(Player.select())
-        assert(num_game_players == num_players)
 
     @staticmethod
     def __id_of_name_id(name_id: str) -> int:
