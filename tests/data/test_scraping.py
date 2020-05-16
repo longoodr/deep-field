@@ -1,3 +1,5 @@
+import os
+from shutil import copyfile
 from typing import List
 
 import pytest
@@ -47,3 +49,15 @@ class TestParseable:
         if isinstance(page, GamePage):
             test_env.insert_mock_players(page)
         ScrapeNode.from_page(page).scrape()
+
+    def test_malformed_html(self):
+        # the web handler will download the correct html, so need to copy
+        # malformed html to cached file beforehand to test properly
+        player_pages = os.path.join("tests", "data", "resources", "PlayerPage")
+        copyfile(
+                src = os.path.join(player_pages, "malformed_arod.shtml"),
+                dst = os.path.join(player_pages, "rodrial01.shtml")
+            )
+        url = "https://www.baseball-reference.com/players/r/rodrial01.shtml"
+        link = BBRefLink(url)
+        page = Page.from_link(link)
