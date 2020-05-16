@@ -101,7 +101,8 @@ class PlayerPage(BBRefInsertablePage):
     
     def __init__(self, html: str):
         super().__init__(html)
-        self._player_info = self._soup.find("div", {"itemtype": "https://schema.org/Person"})
+        self._player_info = self._soup.find("div",
+            {"itemtype": "https://schema.org/Person"})
     
     def get_links(self) -> Iterable[Link]:
         """PlayerPages don't depend on anything else."""
@@ -144,7 +145,11 @@ class GamePage(BBRefInsertablePage):
         
     def _run_queries(self) -> None:
         if not hasattr(self, "_query_runner"):
-            self.__query_runner = _GamePageQueryRunner(self._soup, self._player_tables, self._link.name_id)
+            self.__query_runner = _GamePageQueryRunner(
+                    self._soup,
+                    self._player_tables,
+                    self._link.name_id
+                )
         self.__query_runner.run_queries()
     
 class _NameStripper:
@@ -194,7 +199,8 @@ class _PlayerTables:
     game.
     """
     def __init__(self, soup):
-        ptable_placeholders = list(soup.find_all(_PlaceholderDivFilter("batting"), limit=2))
+        ptable_placeholders = list(soup.find_all(
+            _PlaceholderDivFilter("batting"), limit=2))
         self.away = _PlayerTable(ptable_placeholders[0])
         self.home = _PlayerTable(ptable_placeholders[1])
     
@@ -236,7 +242,8 @@ class _PlayerTable(_PlaceholderTable):
     
     def get_name_ids(self) -> Iterable[str]:
         if self.__name_ids is None:
-            self.__name_ids = [self.__get_name_id(row) for row in self.__get_rows()]
+            self.__name_ids = [self.__get_name_id(row)
+                               for row in self.__get_rows()]
         return self.__name_ids
     
     def get_name_to_db_ids(self) -> Dict[str, int]:
@@ -247,21 +254,25 @@ class _PlayerTable(_PlaceholderTable):
             db_players = Player.select(Player.id, Player.name_id)\
                 .where(Player.name_id.in_(name_ids))
             name_ids_to_db_ids = {p.name_id: p.id for p in db_players}
-            self.__name_to_db_ids = {name_ids_to_name[nid]: name_ids_to_db_ids[nid]
-                                    for nid in name_ids}
+            self.__name_to_db_ids = {
+                    name_ids_to_name[nid]: name_ids_to_db_ids[nid]
+                    for nid in name_ids
+                }
         return self.__name_to_db_ids
     
     def get_name_to_name_ids(self) -> Dict[str, str]:
         if self._PlayerTable__name_to_name_ids is None:
-            self.__name_to_name_ids = {self.__get_player_name(row): self.__get_name_id(row)
-                                       for row in self.__get_rows()}
+            self.__name_to_name_ids = {
+                    self.__get_player_name(row): self.__get_name_id(row)
+                    for row in self.__get_rows()
+                }
         return self.__name_to_name_ids
     
     def __get_rows(self):
         if self.__rows is None:
             self.__rows = self.find_all(
-                self.__player_tag_filter,
-                attrs=self.__PLAYER_TAG_ATTR_FILTER
+                    self.__player_tag_filter,
+                    attrs=self.__PLAYER_TAG_ATTR_FILTER
                 )
         return self.__rows
     
@@ -288,11 +299,19 @@ class _GamePageQueryRunner:
     
     def __init__(self, soup, player_tables: _PlayerTables, game_name: str):
         self.__soup = soup
-        self.__scorebox = self.__soup.find("div", {"class": "scorebox"})
-        self.__scorebox_meta = self.__scorebox.find("div", {"class": "scorebox_meta"})
+        self.__scorebox = self.__soup.find(
+                "div", {"class": "scorebox"}
+            )
+        self.__scorebox_meta = self.__scorebox.find(
+                "div", {"class": "scorebox_meta"}
+            )
         self.__team_adder = _TeamQueryRunner(self.__scorebox)
         self.__venue_adder = _VenueQueryRunner(self.__scorebox_meta)
-        self.__game_adder = _GameQueryRunner(self.__soup, self.__scorebox_meta, game_name)
+        self.__game_adder = _GameQueryRunner(
+                self.__soup,
+                self.__scorebox_meta,
+                game_name
+            )
         self.__pbp_adder = _PlayQueryRunner(self.__soup, player_tables)
         
     def run_queries(self) -> None:
@@ -535,7 +554,8 @@ class _PlayDataTransformer:
             "batter":               ("batter_id"    , cls.__batter_to_id),
             "pitcher":              ("pitcher_id"   , cls.__pitcher_to_id),
         }
-        cls.__PBP_STATS = set(cls.__PBP_TO_DB_STATS.keys()).union(set(cls.__PLAYERS.keys()))
+        all_keys = set(cls.__PBP_TO_DB_STATS.keys()).union(set(cls.__PLAYERS.keys()))
+        cls.__PBP_STATS = set(all_keys)
         cls.__lookups_init = True
         
     def extract_raw_play_data(self, play_row) -> Dict[str, str]:
@@ -548,22 +568,32 @@ class _PlayDataTransformer:
                 raw_play_data[data_stat] = play_data_pt.text.replace(u"\xa0", u" ")
         return raw_play_data
     
-    def transform_raw_play_data(self, raw_play_data: Dict[str, str]) -> Dict[str, Any]:
+    def transform_raw_play_data(self,
+                                raw_play_data: Dict[str, str]
+                                ) -> Dict[str, Any]:
         transformed_stats = self.__transform_stats(raw_play_data)
         self.__insert_player_ids(raw_play_data, into_dict=transformed_stats)
         return transformed_stats
     
-    def __transform_stats(self, raw_play_data: Dict[str, str]) -> Dict[str, Any]:
+    def __transform_stats(self,
+                          raw_play_data: Dict[str, str]
+                          ) -> Dict[str, Any]:
         new_data: Dict[str, Any] = {}
-        for pbp_statname, (db_statname, transform_func) in self.__PBP_TO_DB_STATS.items():
+        for pbp_statname, (db_statname, transform_func)\
+                in self.__PBP_TO_DB_STATS.items():
             new_data[db_statname] = transform_func(self, raw_play_data[pbp_statname])
         return new_data
     
-    def __insert_player_ids(self, raw_play_data: Dict[str, str], into_dict: Dict[str, Any]) -> Dict[str, str]:
+    def __insert_player_ids(self,
+                            raw_play_data: Dict[str, str],
+                            into_dict: Dict[str, Any]
+                            ) -> Dict[str, str]:
         inning_half_char = raw_play_data["inning"][0]
-        for player_type, (player_type_id, player_lookup_func) in self.__PLAYERS.items():
+        for player_type, (player_type_id, player_lookup_func) \
+                in self.__PLAYERS.items():
             player_name = raw_play_data[player_type]
-            into_dict[player_type_id] = player_lookup_func(self, player_name, inning_half_char)
+            into_dict[player_type_id] = \
+                    player_lookup_func(self, player_name, inning_half_char)
         return into_dict
     
     def __inning_to_inning_half(self, inning: str) -> int:
@@ -576,7 +606,8 @@ class _PlayDataTransformer:
     def __runners_to_on_base(self, runners: str) -> int:
         #[-|1][-|2][-|3] where - means nobody on base (---, 1-3, 12-, etc)
         on_base = 0
-        for base, on_base_flag in zip(runners, [OnBase.FIRST, OnBase.SECOND, OnBase.THIRD]):
+        for base, on_base_flag \
+                in zip(runners, [OnBase.FIRST, OnBase.SECOND, OnBase.THIRD]):
             if not base == "-":
                 on_base += on_base_flag.value
         return on_base
@@ -587,7 +618,11 @@ class _PlayDataTransformer:
     def __pitcher_to_id(self, pitcher_name: str, inning_half_char: str) -> int:
         return self.__player_to_id(pitcher_name, inning_half_char, "pitcher")
     
-    def __player_to_id(self, player_name: str, inning_half_char: str, player_type: str) -> int:
+    def __player_to_id(self,
+                       player_name: str,
+                       inning_half_char:str,
+                       player_type: str
+                       ) -> int:
         side = self.__INNING_AND_PLAYER_TO_SIDE[(inning_half_char, player_type)]
         pmap = self.__player_maps[side]
         try:
