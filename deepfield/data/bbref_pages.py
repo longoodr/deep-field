@@ -73,14 +73,6 @@ class BBRefLink(Link):
     
     def __get_link_model(self) -> Optional[Type[DeepFieldModel]]:
         return self.__TYPE_TO_MODEL[self.page_type.__name__]
-    
-class BBRefInsertablePage(BBRefPage, InsertablePage):
-    
-    def __init__(self, html: str, model: Type[DeepFieldModel]):
-        super().__init__(html)
-        
-    def _exists_in_db(self):
-        return self._link.exists_in_db()
 
 class SchedulePage(BBRefPage):
     """A page containing a set of URLs corresponding to game pages."""
@@ -96,11 +88,19 @@ class SchedulePage(BBRefPage):
                 # no link to boxscore exists (future game?)
                 continue
 
+class BBRefInsertablePage(BBRefPage, InsertablePage):
+    """A page from baseball-reference.com that can be inserted into the
+    database.
+    """
+        
+    def _exists_in_db(self):
+        return self._link.exists_in_db()
+
 class PlayerPage(BBRefInsertablePage):
     """A page containing info on a given player."""
     
     def __init__(self, html: str):
-        super().__init__(html, Player)
+        super().__init__(html)
         self._player_info = self._soup.find("div", {"itemtype": "https://schema.org/Person"})
     
     def get_links(self) -> Iterable[Link]:
@@ -133,7 +133,7 @@ class GamePage(BBRefInsertablePage):
     """
     
     def __init__(self, html: str):
-        super().__init__(html, Game)
+        super().__init__(html)
         self._player_tables = _PlayerTables(self._soup)
         
     def get_links(self) -> Iterable[Link]:
