@@ -53,7 +53,7 @@ class BBRefLink(Link):
         record = self._link_model.get_or_none(expr)
         return record is not None
     
-    __PLAYER_NAME_ID_MATCHER = re.compile(r"^[\w\.]+\d\d$")
+    __PLAYER_NAME_ID_MATCHER = re.compile(r"^[\w\.']+\d\d$")
     __GAME_NAME_ID_MATCHER   = re.compile(r"[A-Z]{3}\d{9}")
     
     def _get_page_type(self) -> Type[BBRefPage]:
