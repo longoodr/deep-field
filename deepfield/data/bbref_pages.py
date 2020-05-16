@@ -173,6 +173,20 @@ class _PlaceholderTable(BeautifulSoup):
         # an intermediate \n.
         table_contents = ph_div.next_sibling.next_sibling
         super().__init__(table_contents, "lxml")
+    
+class _PlaceholderDivFilter:
+    """Matches placeholder divs whose comment of interest contains the
+    given text."""
+    
+    def __init__(self, text: str):
+        self._text = text
+        
+    def __call__(self, tag) -> bool:
+        return (tag.name == "div"
+            and "class" in tag.attrs
+            and tag["class"][0] == "placeholder"
+            and self._text in tag.next_sibling.next_sibling.string
+        )
         
 class _PlayerTables:
     """Manages access to the tables of away and home players for the given
@@ -180,7 +194,7 @@ class _PlayerTables:
     """
     def __init__(self, soup):
         # player tables are marked by first 2 placeholders on page
-        ptable_placeholders = list(soup.find_all(self.__ptable_filter, limit=2))
+        ptable_placeholders = list(soup.find_all(_PlaceholderDivFilter("batting"), limit=2))
         self.away = _PlayerTable(ptable_placeholders[0])
         self.home = _PlayerTable(ptable_placeholders[1])
     
@@ -200,14 +214,6 @@ class _PlayerTables:
         this_table = self.__tables[self.__cur]
         self.__cur += 1
         return this_table
-    
-    @staticmethod
-    def __ptable_filter(tag) -> bool:
-        return (tag.name == "div"
-                and "class" in tag.attrs
-                and tag["class"][0] == "placeholder"
-                and "batting" in tag.next_sibling.next_sibling.string
-            )
     
 class _PlayerTable(_PlaceholderTable):
     """Manages access to a table of players."""
@@ -253,7 +259,7 @@ class _PlayerTable(_PlaceholderTable):
     def __get_rows(self):
         if self.__rows is None:
             self.__rows = self.find_all(
-                self._player_tag_filter,
+                self.__player_tag_filter,
                 attrs=self.__PLAYER_TAG_ATTR_FILTER
                 )
         return self.__rows
@@ -273,7 +279,7 @@ class _PlayerTable(_PlaceholderTable):
         return row.a["href"] # /players/s/smithjo01.shtml
                 
     @staticmethod 
-    def _player_tag_filter(tag) -> bool:
+    def __player_tag_filter(tag) -> bool:
         return tag.name == "th" and len(tag.attrs) == 5
 
 class _GamePageQueryRunner:
@@ -441,8 +447,7 @@ class _PlayQueryRunner:
         
     def __get_pbp_table(self) -> _PlaceholderTable:
         # pbp table placeholder is the 7th on page
-        placeholders = self.__soup.find_all("div", {"class": "placeholder"}, limit=7)
-        ph = placeholders[-1]
+        ph = self.__soup.find(_PlaceholderDivFilter("play_by_play"))
         return _PlaceholderTable(ph)
     
     def __get_play_rows(self):

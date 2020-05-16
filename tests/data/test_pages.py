@@ -188,6 +188,7 @@ class TestGamePage(TestPage):
                 and Play.batter_id == self.__id_of_name_id("almoral01")
                 and Play.pitcher_id == self.__id_of_name_id("gonzagi01")
             )
+        assert len(list(Play.select())) == 97
 
     @staticmethod
     def __id_of_name_id(name_id: str) -> int:
