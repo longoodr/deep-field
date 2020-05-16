@@ -1,3 +1,4 @@
+import logging
 import os
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -8,6 +9,7 @@ from typing import Callable, Dict, Iterable, Optional, Type
 import requests
 from bs4 import BeautifulSoup
 
+logger = logging.getLogger(__name__)
 
 class Link(ABC):
     """A page located at a URL that can determine if itself already exists in 
@@ -53,10 +55,7 @@ class Page(ABC):
     
     @staticmethod
     def from_link(link: Link, cachable: bool = True) -> "Page":
-        html = _HtmlRetriever(link, cachable).retrieve_html()
-        if html is None:
-            raise ValueError(f"Could not get HTML for {link}")
-        return link.page_type(html)
+        return _PageRetriever(link, cachable).get_page()
      
     def __init__(self, html: str):
         self._soup = BeautifulSoup(html, "lxml")
@@ -109,25 +108,14 @@ class InsertablePage(Page):
         """Returns whether this page already exists in the database."""
         pass
     
-class _AbstractHtmlRetrievalHandler(ABC):
-    """A step in the HTML retrieval process."""
+class _PageRetriever:
+    """Retrieves the page associated with the given link."""
     
-    def __init__(self, link: Link):
-        self._link = link
-    
-    @abstractmethod
-    def retrieve_html(self) -> Optional[str]:
-        """Returns HTML if successful, or None if not."""
-        pass
-    
-class _HtmlRetriever(_AbstractHtmlRetrievalHandler):
-    """Retrieves HTML associated with the given link."""
-    
-    Handler = Callable[["_HtmlRetriever"], Optional[str]]
+    Handler = Callable[["_PageRetriever"], Optional[str]]
     _HANDLER_SEQUENCE: Iterable[Handler]
     
     def __init__(self, link: Link, cachable: bool = True):
-        super().__init__(link)
+        self._link = link
         self.__init_handler_seq()
         self._cachable = cachable
         
@@ -139,12 +127,15 @@ class _HtmlRetriever(_AbstractHtmlRetrievalHandler):
                 cls._run_web_handler
             ]
         
-    def retrieve_html(self) -> Optional[str]:
+    def get_page(self) -> Page:
         for handler in self._HANDLER_SEQUENCE:
             html = handler(self)
             if html is not None:
-                return html
-        return None
+                try:
+                    return self._link.page_type(html)
+                except:
+                    logger.warning(f"{handler.__name__} returned malformed HTML for link {self._link}")
+        raise ValueError(f"HTML could not be retrieved for {self._link}")
     
     def _run_cached_handler(self) -> Optional[str]:
         if self._cachable:
@@ -153,7 +144,17 @@ class _HtmlRetriever(_AbstractHtmlRetrievalHandler):
     
     def _run_web_handler(self) -> Optional[str]:
         return _WebHandler(self._link, self._cachable).retrieve_html()
+
+class _AbstractHtmlRetrievalHandler(ABC):
+    """A step in the HTML retrieval process."""
     
+    def __init__(self, link: Link):
+        self._link = link
+    
+    @abstractmethod
+    def retrieve_html(self) -> Optional[str]:
+        """Returns HTML if successful, or None if not."""
+        pass
     
 class _CachedHandler(_AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link from local cache."""
