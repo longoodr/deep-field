@@ -180,7 +180,7 @@ class _PlayerTables:
     """
     def __init__(self, soup):
         # player tables are marked by first 2 placeholders on page
-        ptable_placeholders = list(soup.find_all("div", {"class": "placeholder"}, limit=2))
+        ptable_placeholders = list(soup.find_all(self.__ptable_filter, limit=2))
         self.away = _PlayerTable(ptable_placeholders[0])
         self.home = _PlayerTable(ptable_placeholders[1])
     
@@ -201,6 +201,14 @@ class _PlayerTables:
         self.__cur += 1
         return this_table
     
+    @staticmethod
+    def __ptable_filter(tag) -> bool:
+        return (tag.name == "div"
+                and "class" in tag.attrs
+                and tag["class"][0] == "placeholder"
+                and "batting" in tag.next_sibling.next_sibling.string
+            )
+    
 class _PlayerTable(_PlaceholderTable):
     """Manages access to a table of players."""
     
@@ -208,18 +216,25 @@ class _PlayerTable(_PlaceholderTable):
         "data-stat": "player",
         "scope": "row"
     }
+    
+    def __init__(self, ph_div):
+        super().__init__(ph_div)
+        self.__rows = None
+        self.__name_ids = None
+        self.__name_to_db_ids = None
+        self.__name_to_name_ids = None
             
     def get_page_suffixes(self) -> Iterable[str]:
         for row in self.__get_rows():
             yield self.__get_page_suffix(row)
     
     def get_name_ids(self) -> Iterable[str]:
-        if not hasattr(self, "__name_ids"):
+        if self.__name_ids is None:
             self.__name_ids = [self.__get_name_id(row) for row in self.__get_rows()]
         return self.__name_ids
     
     def get_name_to_db_ids(self) -> Dict[str, int]:
-        if not hasattr(self, "__name_to_db_ids"):
+        if self.__name_to_db_ids is None:
             name_ids = set(self.get_name_ids())
             name_ids_to_name = {nid: name for name, nid
                                 in self.get_name_to_name_ids().items()}
@@ -231,12 +246,12 @@ class _PlayerTable(_PlaceholderTable):
         return self.__name_to_db_ids
     
     def get_name_to_name_ids(self) -> Dict[str, str]:
-        if not hasattr(self, "__name_to_name_ids"):
+        if self._PlayerTable__name_to_name_ids is None:
             self.__name_to_name_ids = {self.__get_player_name(row): self.__get_name_id(row) for row in self.__get_rows()}
         return self.__name_to_name_ids
     
     def __get_rows(self):
-        if not hasattr(self, "__rows"):
+        if self.__rows is None:
             self.__rows = self.find_all(
                 self._player_tag_filter,
                 attrs=self.__PLAYER_TAG_ATTR_FILTER

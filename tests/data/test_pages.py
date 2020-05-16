@@ -196,6 +196,35 @@ class TestGamePage(TestPage):
     def __id_of_name_id(name_id: str) -> int:
         return Player.get(Player.name_id == name_id).id
 
+class TestPlayerTables(TestPage):
+    
+    name = "OAK201903200.shtml"
+    page_type = GamePage
+    
+    def test_players(self):
+        away = [
+            "gordode01",
+            "hanigmi01",
+            "bruceja01",
+            "strichu01"
+        ]
+        home = [
+            "laurera01",
+            "chapmma01",
+            "piscost01",
+            "trivilo01"
+        ]
+        for on_list, not_on_list, ptable in zip(
+                [away, home],
+                [home, away],
+                [self.page._player_tables.away, self.page._player_tables.home]
+            ):
+            for p in on_list:
+                assert p in ptable.get_name_ids()
+            for p in not_on_list:
+                assert p not in ptable.get_name_ids()
+    
+
 def insert_mock_players(page: GamePage) -> None:
     ptables = page._player_tables
     with db.atomic():
