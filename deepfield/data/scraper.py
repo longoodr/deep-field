@@ -12,7 +12,13 @@ from deepfield.data.pages import Page
 from deepfield.data.dbmodels import db, create_tables
 
 logger = logging.getLogger()
-logger.addHandler(logging.StreamHandler(sys.stdout))
+hdlr = logging.StreamHandler(sys.stdout)
+fmtr = logging.Formatter(
+        fmt =     "%(asctime)s - %(message)s",
+        datefmt = "%m-%d %H:%M:%S"
+    )
+hdlr.setFormatter(fmtr)
+logger.addHandler(hdlr)
 logger.setLevel(logging.INFO)
 
 CUR_YEAR = datetime.now().year
