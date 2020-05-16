@@ -1,10 +1,13 @@
+from typing import List
+
 import pytest
 
 import tests.data.test_env as test_env
 from deepfield.data.bbref_pages import (BBRefLink, GamePage, PlayerPage,
                                         SchedulePage)
-from deepfield.data.pages import HtmlCache, Page
 from deepfield.data.nodes import InsertableScrapeNode, ScrapeNode
+from deepfield.data.pages import HtmlCache, Page
+
 
 class TestScrapeNode:
     
@@ -28,3 +31,19 @@ class TestScrapeNode:
             page = Page.from_link(link)
             node = ScrapeNode.from_page(page)
             assert node.scrape() == expected_scrape_num
+
+PARSE_URLS: List[str] = [
+    "https://www.baseball-reference.com/boxes/OAK/OAK201903200.shtml",
+    "https://www.baseball-reference.com/players/s/sabatc.01.shtml",
+]
+
+class TestParseable:
+    
+    @pytest.mark.parametrize("url", PARSE_URLS)
+    def test_can_parse(self, url: str):
+        test_env.clean_db()
+        link = BBRefLink(url)
+        page = Page.from_link(link)
+        if isinstance(page, GamePage):
+            test_env.insert_mock_players(page)
+        ScrapeNode.from_page(page).scrape()

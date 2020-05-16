@@ -149,7 +149,7 @@ class TestGamePage(TestPage):
     def test_queries(self):
         with raises(ValueError):
             self.page.update_db()
-        insert_mock_players(self.page)
+        test_env.insert_mock_players(self.page)
         assert not self.page._exists_in_db()
         self.page.update_db()
         assert self.page._exists_in_db()
@@ -221,22 +221,3 @@ class TestPlayerTables(TestPage):
                 assert p in ptable.get_name_ids()
             for p in not_on_list:
                 assert p not in ptable.get_name_ids()
-    
-
-def insert_mock_players(page: GamePage) -> None:
-    ptables = page._player_tables
-    with db.atomic():
-        for table in ptables:
-            pmap = table.get_name_to_name_ids()
-            for name, name_id in pmap.items():
-                _insert_mock_player(name, name_id)
-
-def _insert_mock_player(name: str, name_id: str) -> None:
-    fields = {
-        "name": name,
-        "name_id": name_id,
-        "bats": Handedness.RIGHT.value,
-        "throws": Handedness.RIGHT.value,
-    }
-    if Player.get_or_none(Player.name_id == name_id) is None:
-        Player.create(**fields)
