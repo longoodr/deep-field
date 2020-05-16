@@ -156,7 +156,8 @@ class _NameStripper:
     """There are a few edge cases for name lookups, since canonical player
     names and the names presented in play rows vary slightly. Players known
     with middle initials and/or with Jr./Sr. title may or may not be
-    represented in play rows with these name elements. This allows names to be
+    represented in play rows with these name elements. In addition, players
+    with accents in their names may not have these.This allows names to be
     standardized across these different presentations.
     """
     __NAME_TITLE = re.compile(r" [J|S]r\.")
@@ -253,13 +254,14 @@ class _PlayerTable(_PlaceholderTable):
         """
         if self.__name_to_db_ids is None:
             name_ids = set(self.get_name_ids())
-            db_players = Player.select(Player.name, Player.id, Player.name_id)\
+            db_players = Player.select(Player.name, Player.id)\
                 .where(Player.name_id.in_(name_ids))
-            self.__name_to_db_ids = {nid: [] for nid in name_ids}
+            self.__name_to_db_ids = {name: [] for name, _ in self.get_name_name_ids()}
             for p in db_players:
-                self.__name_to_db_ids[p.name_id].append(p.id)
-            self.__name_to_db_ids = {nid: tuple(ids)
-                                     for nid, ids in self.__name_to_db_ids.items()}
+                stripped_name = _NameStripper.get_stripped_name(p.name)
+                self.__name_to_db_ids[stripped_name].append(p.id)
+            self.__name_to_db_ids = {name: tuple(ids)
+                                     for name, ids in self.__name_to_db_ids.items()}
         return self.__name_to_db_ids
     
     def get_name_name_ids(self) -> Iterable[Tuple[str, str]]:
@@ -458,6 +460,14 @@ class _PlayQueryRunner:
     
     __ROWS_PER_BATCH = 100
     
+    # Home team gets to bat last, i.e. in second half of inning (b).
+    INNING_AND_PLAYER_TO_SIDE: Dict[Tuple[str, str], str] = {
+        ("t", "batter") : "away",
+        ("b", "batter") : "home",
+        ("t", "pitcher"): "home",
+        ("b", "pitcher"): "away",
+    }
+    
     def __init__(self, soup, player_tables: _PlayerTables):
         self.__soup = soup
         self.__pbp_table = self.__get_pbp_table()
@@ -469,12 +479,16 @@ class _PlayQueryRunner:
             Play.insert_many(batch).execute()
         
     def __get_play_data(self, game: Game) -> Iterable[Dict[str, Any]]:
+        appearances = _PlayerAppearances(self.__player_tables)
+        prev_play = None
         for play_num, play_row in enumerate(self.__get_play_rows()):
             raw_play_data = self.__transformer.extract_raw_play_data(play_row)
-            play_data = self.__transformer.transform_raw_play_data(raw_play_data)
+            appearances.update(prev_play, raw_play_data)
+            play_data = self.__transformer.transform_raw_play_data(raw_play_data, appearances)
             play_data["game_id"] = game.id
             play_data["play_num"] = play_num
             yield play_data
+            prev_play = raw_play_data
         
     def __get_pbp_table(self) -> _PlaceholderTable:
         ph = self.__soup.find(_PlaceholderDivFilter("play_by_play"))
@@ -495,14 +509,6 @@ class _PlayDataTransformer:
             "t": 0,
             "b": 1
         }
-    
-    # Home team gets to bat last, i.e. in second half of inning (b).
-    __INNING_AND_PLAYER_TO_SIDE = {
-        ("t", "batter") : "away",
-        ("b", "batter") : "home",
-        ("t", "pitcher"): "home",
-        ("b", "pitcher"): "away",
-    }
     
     # These instance methods can translate to db data with only raw data (arg)
     # as input.
@@ -646,7 +652,7 @@ class _PlayDataTransformer:
                        player_type: str,
                        appearances: "_PlayerAppearances"
                        ) -> int:
-        side = self.__INNING_AND_PLAYER_TO_SIDE[(inning_half_char, player_type)]
+        side = _PlayQueryRunner.INNING_AND_PLAYER_TO_SIDE[(inning_half_char, player_type)]
         pmap = self.__player_maps[side]
         try:
             # first try unedited name, since there's some overhead w/ stripping
@@ -713,10 +719,28 @@ class _PlayerAppearances:
                         ) -> int:
         return self.__map[side][name][batter_or_pitcher]
     
-    def inc_appearances(self,
-                        side: str,
-                        name: str,
-                        batter_or_pitcher: str
-                        ) -> None:
-        self.__map[side][name][batter_or_pitcher] += 1
+    def update(self,
+               this_raw: Optional[Dict[str, str]],
+               next_raw: Dict[str, str]
+               ) -> None:
+        """
+        Increments appearances by checking how players differ between
+        subsequent plays. The appearances will be updated to reflect
+        appearances of this play.
+        """
+        if this_raw is None:
+            return
+        inning = this_raw["inning"]
+        self.__inc_appearance(inning, "batter", this_raw["batter"])
+        if this_raw["pitcher"] != next_raw["pitcher"]:
+            self.__inc_appearance(inning, "pitcher", this_raw["pitcher"])
         
+    def __inc_appearance(self,
+                          inning: str,
+                          player_type: str,
+                          name: str
+                          ) -> None:
+        inning_char = inning[0]
+        inning_player = (inning_char, player_type)
+        side = _PlayQueryRunner.INNING_AND_PLAYER_TO_SIDE[inning_player]
+        self.__map[side][name][player_type] += 1
