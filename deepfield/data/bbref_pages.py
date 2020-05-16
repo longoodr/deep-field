@@ -194,7 +194,6 @@ class _PlayerTables:
     game.
     """
     def __init__(self, soup):
-        # player tables are marked by first 2 placeholders on page
         ptable_placeholders = list(soup.find_all(_PlaceholderDivFilter("batting"), limit=2))
         self.away = _PlayerTable(ptable_placeholders[0])
         self.home = _PlayerTable(ptable_placeholders[1])
@@ -254,7 +253,8 @@ class _PlayerTable(_PlaceholderTable):
     
     def get_name_to_name_ids(self) -> Dict[str, str]:
         if self._PlayerTable__name_to_name_ids is None:
-            self.__name_to_name_ids = {self.__get_player_name(row): self.__get_name_id(row) for row in self.__get_rows()}
+            self.__name_to_name_ids = {self.__get_player_name(row): self.__get_name_id(row)
+                                       for row in self.__get_rows()}
         return self.__name_to_name_ids
     
     def __get_rows(self):
@@ -380,6 +380,7 @@ class _GameQueryRunner:
         # Start Time: %I:%M [a.m.|p.m.] Local
         lst_text = lst_div.text.split("Time: ")[-1] # "%I:%M [a.m.|p.m.] Local"
         if lst_text.split()[-1] != "Local":
+            # don't bother trying to convert between timezones
             return None
         lst_text = lst_text.replace(" Local", "") # "%I:%M [a.m.|p.m.]"
         lst_text = lst_text.replace(".", "").upper() # "%I:%M %p"
@@ -457,8 +458,8 @@ class _PlayQueryRunner:
     
     def __get_play_rows(self):
         return self.__pbp_table.find_all(
-            "tr",
-            id=lambda id: id and id.startswith("event_")
+                "tr",
+                id=lambda id: id and id.startswith("event_")
             )
         
 class _PlayDataTransformer:
@@ -481,11 +482,11 @@ class _PlayDataTransformer:
     
     # These instance methods can translate to db data with only raw data (arg)
     # as input.
-    __RawStatTranslation = Callable[["_PlayDataTransformer", str     ], Any]
+    __RawStatTranslation = Callable[["_PlayDataTransformer", str], Any]
     
     # These instance methods require knowledge of inning half (2nd str arg) to 
     # determine if home or away player for id lookup.
-    __PlayerLookup  = Callable[["_PlayDataTransformer", str, str], int]
+    __PlayerLookup = Callable[["_PlayDataTransformer", str, str], int]
     
     """
     THE FOLLOWING CLASS VARS ARE INSTANTIATED IN A CLASS METHOD AND NOT HERE.
@@ -499,10 +500,13 @@ class _PlayDataTransformer:
     
     # Matches each player raw name_id to the db field for the player id, along
     # with the lookup function to translate name_id to player id.
-    __PLAYERS:         Dict[str, Tuple[str, __PlayerLookup      ]]
+    __PLAYERS: Dict[str, Tuple[str, __PlayerLookup]]
     
-    # "data-stat" names to extract from each player row.
+    # "data-stat" names to extract from each player row: just the union of
+    # the previous two dicts' keys.
     __PBP_STATS: Set[str]
+    
+    __lookups_init = False
     
     def __init__(self, player_tables: _PlayerTables):
         self.__init_lookups()
@@ -516,7 +520,7 @@ class _PlayDataTransformer:
         """Initializes dicts to lookup database stat names and
         transformation functions to translate page data to database format.
         """
-        if hasattr(cls, "PBP_TO_DB_STATS"):
+        if cls.__lookups_init:
             return
         
         cls.__PBP_TO_DB_STATS = {
@@ -532,6 +536,7 @@ class _PlayDataTransformer:
             "pitcher":              ("pitcher_id"   , cls.__pitcher_to_id),
         }
         cls.__PBP_STATS = set(cls.__PBP_TO_DB_STATS.keys()).union(set(cls.__PLAYERS.keys()))
+        cls.__lookups_init = True
         
     def extract_raw_play_data(self, play_row) -> Dict[str, str]:
         raw_play_data: Dict[str, str] = {}
