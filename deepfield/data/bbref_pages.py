@@ -355,13 +355,17 @@ class _VenueQueryRunner:
     def __init__(self, scorebox_meta):
         self.__scorebox_meta = scorebox_meta
         
-    def add_venue(self) -> Venue:
+    def add_venue(self) -> Optional[Venue]:
         name = self.__get_venue_name()
+        if name is None:
+            return None
         venue, _ = Venue.get_or_create(name=name)
         return venue
         
-    def __get_venue_name(self) -> str:
+    def __get_venue_name(self) -> Optional[str]:
         venue_div = self.__scorebox_meta.find(self.__venue_div_filter)
+        if venue_div is None:
+            return None
         return venue_div.text.split(": ")[1] # "Venue: <venue name>"
     
     @staticmethod
@@ -381,7 +385,7 @@ class _GameQueryRunner:
             "time_of_day"     : self.__enum_to_int(self.__get_time_of_day()),
             "field_type"      : self.__enum_to_int(self.__get_field_type()),
             "date"            : self.__get_date(),
-            "venue_id"        : venue.id,
+            "venue_id"        : None if venue is None else venue.id,
             "away_team_id"    : teams[0].id,
             "home_team_id"    : teams[1].id,
         }

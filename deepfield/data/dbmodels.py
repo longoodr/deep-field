@@ -26,7 +26,7 @@ class Game(DeepFieldModel):
     time_of_day = SmallIntegerField(null=True)
     field_type = SmallIntegerField(null=True)
     date = DateField()
-    venue_id = ForeignKeyField(Venue)
+    venue_id = ForeignKeyField(Venue, null=True)
     home_team_id = ForeignKeyField(Team)
     away_team_id = ForeignKeyField(Team)
     
