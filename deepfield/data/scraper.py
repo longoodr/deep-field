@@ -12,14 +12,6 @@ from deepfield.data.pages import Page
 from deepfield.data.dbmodels import db, create_tables
 
 logger = logging.getLogger()
-hdlr = logging.StreamHandler(sys.stdout)
-fmtr = logging.Formatter(
-        fmt =     "%(asctime)s - %(message)s",
-        datefmt = "%m-%d %H:%M:%S"
-    )
-hdlr.setFormatter(fmtr)
-logger.addHandler(hdlr)
-logger.setLevel(logging.INFO)
 
 CUR_YEAR = datetime.now().year
 
@@ -35,13 +27,11 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 def main(args: argparse.Namespace) -> None:
+    config_logging()
     db.init("stats.db")
     create_tables()
     for y in get_years(args.year, args.no_earlier):
-        try:
-            scrape_year(y)
-        except HTTPError as e:
-            logger.warning(f"Got code {e.response.status_code} when trying to scrape year {y}. Skipping")
+        scrape_year(y)
     
 def scrape_year(year: int) -> None:
     sched_url = f"https://www.baseball-reference.com/leagues/MLB/{year}-schedule.shtml"
@@ -64,6 +54,23 @@ def get_years(year: int, no_earlier: bool) -> Iterable[int]:
             yield y
     else:
         yield year
+        
+def config_logging():
+    hdlr = logging.StreamHandler(sys.stdout)
+    fmtr = logging.Formatter(
+            fmt =     "%(asctime)s - %(message)s",
+            datefmt = "%m-%d %H:%M:%S"
+        )
+    hdlr.setFormatter(fmtr)
+    logger.addHandler(hdlr)
+    hdlr = logging.FileHandler("log.log")
+    fmtr = logging.Formatter(
+            fmt =     "%(asctime)s - %(levelname)s - %(message)s",
+            datefmt = "%m-%d %H:%M:%S"
+        )
+    hdlr.setFormatter(fmtr)
+    logger.addHandler(hdlr)
+    logger.setLevel(logging.INFO)
 
 if __name__ == "__main__":
     args = parse_args()
