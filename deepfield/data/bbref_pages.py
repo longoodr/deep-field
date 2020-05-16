@@ -396,6 +396,8 @@ class _GameQueryRunner:
         
     def __get_local_start_time(self) -> Optional[time]:
         lst_div = self.__scorebox_meta.find(self.__lst_filter)
+        if lst_div is None:
+            return None
         # Start Time: %I:%M [a.m.|p.m.] Local
         lst_text = lst_div.text.split("Time: ")[-1] # "%I:%M [a.m.|p.m.] Local"
         if lst_text.split()[-1] != "Local":

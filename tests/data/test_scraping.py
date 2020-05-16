@@ -37,7 +37,9 @@ class TestScrapeNode:
 PARSE_URLS: List[str] = [
     "https://www.baseball-reference.com/boxes/OAK/OAK201903200.shtml",
     "https://www.baseball-reference.com/players/s/sabatc.01.shtml",
-    "https://www.baseball-reference.com/boxes/HOU/HOU201710290.shtml"
+    "https://www.baseball-reference.com/boxes/HOU/HOU201710290.shtml",
+    "https://www.baseball-reference.com/boxes/PHI/PHI198010080.shtml",
+    "https://www.baseball-reference.com/players/j/jimend'01.shtml"
 ]
 
 class TestParseable:
