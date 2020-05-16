@@ -31,7 +31,7 @@ class Link(ABC):
     
     def _get_name_id(self) -> str:
         """Returns a unique identifier for the corresponding page."""
-        return self._url.split("/")[-1].split(".")[0]
+        return os.path.splitext(self._url.split("/")[-1])[0]
     
     def __str__(self) -> str:
         return self._url
