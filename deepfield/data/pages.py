@@ -134,7 +134,8 @@ class _PageRetriever:
                 try:
                     return self._link.page_type(html)
                 except:
-                    logger.warning(f"{handler.__name__} returned malformed HTML for link {self._link}")
+                    logger.warning(
+                        f"{handler.__name__} returned malformed HTML for link {self._link}")
         raise ValueError(f"HTML could not be retrieved for {self._link}")
     
     def _run_cached_handler(self) -> Optional[str]:
@@ -240,7 +241,8 @@ class HtmlCache(_AbstractHtmlCache):
             parents = Path(__file__).parents
             for actual, expected in zip(parents, ["data", "deepfield", "deep-field"]):
                 if actual.name != expected:
-                    raise RuntimeError("HtmlCache def not found with right parent folder structure")
+                    raise RuntimeError(
+                        "HtmlCache def not found with right parent folder structure")
             project_root = parents[2]
             if "TESTING" in os.environ:
                 root = (project_root / os.path.join("tests", "data", "resources")).resolve()
