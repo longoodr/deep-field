@@ -56,7 +56,6 @@ class InsertableScrapeNode(ScrapeNode):
         self._page = page
         
     def scrape(self) -> int:
-        logger.info(f"Starting scrape for {self._page}")
         num_scraped = self._visit_children()
         self._page.update_db() # type: ignore
         logger.info(f"Finished scraping {self._page}")
