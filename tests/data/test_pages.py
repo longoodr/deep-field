@@ -125,10 +125,17 @@ class TestPlayerPage(TestPage):
                    and Player.bats == Handedness.LEFT.value
                    and Player.throws == Handedness.BOTH.value)
 
-class TestGamePage(TestPage):
+class AbstractTestGamePage(TestPage):
+    
+    page_type = GamePage
+    
+    @staticmethod
+    def _id_of_name_id(name_id: str) -> int:
+        return Player.get(Player.name_id == name_id).id
+
+class TestGamePage(AbstractTestGamePage):
     
     name = "WAS201710120.shtml"
-    page_type = GamePage
 
     def test_hash_eq(self):
         self._test_hash_eq(TestSchedulePage.name)
@@ -174,8 +181,8 @@ class TestGamePage(TestPage):
                 and Play.play_num == 0
                 and Play.desc == "Double to RF (Line Drive)"
                 and Play.pitch_ct == "2,(0-1) CX"
-                and Play.batter_id == self.__id_of_name_id("jayjo02")
-                and Play.pitcher_id == self.__id_of_name_id("gonzagi01")
+                and Play.batter_id == self._id_of_name_id("jayjo02")
+                and Play.pitcher_id == self._id_of_name_id("gonzagi01")
             )
         Play.get(
                 Play.game_id == game.id
@@ -185,14 +192,27 @@ class TestGamePage(TestPage):
                 and Play.play_num == 28
                 and Play.desc == "Walk; Bryant to 3B; Contreras to 2B"
                 and Play.pitch_ct == "6,(3-2) CBFBBB"
-                and Play.batter_id == self.__id_of_name_id("almoral01")
-                and Play.pitcher_id == self.__id_of_name_id("gonzagi01")
+                and Play.batter_id == self._id_of_name_id("almoral01")
+                and Play.pitcher_id == self._id_of_name_id("gonzagi01")
             )
         assert len(list(Play.select())) == 97
 
-    @staticmethod
-    def __id_of_name_id(name_id: str) -> int:
-        return Player.get(Player.name_id == name_id).id
+class TestGamePageAmbiguousNames(AbstractTestGamePage):
+    
+    name = "BAL200705070.shtml"
+    
+    def test_queries(self):
+        test_env.insert_mock_players(self.page)
+        self.page.update_db()
+        assert self.page._exists_in_db()
+        Play.get(
+            Play.play_num == 66
+            and Play.pitcher_id == self._id_of_name_id("hernaro01")
+        )
+        Play.get(
+            Play.play_num == 82
+            and Play.pitcher_id == self._id_of_name_id("carmofa01")
+        )
 
 class TestPlayerTables(TestPage):
     
