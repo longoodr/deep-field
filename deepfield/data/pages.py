@@ -176,6 +176,7 @@ class _WebHandler(_AbstractHtmlRetrievalHandler):
     def retrieve_html(self) -> Optional[str]:
         self.__wait_until_can_pull()
         self.__set_last_pull_time()
+        logger.info(f"Fetching page for {self._link.name_id}")
         response = requests.get(str(self._link))
         response.raise_for_status()
         html = response.text
@@ -188,6 +189,7 @@ class _WebHandler(_AbstractHtmlRetrievalHandler):
         if self.__last_pull_time <= t - self.__CRAWL_DELAY:
             return
         secs_to_wait = max(0, self.__last_pull_time + self.__CRAWL_DELAY - t)
+        logger.info(f"Waiting {secs_to_wait:.1f} seconds to abide by crawl delay")
         sleep(secs_to_wait)
         
     @classmethod
@@ -294,6 +296,7 @@ class _HtmlFolder(_AbstractHtmlCache):
         self._contained_files.add(filename)
 
     def __init_contained_files(self) -> None:
+        logger.debug(f"Initializing cache for {self._root}")
         contained_files = [f for f in os.listdir(self._root)
                            if os.path.isfile(self._full_path(f))]
         self._contained_files = set(contained_files)
