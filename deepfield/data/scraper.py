@@ -43,7 +43,7 @@ def scrape_year(year: int) -> None:
     # are played, do not want to use cached version of its page
     use_cache = False if year == CUR_YEAR else True
     sched = Page.from_link(sched_link, use_cache)
-    ScrapeNode(sched).scrape()
+    ScrapeNode.from_page(sched).scrape()
 
 def check_year(string: str) -> int:
     year = int(string)
