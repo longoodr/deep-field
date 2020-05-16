@@ -8,8 +8,8 @@ import requests
 from bs4 import BeautifulSoup, Comment
 from peewee import Query, chunked
 
-from deepfield.data.dbmodels import (MAX_SQL_VARS, DeepFieldModel, Game, Play,
-                                     Player, Team, Venue, db)
+from deepfield.data.dbmodels import (DeepFieldModel, Game, Play, Player, Team,
+                                     Venue, db)
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.data.pages import InsertablePage, Link, Page
 
@@ -430,7 +430,7 @@ class _GameQueryRunner:
 
 class _PlayQueryRunner:
     
-    __ROWS_PER_BATCH = math.floor(MAX_SQL_VARS / Game.NUM_FIELDS)
+    __ROWS_PER_BATCH = 100
     
     def __init__(self, soup, player_tables: _PlayerTables):
         self.__soup = soup
