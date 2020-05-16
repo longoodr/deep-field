@@ -2,6 +2,7 @@ import logging
 from typing import Dict, Iterable, Optional, Set, Tuple, Type
 
 from deepfield.data.pages import InsertablePage, Link, Page
+from lru import LRU
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -9,7 +10,8 @@ logger.setLevel(logging.INFO)
 class ScrapeNode:
     """A node in the page dependency graph. The nodes are traversed via DFS."""
     
-    _cached_nodes: Dict[Page, "ScrapeNode"] = {}
+    _CACHE_SIZE = 100
+    _cached_nodes = LRU(_CACHE_SIZE)
     
     @classmethod
     def from_page(cls, page: Page):
