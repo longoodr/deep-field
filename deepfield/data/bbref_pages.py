@@ -284,7 +284,6 @@ class _PlayerTable(_PlaceholderTable):
         unstripped_name = _PlayerTable.__get_player_name(row, strip=False)
         _, nid = n_nids[row_ind]
         n_nids[row_ind] = (unstripped_name, nid)
-        
     
     def get_name_to_db_ids(self, player_name: str) -> Tuple[int]:
         """Returns a mapping to database IDs found for a given name. If there
@@ -304,7 +303,6 @@ class _PlayerTable(_PlaceholderTable):
             self.__name_to_db_ids[n].append(db_player.id)
         self.__name_to_db_ids = {name: tuple(ids)
                                  for name, ids in self.__name_to_db_ids.items()}
-            
     
     def __get_rows(self):
         if self.__rows is None:
