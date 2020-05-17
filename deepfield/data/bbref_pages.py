@@ -249,6 +249,13 @@ class _PlayerTable(_PlaceholderTable):
         return self.__name_ids
     
     def get_name_name_ids(self) -> Iterable[Tuple[str, str]]:
+        """Returns a collection of tuples, where each tuple consists of the
+        name and the name_id of a player in the table. These tuples are in the
+        same order as they are found in the table. Names will be stripped to
+        appear as they do in the play table, except if there are players who
+        share the same name. In this case, the players' name will not be
+        stripped.
+        """
         if self.__name_name_ids is None:
             self.__init_name_name_ids()
         return self.__name_name_ids # type: ignore
