@@ -164,6 +164,7 @@ class _NameStripper:
     with accents in their names may not have these. This allows names to be
     standardized across these different presentations.
     """
+    
     __NAME_TITLE = re.compile(r" [J|S]r\.")
     __MIDDLE_INITIAL = re.compile(r" \w\.")
 
@@ -187,7 +188,8 @@ class _PlaceholderTable(BeautifulSoup):
     
 class _PlaceholderDivFilter:
     """Matches placeholder divs whose comment of interest contains the
-    given text."""
+    given text.
+    """
     
     def __init__(self, text: str):
         self._text = text
@@ -203,6 +205,7 @@ class _PlayerTables:
     """Manages access to the tables of away and home players for the given
     game.
     """
+    
     def __init__(self, soup):
         ptable_placeholders = list(soup.find_all(
             _PlaceholderDivFilter("batting"), limit=2))
@@ -597,6 +600,7 @@ class _PlayDataTransformer:
             return
         
         cls.__PBP_TO_DB_STATS = {
+        #   data-stat name           db field name    translation function
             "inning":               ("inning_half"  , cls.__inning_to_inning_half),
             "pitches_pbp":          ("pitch_ct"     , cls.__strip),
             "play_desc":            ("desc"         , cls.__no_transformation_needed),
@@ -605,6 +609,7 @@ class _PlayDataTransformer:
         }
         
         cls.__PLAYERS = {
+        #   player_type              db field name    lookup function
             "batter":               ("batter_id"    , cls.__batter_to_id),
             "pitcher":              ("pitcher_id"   , cls.__pitcher_to_id),
         }
@@ -765,8 +770,7 @@ class _PlayerAppearances:
                this_raw: Optional[Dict[str, str]],
                next_raw: Dict[str, str]
                ) -> None:
-        """
-        Increments appearances by checking how players differ between
+        """Increments appearances by checking how players differ between
         subsequent plays. The appearances will be updated to reflect
         appearances of this play.
         """
