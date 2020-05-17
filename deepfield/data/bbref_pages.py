@@ -1,3 +1,4 @@
+import logging
 import math
 import re
 from collections import Counter
@@ -14,6 +15,8 @@ from deepfield.data.dbmodels import (DeepFieldModel, Game, Play, Player, Team,
 from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.data.pages import InsertablePage, Link, Page
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class BBRefPage(Page):
     """A page from baseball-reference.com."""
@@ -447,8 +450,12 @@ class _GameQueryRunner:
             return None
         lst_text = lst_text.replace(" Local", "") # "%I:%M [a.m.|p.m.]"
         lst_text = lst_text.replace(".", "").upper() # "%I:%M %p"
-        dt = datetime.strptime(lst_text, "%I:%M %p")
-        return dt.time()
+        try:
+            dt = datetime.strptime(lst_text, "%I:%M %p")
+            return dt.time()
+        except ValueError:
+            logger.warning(f"Could not parse {lst_text}, defaulting to no local time")
+            return None
     
     @staticmethod
     def __lst_filter(div) -> bool:
@@ -771,10 +778,10 @@ class _PlayerAppearances:
             self.__inc_appearance(inning, "pitcher", this_raw["pitcher"])
         
     def __inc_appearance(self,
-                          inning: str,
-                          player_type: str,
-                          name: str
-                          ) -> None:
+                         inning: str,
+                         player_type: str,
+                         name: str
+                         ) -> None:
         inning_char = inning[0]
         inning_player = (inning_char, player_type)
         side = _PlayQueryRunner.INNING_AND_PLAYER_TO_SIDE[inning_player]
