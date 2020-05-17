@@ -1,5 +1,6 @@
 import math
 import re
+from collections import Counter
 from datetime import date, datetime, time
 from typing import (Any, Callable, Dict, Iterable, List, Optional, Set, Tuple,
                     Type)
@@ -247,26 +248,51 @@ class _PlayerTable(_PlaceholderTable):
                                for row in self.__get_rows()]
         return self.__name_ids
     
-    def get_name_to_db_ids(self) -> Dict[str, Tuple[int]]:
-        """Returns a mapping from names to database IDs found for that name.
-        If there are multiple names for the same player, the IDs will appear in
-        the order that they occur in the player table.
+    def get_name_name_ids(self) -> Iterable[Tuple[str, str]]:
+        name_to_inds: Dict[str, int] = {}
+        n_nids: List[Tuple[str, str]] = []
+        rows = list(self.__get_rows())
+        for i, row in enumerate(rows):
+            name = self.__get_player_name(row)
+            nid = self.__get_name_id(row)
+            # if a stripped name appears more than once, then don't strip
+            # either. This will keep the titles for father/son duos
+            if name in name_to_inds:
+                unstrip_row_ind = name_to_inds[name]
+                self.__unstrip_row_name(unstrip_row_ind, rows, n_nids)
+                name = self.__get_player_name(row, strip=False)
+            n_nids.append((name, nid))
+            name_to_inds[name] = i
+        return n_nids
+    
+    @staticmethod
+    def __unstrip_row_name(row_ind, rows: list, n_nids: List[Tuple[str, str]]) -> None:
+        """Modifies n_nids in place to unstrip the name for the given row."""
+        row = rows[row_ind]
+        unstripped_name = _PlayerTable.__get_player_name(row, strip=False)
+        _, nid = n_nids[row_ind]
+        n_nids[row_ind] = (unstripped_name, nid)
+        
+    
+    def get_name_to_db_ids(self, player_name: str) -> Tuple[int]:
+        """Returns a mapping to database IDs found for a given name. If there
+        are multiple names for the same player, the IDs will appear in the
+        order that they occur in the player table.
         """
         if self.__name_to_db_ids is None:
-            name_ids = set(self.get_name_ids())
-            db_players = Player.select(Player.name, Player.id)\
-                .where(Player.name_id.in_(name_ids))
-            self.__name_to_db_ids = {name: [] for name, _ in self.get_name_name_ids()}
-            for p in db_players:
-                stripped_name = _NameStripper.get_stripped_name(p.name)
-                self.__name_to_db_ids[stripped_name].append(p.id)
-            self.__name_to_db_ids = {name: tuple(ids)
-                                     for name, ids in self.__name_to_db_ids.items()}
-        return self.__name_to_db_ids
+            self.__init_name_to_db_ids()
+        return self.__name_to_db_ids[player_name] # type: ignore
     
-    def get_name_name_ids(self) -> Iterable[Tuple[str, str]]:
-        for row in self.__get_rows():
-            yield (self.__get_player_name(row), self.__get_name_id(row))
+    def __init_name_to_db_ids(self) -> None:
+        name_ids = set(self.get_name_ids())
+        db_players = Player.select(Player.name, Player.id)\
+            .where(Player.name_id.in_(name_ids))
+        self.__name_to_db_ids = {name: [] for name, _ in self.get_name_name_ids()}
+        for p in db_players:
+            stripped_name = _NameStripper.get_stripped_name(p.name)
+            self.__name_to_db_ids[stripped_name].append(p.id)
+        self.__name_to_db_ids = {name: tuple(ids)
+                                    for name, ids in self.__name_to_db_ids.items()}
     
     def __get_rows(self):
         if self.__rows is None:
@@ -277,9 +303,11 @@ class _PlayerTable(_PlaceholderTable):
         return self.__rows
     
     @staticmethod
-    def __get_player_name(row) -> str:
+    def __get_player_name(row, strip: bool = True) -> str:
         canonical_name = row.a.text.replace(u"\xa0", u" ")
-        return _NameStripper.get_stripped_name(canonical_name)
+        if strip:
+            return _NameStripper.get_stripped_name(canonical_name)
+        return canonical_name
     
     @staticmethod
     def __get_name_id(row) -> str:
@@ -541,10 +569,7 @@ class _PlayDataTransformer:
     
     def __init__(self, player_tables: _PlayerTables):
         self.__init_lookups()
-        self.__player_maps = {
-            "home": player_tables.home.get_name_to_db_ids(),
-            "away": player_tables.away.get_name_to_db_ids(),
-        }
+        self.__player_tables = player_tables
         
     @classmethod
     def __init_lookups(cls):
@@ -653,7 +678,7 @@ class _PlayDataTransformer:
                        appearances: "_PlayerAppearances"
                        ) -> int:
         side = _PlayQueryRunner.INNING_AND_PLAYER_TO_SIDE[(inning_half_char, player_type)]
-        pmap = self.__player_maps[side]
+        pmap = getattr(self.__player_tables, side)
         try:
             # first try unedited name, since there's some overhead w/ stripping
             appear_no = appearances.get_appearances(side, player_name, player_type)
@@ -667,7 +692,7 @@ class _PlayDataTransformer:
     def __get_id(pmap, name: str, appear_no: int):
         # assume that a subsequent appearance cycles to the next ID found for 
         # that name
-        ids = pmap[name]
+        ids = pmap.get_name_to_db_ids(name)
         id_index = appear_no % len(ids)
         return ids[id_index]
         
