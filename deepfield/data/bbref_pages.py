@@ -236,7 +236,7 @@ class _PlayerTable(_PlaceholderTable):
         self.__rows = None
         self.__name_ids = None
         self.__name_to_db_ids = None
-        self.__name_to_name_ids = None
+        self.__name_name_ids = None
             
     def get_page_suffixes(self) -> Iterable[str]:
         for row in self.__get_rows():
@@ -249,6 +249,11 @@ class _PlayerTable(_PlaceholderTable):
         return self.__name_ids
     
     def get_name_name_ids(self) -> Iterable[Tuple[str, str]]:
+        if self.__name_name_ids is None:
+            self.__init_name_name_ids()
+        return self.__name_name_ids # type: ignore
+    
+    def __init_name_name_ids(self) -> None:
         name_to_inds: Dict[str, int] = {}
         n_nids: List[Tuple[str, str]] = []
         rows = list(self.__get_rows())
@@ -263,7 +268,7 @@ class _PlayerTable(_PlaceholderTable):
                 name = self.__get_player_name(row, strip=False)
             n_nids.append((name, nid))
             name_to_inds[name] = i
-        return n_nids
+        self.__name_name_ids = n_nids
     
     @staticmethod
     def __unstrip_row_name(row_ind, rows: list, n_nids: List[Tuple[str, str]]) -> None:
@@ -284,15 +289,15 @@ class _PlayerTable(_PlaceholderTable):
         return self.__name_to_db_ids[player_name] # type: ignore
     
     def __init_name_to_db_ids(self) -> None:
-        name_ids = set(self.get_name_ids())
-        db_players = Player.select(Player.name, Player.id)\
-            .where(Player.name_id.in_(name_ids))
-        self.__name_to_db_ids = {name: [] for name, _ in self.get_name_name_ids()}
-        for p in db_players:
-            stripped_name = _NameStripper.get_stripped_name(p.name)
-            self.__name_to_db_ids[stripped_name].append(p.id)
+        self.__name_to_db_ids = {}
+        for n, nid in self.get_name_name_ids():
+            if n not in self.__name_to_db_ids:
+                self.__name_to_db_ids[n] = []
+            db_player = Player.get(Player.name_id == nid)
+            self.__name_to_db_ids[n].append(db_player.id)
         self.__name_to_db_ids = {name: tuple(ids)
-                                    for name, ids in self.__name_to_db_ids.items()}
+                                 for name, ids in self.__name_to_db_ids.items()}
+            
     
     def __get_rows(self):
         if self.__rows is None:
