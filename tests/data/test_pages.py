@@ -1,6 +1,6 @@
 from datetime import date, time
 from pathlib import Path
-from typing import Iterable, Type
+from typing import Iterable, Tuple, Type
 
 import pytest
 from pytest import raises
@@ -197,22 +197,43 @@ class TestGamePage(AbstractTestGamePage):
             )
         assert len(list(Play.select())) == 97
 
-class TestGamePageAmbiguousNames(AbstractTestGamePage):
+class TestGamePageNames(AbstractTestGamePage):
     
-    name = "BAL200705070.shtml"
+    player_type: str
+    plays: Iterable[Tuple[int, str]] # play_num, name_id
     
-    def test_queries(self):
+    def _test_queries(self):
         test_env.insert_mock_players(self.page)
         self.page.update_db()
         assert self.page._exists_in_db()
-        Play.get(
-            Play.play_num == 66
-            and Play.pitcher_id == self._id_of_name_id("hernaro01")
-        )
-        Play.get(
-            Play.play_num == 82
-            and Play.pitcher_id == self._id_of_name_id("carmofa01")
-        )
+        for play_num, name_id in self.plays:
+            Play.get(
+                Play.play_num == play_num
+                and getattr(Play, self.player_type + "_id")
+            )
+        
+
+class TestGamePageSameNames(TestGamePageNames):
+    
+    name = "BAL200705070.shtml"
+    player_type = "pitcher"
+    plays = [
+        (66, "hernaro01"),
+        (82, "carmofa01")
+    ]
+    def test_queries(self):
+        self._test_queries()
+        
+class TestGamePageFatherAndSon(TestGamePageNames):
+    
+    name = "SEA199105260.shtml"
+    player_type = "batter"
+    plays = [
+        (9, "griffke01"),
+        (82, "griffke02")
+    ]
+    def test_queries(self):
+        self._test_queries()
 
 class TestPlayerTables(TestPage):
     
