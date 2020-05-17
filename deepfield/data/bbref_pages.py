@@ -158,7 +158,7 @@ class _NameStripper:
     names and the names presented in play rows vary slightly. Players known
     with middle initials and/or with Jr./Sr. title may or may not be
     represented in play rows with these name elements. In addition, players
-    with accents in their names may not have these.This allows names to be
+    with accents in their names may not have these. This allows names to be
     standardized across these different presentations.
     """
     __NAME_TITLE = re.compile(r" [J|S]r\.")
