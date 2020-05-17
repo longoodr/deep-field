@@ -218,9 +218,9 @@ class TestGamePageSameNames(TestGamePageNames):
     name = "BAL200705070.shtml"
     player_type = "pitcher"
     plays = [
-        (3, "hernaro01"),
-        (4, "hernaro01"),
-        (5, "hernaro01"),
+        ( 3, "hernaro01"),
+        ( 4, "hernaro01"),
+        ( 5, "hernaro01"),
         (66, "hernaro01"),
         (82, "carmofa01"),
         (83, "carmofa01"),
@@ -234,8 +234,12 @@ class TestGamePageFatherAndSon(TestGamePageNames):
     name = "SEA199105260.shtml"
     player_type = "batter"
     plays = [
-        (9, "griffke01"),
-        (82, "griffke02")
+        ( 9, "griffke01"),
+        (26, "griffke01"),
+        (48, "griffke01"),
+        (82, "griffke02"),
+        (83, "griffke02"),
+        (84, "griffke01"),
     ]
     def test_queries(self):
         self._test_queries()
