@@ -218,8 +218,13 @@ class TestGamePageSameNames(TestGamePageNames):
     name = "BAL200705070.shtml"
     player_type = "pitcher"
     plays = [
+        (3, "hernaro01"),
+        (4, "hernaro01"),
+        (5, "hernaro01"),
         (66, "hernaro01"),
-        (82, "carmofa01")
+        (82, "carmofa01"),
+        (83, "carmofa01"),
+        (84, "carmofa01"),
     ]
     def test_queries(self):
         self._test_queries()
