@@ -291,6 +291,7 @@ class _HtmlFolder(_AbstractHtmlCache):
     def insert_html(self, html: str, link: Link) -> None:
         if not os.path.isdir(self._root):
             os.mkdir(self._root)
+            self.__init_contained_files()
         filename = self._get_filename(link)
         filepath = self._full_path(filename)
         with open(filepath, 'w', encoding="utf-8") as html_file:
