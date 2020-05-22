@@ -785,4 +785,8 @@ class _PlayerAppearances:
         inning_char = inning[0]
         inning_player = (inning_char, player_type)
         side = _PlayQueryRunner.INNING_AND_PLAYER_TO_SIDE[inning_player]
-        self.__map[side][name][player_type] += 1
+        try:
+            self.__map[side][name][player_type] += 1
+        except KeyError:
+            stripped_name = _NameStripper.get_stripped_name(name)
+            self.__map[side][stripped_name][player_type] += 1
