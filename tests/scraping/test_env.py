@@ -1,10 +1,10 @@
 from os import environ
 from pathlib import Path
 
-from deepfield.data.bbref_pages import BBRefLink, GamePage
-from deepfield.data.dbmodels import Player, create_tables, db, drop_tables
-from deepfield.data.enums import Handedness
-from deepfield.data.pages import HtmlCache
+from deepfield.scraping.bbref_pages import BBRefLink, GamePage
+from deepfield.scraping.dbmodels import Player, create_tables, db, drop_tables
+from deepfield.scraping.enums import Handedness
+from deepfield.scraping.pages import HtmlCache
 
 db.init(":memory:")
 environ["TESTING"] = "TRUE"

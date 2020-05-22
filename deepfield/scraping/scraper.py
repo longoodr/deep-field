@@ -6,10 +6,10 @@ from typing import Iterable
 
 from requests.exceptions import HTTPError
 
-from deepfield.data.bbref_pages import BBRefLink, SchedulePage
-from deepfield.data.nodes import ScrapeNode
-from deepfield.data.pages import Page
-from deepfield.data.dbmodels import db, create_tables
+from deepfield.scraping.bbref_pages import BBRefLink, SchedulePage
+from deepfield.scraping.nodes import ScrapeNode
+from deepfield.scraping.pages import Page
+from deepfield.scraping.dbmodels import db, create_tables
 
 logger = logging.getLogger()
 

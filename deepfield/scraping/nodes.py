@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, Iterable, Optional, Set, Tuple, Type
 
-from deepfield.data.pages import InsertablePage, Link, Page
+from deepfield.scraping.pages import InsertablePage, Link, Page
 from lru import LRU
 
 logger = logging.getLogger(__name__)

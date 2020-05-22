@@ -136,4 +136,4 @@ dmypy.json
 **/*.db
 
 # cached pages
-/deepfield/data/pages
+/deepfield/scraping/pages

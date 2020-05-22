@@ -10,10 +10,10 @@ import requests
 from bs4 import BeautifulSoup, Comment
 from peewee import Query, chunked
 
-from deepfield.data.dbmodels import (DeepFieldModel, Game, Play, Player, Team,
+from deepfield.scraping.dbmodels import (DeepFieldModel, Game, Play, Player, Team,
                                      Venue, db)
-from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
-from deepfield.data.pages import InsertablePage, Link, Page
+from deepfield.scraping.enums import FieldType, Handedness, OnBase, TimeOfDay
+from deepfield.scraping.pages import InsertablePage, Link, Page
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

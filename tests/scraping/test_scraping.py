@@ -4,11 +4,11 @@ from typing import List
 
 import pytest
 
-import tests.data.test_env as test_env
-from deepfield.data.bbref_pages import (BBRefLink, GamePage, PlayerPage,
+import tests.scraping.test_env as test_env
+from deepfield.scraping.bbref_pages import (BBRefLink, GamePage, PlayerPage,
                                         SchedulePage)
-from deepfield.data.nodes import InsertableScrapeNode, ScrapeNode
-from deepfield.data.pages import HtmlCache, Page
+from deepfield.scraping.nodes import InsertableScrapeNode, ScrapeNode
+from deepfield.scraping.pages import HtmlCache, Page
 
 
 class TestScrapeNode:
@@ -61,7 +61,7 @@ class TestParseable:
     def test_malformed_html(self):
         # the web handler will download the correct html, so need to copy
         # malformed html to cached file beforehand to test properly
-        player_pages = os.path.join("tests", "data", "resources", "PlayerPage")
+        player_pages = os.path.join("tests", "scraping", "resources", "PlayerPage")
         copyfile(
                 src = os.path.join(player_pages, "malformed_arod.shtml"),
                 dst = os.path.join(player_pages, "rodrial01.shtml")

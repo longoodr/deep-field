@@ -5,13 +5,13 @@ from typing import Iterable, Tuple, Type
 import pytest
 from pytest import raises
 
-import tests.data.test_env as test_env
-from deepfield.data.bbref_pages import (BBRefLink, BBRefPage, GamePage,
+import tests.scraping.test_env as test_env
+from deepfield.scraping.bbref_pages import (BBRefLink, BBRefPage, GamePage,
                                         PlayerPage, SchedulePage)
-from deepfield.data.dbmodels import (Game, Play, Player, Team,
+from deepfield.scraping.dbmodels import (Game, Play, Player, Team,
                                      Venue, db)
-from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
-from deepfield.data.pages import HtmlCache, Page
+from deepfield.scraping.enums import FieldType, Handedness, OnBase, TimeOfDay
+from deepfield.scraping.pages import HtmlCache, Page
 
 RES_URLS = [
     "https://www.baseball-reference.com/boxes/WAS/WAS201710120.shtml",
