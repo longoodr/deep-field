@@ -419,7 +419,7 @@ class _GameQueryRunner:
         self.__scorebox_meta = scorebox_meta
         self.__game_name = game_name
 
-    def add_game(self, teams: List[Team], venue: Venue) -> Game:
+    def add_game(self, teams: List[Team], venue: Optional[Venue]) -> Game:
         fields = {
             "name_id"         : self.__game_name,
             "local_start_time": self.__get_local_start_time(),
