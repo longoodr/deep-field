@@ -6,11 +6,10 @@ import pytest
 from pytest import raises
 
 import tests.scraping.test_env as test_env
+from deepfield.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.scraping.bbref_pages import (BBRefLink, BBRefPage, GamePage,
-                                        PlayerPage, SchedulePage)
-from deepfield.scraping.dbmodels import (Game, Play, Player, Team,
-                                     Venue, db)
-from deepfield.scraping.enums import FieldType, Handedness, OnBase, TimeOfDay
+                                            PlayerPage, SchedulePage)
+from deepfield.scraping.dbmodels import Game, Play, Player, Team, Venue, db
 from deepfield.scraping.pages import HtmlCache, Page
 
 RES_URLS = [

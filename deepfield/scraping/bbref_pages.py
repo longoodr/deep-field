@@ -12,7 +12,7 @@ from peewee import Query, chunked
 
 from deepfield.scraping.dbmodels import (DeepFieldModel, Game, Play, Player, Team,
                                      Venue, db)
-from deepfield.scraping.enums import FieldType, Handedness, OnBase, TimeOfDay
+from deepfield.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.scraping.pages import InsertablePage, Link, Page
 
 logger = logging.getLogger(__name__)

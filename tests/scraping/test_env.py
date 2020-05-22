@@ -3,7 +3,7 @@ from pathlib import Path
 
 from deepfield.scraping.bbref_pages import BBRefLink, GamePage
 from deepfield.scraping.dbmodels import Player, create_tables, db, drop_tables
-from deepfield.scraping.enums import Handedness
+from deepfield.enums import Handedness
 from deepfield.scraping.pages import HtmlCache
 
 db.init(":memory:")
