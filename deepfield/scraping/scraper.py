@@ -7,9 +7,9 @@ from typing import Iterable
 from requests.exceptions import HTTPError
 
 from deepfield.scraping.bbref_pages import BBRefLink, SchedulePage
+from deepfield.scraping.dbmodels import create_tables, init_db
 from deepfield.scraping.nodes import ScrapeNode
 from deepfield.scraping.pages import Page
-from deepfield.scraping.dbmodels import db, create_tables
 
 logger = logging.getLogger()
 
@@ -28,8 +28,7 @@ def parse_args() -> argparse.Namespace:
 
 def main(args: argparse.Namespace) -> None:
     config_logging()
-    db.init("stats.db")
-    create_tables()
+    init_db()
     try:
         for y in get_years(args.year, args.no_earlier):
             scrape_year(y)

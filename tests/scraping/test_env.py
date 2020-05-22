@@ -1,13 +1,14 @@
 from os import environ
 from pathlib import Path
 
-from deepfield.scraping.bbref_pages import BBRefLink, GamePage
-from deepfield.scraping.dbmodels import Player, create_tables, db, drop_tables
 from deepfield.enums import Handedness
+from deepfield.scraping.bbref_pages import BBRefLink, GamePage
+from deepfield.scraping.dbmodels import (Player, create_tables, db,
+                                         drop_tables, init_db)
 from deepfield.scraping.pages import HtmlCache
 
-db.init(":memory:")
 environ["TESTING"] = "TRUE"
+init_db()
 
 resources = HtmlCache.get()
 

@@ -1,5 +1,9 @@
+import os
+
 from peewee import (CharField, DateField, FixedCharField, ForeignKeyField,
                     Model, SmallIntegerField, SqliteDatabase, TimeField)
+
+DB_NAME = "stats.db"
 
 db = SqliteDatabase(None)
 
@@ -48,3 +52,8 @@ def create_tables():
     
 def drop_tables():
     db.drop_tables(_MODELS)
+
+def init_db():
+    name = ":memory:" if "TESTING" in os.environ else DB_NAME
+    db.init(name)
+    create_tables()
