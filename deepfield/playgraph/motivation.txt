@@ -1,0 +1,11 @@
+THE GOAL: write a script, akin to the scraper, that:
+    1. queries all plays in stats.db,
+    2. creates a dependency graph of the plays,
+    3. stores the dependency graph in a graph database
+
+This goal is meant to facilitate using different subgraphs of the master play dependency graph during fitness function evaluation of rating systems.
+
+In the beginning of model optimization, a full traversal of the dependency graph is unnecessary because the variance among model fitnesses is wide. However, as the model performance increases and fitnesses begin to converge, more thorough traversals become necessary.
+
+Q: Why use a dependency graph vs sequential evaluation of plays by date?
+A: Naive sequential evaluation results in an uneven distribution of involved players across the evaluated plays. With a dependency graph, nodes of the same rank can be evaluated sequentially to evenly distribute plays across players. This results in more consistent ratings because players have more even play counts. Player play counts are more directly parametrized by max graph depth than number of sequential plays evaluated.
