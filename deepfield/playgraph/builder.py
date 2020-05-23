@@ -106,11 +106,14 @@ class _PlayGraphBuilder(_GraphGetter):
         return self._graph
 
     def __add_play(self, play, p2lp: Dict[int, int]) -> None:
+        outcome = Outcome.from_desc(play.desc).value
+        if outcome is None:
+            return
         self._graph.add_node(
                 play.id, 
                 bid     = play.batter_id.id,
                 pid     = play.pitcher_id.id,
-                outcome = Outcome.from_desc(play.desc).value
+                outcome = outcome
             )
         for player_id in [play.batter_id, play.pitcher_id]:
             if player_id in p2lp:
