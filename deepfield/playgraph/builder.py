@@ -37,6 +37,7 @@ class PlayGraphPersistor(_GraphGetter):
             return od_graph
         graph = _PlayGraphBuilder().get_graph()
         self._save_graph(graph)
+        return graph
 
     def remove_files(self) -> None:
         for filename in [self._graph_filename, self._hash_filename]:
@@ -63,7 +64,7 @@ class PlayGraphPersistor(_GraphGetter):
 
     def _get_graph_json(self):
         try:
-            with open(self.self._graph_filename, "r") as graph_file:
+            with open(self._graph_filename, "r") as graph_file:
                 return json.load(graph_file)
         except FileNotFoundError:
             return None
@@ -77,7 +78,7 @@ class PlayGraphPersistor(_GraphGetter):
 
     def _save_graph(self, graph: nx.DiGraph) -> None:
         with open(self._graph_filename, "w") as graph_file:
-            json.dump(json_graph.node_link_data(graph), graph_file)
+            json.dump(json_graph.node_link_data(graph), graph_file, indent=0)
         with open(self._hash_filename, "w") as hash_file:
             # file must exist at this point (would have exited if not)
             hash_file.write(self._get_db_hash())    # type: ignore
@@ -108,7 +109,7 @@ class _PlayGraphBuilder(_GraphGetter):
                 play.id, 
                 bid     = play.batter_id.id,
                 pid     = play.pitcher_id.id,
-                outcome = Outcome.from_desc(play.desc)
+                outcome = Outcome.from_desc(play.desc).value
             )
         for player_id in [play.batter_id, play.pitcher_id]:
             if player_id in p2lp:
