@@ -3,7 +3,7 @@ from typing import Iterable, Tuple
 import networkx as nx
 import pytest
 
-from deepfield.playgraph.builder import PlayGraphPersistor, _PlayGraphBuilder
+from deepfield.playgraph.getters import PlayGraphPersistor, _PlayGraphBuilder
 from deepfield.scraping.bbref_pages import BBRefLink
 from deepfield.scraping.dbmodels import Play
 from deepfield.scraping.nodes import ScrapeNode
@@ -27,15 +27,16 @@ class TestBuilder:
         _add_game("WAS201710120.shtml")
         graph = _PlayGraphBuilder().get_graph()
         included_edges = [
-            (0, 1),
-            (1, 2),
+            (0, 2),
             (2, 3),
             (7, 13),
         ]
         excluded_edges = [
-            (0, 2),
+            (1, 2),
+            (0, 3),
             (1, 3),
             (7, 8),
+            (10, 11)
         ]
         for u, v in map(_play_nums_to_id, included_edges):
             assert graph.has_edge(u, v)
