@@ -1,3 +1,4 @@
+import os
 from datetime import date, time
 from pathlib import Path
 from typing import Iterable, Tuple, Type
@@ -17,6 +18,12 @@ RES_URLS = [
     "https://www.baseball-reference.com/leagues/MLB/2016-schedule.shtml",
     "https://www.baseball-reference.com/players/v/vendipa01.shtml"
 ]
+
+def setup_module(module):
+    test_env.init_test_env()
+
+def teardown_module(module):
+    test_env.delete_db_file()
 
 class TestPageFromLink:
     
@@ -55,7 +62,7 @@ class TestPage:
     @classmethod
     def setup_method(cls):
         test_env.clean_db()
-        html = test_env.resources.find_html(BBRefLink(cls.name))
+        html = HtmlCache.get().find_html(BBRefLink(cls.name))
         cls.page = cls.page_type(html)
 
     @classmethod

@@ -11,6 +11,12 @@ from deepfield.scraping.pages import HtmlCache, Page
 from tests import test_env
 
 
+def setup_module(module):
+    test_env.init_test_env()
+
+def teardown_module(module):
+    test_env.delete_db_file()
+
 class TestScrapeNode:
     
     def test_from_page(self):

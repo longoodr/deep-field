@@ -1,16 +1,20 @@
-from os import environ
+import os
 from pathlib import Path
 
 from deepfield.enums import Handedness
 from deepfield.scraping.bbref_pages import BBRefLink, GamePage
 from deepfield.scraping.dbmodels import (Player, create_tables, db,
-                                         drop_tables, init_db)
+                                         drop_tables, get_db_name, init_db)
 from deepfield.scraping.pages import HtmlCache
 
-environ["TESTING"] = "TRUE"
-init_db()
+def init_test_env() -> None:
+    os.environ["TESTING"] = "True"
+    init_db()
+    clean_db()
 
-resources = HtmlCache.get()
+def delete_db_file():
+    db.close()
+    os.remove(get_db_name())
 
 def clean_db():
     drop_tables()
