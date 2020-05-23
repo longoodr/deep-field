@@ -4,7 +4,7 @@ from typing import List
 
 import pytest
 
-import tests.scraping.test_env as test_env
+import tests.test_env as test_env
 from deepfield.scraping.bbref_pages import (BBRefLink, GamePage, PlayerPage,
                                         SchedulePage)
 from deepfield.scraping.nodes import InsertableScrapeNode, ScrapeNode

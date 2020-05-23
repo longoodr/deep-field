@@ -5,7 +5,7 @@ from typing import Iterable, Tuple, Type
 import pytest
 from pytest import raises
 
-import tests.scraping.test_env as test_env
+import tests.test_env as test_env
 from deepfield.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.scraping.bbref_pages import (BBRefLink, BBRefPage, GamePage,
                                             PlayerPage, SchedulePage)
