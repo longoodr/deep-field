@@ -19,7 +19,7 @@ class _GraphGetter(ABC):
         """Returns a play dependency graph."""
         pass
 
-class PlayGraphPersister(_GraphGetter):
+class PlayGraphPersistor(_GraphGetter):
     """Will try returning an on-disk graph if the database's checksum matches
     the checksum for the on-disk graph at its time of creation; otherwise, will
     build the graph from scratch.
