@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from abc import ABC, abstractmethod
 from hashlib import md5
@@ -10,6 +11,8 @@ import networkx.readwrite.json_graph as json_graph
 from deepfield.enums import Outcome
 from deepfield.scraping.dbmodels import Game, Play, get_db_name
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class _GraphGetter(ABC):
     """An object which can return a play dependency graph."""
@@ -110,9 +113,11 @@ class _PlayGraphBuilder(_GraphGetter):
         if outcome is None:
             return
         self._graph.add_node(
-                play.id, 
-                bid     = play.batter_id.id,
-                pid     = play.pitcher_id.id,
+                play.id,
+                # peewee's foreign key fields return entire model: append _id
+                # for just id
+                bid     = play.batter_id_id,
+                pid     = play.pitcher_id_id,
                 outcome = outcome.value
             )
         for player_id in [play.batter_id, play.pitcher_id]:
