@@ -47,6 +47,9 @@ class PlayGraphPersistor(_GraphGetter):
                 pass
 
     def _get_on_disk_graph(self) -> Optional[nx.DiGraph]:
+        """If the on-disk graph is consistent with the database, return it;
+        otherwise return None.
+        """
         if not self._matches_db_hash(self._get_graph_hash()):
             return None
         json = self._get_graph_json()
