@@ -67,6 +67,13 @@ class TestPersistence:
         g2 = self.p._get_on_disk_graph()
         assert nx.is_isomorphic(g1, g2)
 
+    def test_od_consistency(self):
+        _add_game("WAS201710120.shtml")
+        self.p.get_graph()
+        assert self.p._get_on_disk_graph() is not None
+        _add_game("CHN201710110.shtml")
+        assert self.p._get_on_disk_graph() is None
+
 def _play_num_to_id(play_num: int) -> int:
     return Play.get(Play.play_num == play_num).id
 
