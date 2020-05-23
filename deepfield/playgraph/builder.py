@@ -26,7 +26,6 @@ class PlayGraphPersistor(_GraphGetter):
     """
 
     def __init__(self):
-        self._db_hash = None
         db_name = os.path.splitext(get_db_name())[0]
         self._graph_filename = f"{db_name}_playgraph.json"
         self._hash_filename = f"{db_name}_playgraph_hash.txt"
