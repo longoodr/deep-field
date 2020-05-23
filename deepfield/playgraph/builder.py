@@ -8,7 +8,7 @@ import networkx as nx
 import networkx.readwrite.json_graph as json_graph
 
 from deepfield.enums import Outcome
-from deepfield.scraping.dbmodels import Game, Play, get_db_name, init_db
+from deepfield.scraping.dbmodels import Game, Play, get_db_name
 
 
 class _GraphGetter(ABC):
@@ -25,17 +25,25 @@ class PlayGraphPersister(_GraphGetter):
     build the graph from scratch.
     """
 
-    GRAPH_FILENAME = "playgraph.json"
-    GRAPH_HASH_FILENAME = "playgraph_hash.txt"
-
     def __init__(self):
         self._db_hash = None
+        db_name = os.path.splitext(get_db_name())[0]
+        self._graph_filename = f"{get_db_name()}_playgraph.json"
+        self._hash_filename = f"{get_db_name()}_playgraph_hash.txt"
 
     def get_graph(self) -> nx.DiGraph:
         od_graph = self._get_on_disk_graph()
         if od_graph is not None:
             return od_graph
-        graph = PlayGraphBuilder().get_graph()
+        graph = _PlayGraphBuilder().get_graph()
+        self._save_graph(graph)
+
+    def remove_files(self) -> None:
+        for filename in [self._graph_filename, self._hash_filename]:
+            try:
+                os.remove(filename)
+            except FileNotFoundError:
+                pass
 
     def _get_on_disk_graph(self) -> Optional[nx.DiGraph]:
         if not self._matches_db_hash(self._get_graph_hash()):
@@ -55,22 +63,22 @@ class PlayGraphPersister(_GraphGetter):
 
     def _get_graph_json(self):
         try:
-            with open(self.GRAPH_FILENAME, "r") as graph_file:
+            with open(self.self._graph_filename, "r") as graph_file:
                 return json.load(graph_file)
         except FileNotFoundError:
             return None
 
     def _get_graph_hash(self) -> Optional[str]:
         try:
-            with open(self.GRAPH_HASH_FILENAME, "r") as hash_file:
+            with open(self._hash_filename, "r") as hash_file:
                 return hash_file.read()
         except FileNotFoundError:
             return None
 
     def _save_graph(self, graph: nx.DiGraph) -> None:
-        with open(self.GRAPH_FILENAME, "w") as graph_file:
+        with open(self._graph_filename, "w") as graph_file:
             json.dump(json_graph.node_link_data(graph), graph_file)
-        with open(self.GRAPH_HASH_FILENAME, "w") as hash_file:
+        with open(self._hash_filename, "w") as hash_file:
             # file must exist at this point (would have exited if not)
             hash_file.write(self._get_db_hash())    # type: ignore
 
@@ -79,7 +87,7 @@ class PlayGraphPersister(_GraphGetter):
             self._db_hash = _ChecksumGenerator(get_db_name()).get_checksum()
         return self._db_hash
 
-class PlayGraphBuilder(_GraphGetter):
+class _PlayGraphBuilder(_GraphGetter):
     """Builds a graph from plays in the database."""
 
     def __init__(self):
@@ -89,7 +97,7 @@ class PlayGraphBuilder(_GraphGetter):
         if self._graph is not None:
             return self._graph
         player_to_last_play: Dict[int, int] = {}
-        p2lp = player_to_last_play
+        p2lp = player_to_last_play  # a shorter alias
         self._graph = nx.DiGraph()
         for play in self.__get_plays():
             self.__add_play(play, p2lp)
