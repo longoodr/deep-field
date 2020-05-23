@@ -87,9 +87,7 @@ class PlayGraphPersistor(_GraphGetter):
             hash_file.write(self._get_db_hash())    # type: ignore
 
     def _get_db_hash(self) -> Optional[str]:
-        if self._db_hash is None:
-            self._db_hash = _ChecksumGenerator(get_db_name()).get_checksum()
-        return self._db_hash
+        return _ChecksumGenerator(get_db_name()).get_checksum()
 
 class _PlayGraphBuilder(_GraphGetter):
     """Builds a graph from plays in the database."""
