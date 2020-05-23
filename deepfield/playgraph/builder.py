@@ -49,7 +49,7 @@ class PlayGraphPersistor(_GraphGetter):
         """If the on-disk graph is consistent with the database, return it;
         otherwise return None.
         """
-        if not self._matches_db_hash(self._get_graph_hash()):
+        if not self._matches_db_hash():
             return None
         json = self._get_graph_json()
         if json is None:
@@ -59,7 +59,8 @@ class PlayGraphPersistor(_GraphGetter):
         except Exception:
             return None
 
-    def _matches_db_hash(self, hash_: Optional[str]) -> bool:
+    def _matches_db_hash(self) -> bool:
+        hash_ = self._get_graph_hash()
         if hash_ is None:
             return False
         return self._get_db_hash() == hash_
@@ -68,7 +69,7 @@ class PlayGraphPersistor(_GraphGetter):
         try:
             with open(self._graph_filename, "r") as graph_file:
                 return json.load(graph_file)
-        except FileNotFoundError:
+        except (FileNotFoundError, json.JSONDecodeError):
             return None
 
     def _get_graph_hash(self) -> Optional[str]:
@@ -80,7 +81,7 @@ class PlayGraphPersistor(_GraphGetter):
 
     def _save_graph(self, graph: nx.DiGraph) -> None:
         with open(self._graph_filename, "w") as graph_file:
-            json.dump(json_graph.node_link_data(graph), graph_file, indent=0)
+            json.dump(json_graph.node_link_data(graph), graph_file, indent=1)
         with open(self._hash_filename, "w") as hash_file:
             # file must exist at this point (would have exited if not)
             hash_file.write(self._get_db_hash())    # type: ignore
