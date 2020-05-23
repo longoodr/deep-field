@@ -4,11 +4,11 @@ from typing import List
 
 import pytest
 
-import tests.test_env as test_env
 from deepfield.scraping.bbref_pages import (BBRefLink, GamePage, PlayerPage,
-                                        SchedulePage)
+                                            SchedulePage)
 from deepfield.scraping.nodes import InsertableScrapeNode, ScrapeNode
 from deepfield.scraping.pages import HtmlCache, Page
+from tests import test_env
 
 
 class TestScrapeNode:
