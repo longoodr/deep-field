@@ -28,8 +28,8 @@ class PlayGraphPersister(_GraphGetter):
     def __init__(self):
         self._db_hash = None
         db_name = os.path.splitext(get_db_name())[0]
-        self._graph_filename = f"{get_db_name()}_playgraph.json"
-        self._hash_filename = f"{get_db_name()}_playgraph_hash.txt"
+        self._graph_filename = f"{db_name}_playgraph.json"
+        self._hash_filename = f"{db_name}_playgraph_hash.txt"
 
     def get_graph(self) -> nx.DiGraph:
         od_graph = self._get_on_disk_graph()
@@ -106,8 +106,8 @@ class _PlayGraphBuilder(_GraphGetter):
     def __add_play(self, play, p2lp: Dict[int, int]) -> None:
         self._graph.add_node(
                 play.id, 
-                bid     = play.batter_id,
-                pid     = play.pitcher_id,
+                bid     = play.batter_id.id,
+                pid     = play.pitcher_id.id,
                 outcome = Outcome.from_desc(play.desc)
             )
         for player_id in [play.batter_id, play.pitcher_id]:
