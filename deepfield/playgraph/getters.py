@@ -83,8 +83,8 @@ class PlayGraphPersistor(_GraphGetter):
             return None
 
     def _save_graph(self, graph: nx.DiGraph) -> None:
-        with open(self._graph_filename, "w") as graph_file:
-            json.dump(json_graph.node_link_data(graph), graph_file, indent=1)
+        with open(self._graph_filename, "w", buffering=4*1024) as graph_file:
+            json.dump(json_graph.node_link_data(graph), graph_file)
         with open(self._hash_filename, "w") as hash_file:
             # file must exist at this point (would have exited if not)
             hash_file.write(self._get_db_hash())    # type: ignore
@@ -104,8 +104,12 @@ class _PlayGraphBuilder(_GraphGetter):
         player_to_last_play: Dict[int, int] = {}
         p2lp = player_to_last_play  # a shorter alias
         self._graph = nx.DiGraph()
-        for play in self.__get_plays():
+        plays = self.__get_plays()
+        play_ct = plays.count()
+        for i, play in enumerate(plays):
             self.__add_play(play, p2lp)
+            if (i + 1) % 1000 == 0 or i + 1 == play_ct:
+                logger.info(f"{i + 1} of {play_ct} plays processed")
         return self._graph
 
     def __add_play(self, play, p2lp: Dict[int, int]) -> None:
@@ -120,7 +124,7 @@ class _PlayGraphBuilder(_GraphGetter):
                 pid     = play.pitcher_id_id,
                 outcome = outcome.value
             )
-        for player_id in [play.batter_id, play.pitcher_id]:
+        for player_id in [play.batter_id_id, play.pitcher_id_id]:
             if player_id in p2lp:
                 self._graph.add_edge(p2lp[player_id], play.id)
             p2lp[player_id] = play.id
