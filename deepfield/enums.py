@@ -33,9 +33,9 @@ class Outcome(Enum):
     """
 
     """XXX Should these include wild pitches / hit by pitches? Those plays are
-    not technically field agnostic...
+    technically field agnostic...
     """
-    
+
     STRIKEOUT = 0
     LINEOUT = 1
     GROUNDOUT = 2
