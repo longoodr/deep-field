@@ -139,4 +139,4 @@ dmypy.json
 /deepfield/scraping/pages
 
 # playgraph files
-*playgraph*
+*_playgraph*
