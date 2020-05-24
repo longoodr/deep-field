@@ -70,15 +70,26 @@ class TestPersistence:
 
     def test_od_consistency(self):
         self.p.get_graph()
+        assert self.p.is_on_disk_consistent()
         assert self.p._get_on_disk_graph() is not None
         self._add_cubs_game()
+        assert not self.p.is_on_disk_consistent()
         assert self.p._get_on_disk_graph() is None
         self.p.get_graph()
+        assert self.p.is_on_disk_consistent()
         assert self.p._get_on_disk_graph() is not None
         self.p.get_graph()
+        assert self.p.is_on_disk_consistent()
         assert self.p._get_on_disk_graph() is not None
         with open(self.p._hash_filename, "a") as hash_file:
             hash_file.write("bad data")
+        assert not self.p.is_on_disk_consistent()
+        assert self.p._get_on_disk_graph() is None
+        self.p.get_graph()
+        assert self.p.is_on_disk_consistent()
+        assert self.p._get_on_disk_graph() is not None
+        Play.get().delete_instance()
+        assert not self.p.is_on_disk_consistent()
         assert self.p._get_on_disk_graph() is None
 
     @staticmethod
