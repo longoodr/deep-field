@@ -215,10 +215,10 @@ class _ChecksumGenerator:
 
 class _IntervalLogger:
 
-    def __init__(self, total: int, fmt: str, interval: int = 1000):
+    def __init__(self, total: int, fmt: str, intervals: int = 100):
         self._total = total
         self._fmt = fmt
-        self._interval = interval
+        self._interval = total // intervals
 
     def log(self, i: int):
         num = i + 1
