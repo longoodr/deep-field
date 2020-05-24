@@ -63,7 +63,7 @@ class TestPersistence:
         assert self.p._get_on_disk_graph() is None
 
     def test_graph_save(self):
-        self._insert_natls_game()
+        utils.insert_natls_game()
         g1 = self.p.get_graph()
         g2 = self.p._get_on_disk_graph()
         assert nx.is_isomorphic(g1, g2)
@@ -72,7 +72,7 @@ class TestPersistence:
         self.p.get_graph()
         assert self.p.is_on_disk_consistent()
         assert self.p._get_on_disk_graph() is not None
-        self._insert_cubs_game()
+        utils.insert_cubs_game()
         assert not self.p.is_on_disk_consistent()
         assert self.p._get_on_disk_graph() is None
         self.p.get_graph()
@@ -91,14 +91,6 @@ class TestPersistence:
         Play.get().delete_instance()
         assert not self.p.is_on_disk_consistent()
         assert self.p._get_on_disk_graph() is None
-
-    @staticmethod
-    def _insert_natls_game() -> None:
-        utils.insert_game("WAS201710120.shtml")
-
-    @staticmethod
-    def _insert_cubs_game() -> None:
-        utils.insert_game("CHN201710110.shtml")
 
 def _play_num_to_id(play_num: int) -> int:
     return Play.get(Play.play_num == play_num).id

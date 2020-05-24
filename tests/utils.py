@@ -14,20 +14,25 @@ def init_test_env() -> None:
     init_db()
     clean_db()
 
-def delete_db_file():
+def delete_db_file() -> None:
     db.close()
     os.remove(get_db_name())
 
-def clean_db():
+def clean_db() -> None:
     drop_tables()
     create_tables()
+
+def insert_natls_game() -> None:
+    insert_game("WAS201710120.shtml")
+
+def insert_cubs_game() -> None:
+    insert_game("CHN201710110.shtml")
 
 def insert_game(url: str) -> None:
     link = BBRefLink(url)
     page = Page.from_link(link)
     insert_mock_players(page)  # type: ignore
     ScrapeNode.from_page(page).scrape()
-
 
 def insert_mock_players(page: GamePage) -> None:
     ptables = page._player_tables
