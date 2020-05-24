@@ -1,0 +1,52 @@
+Idea: use a genetic algorithm to optimize parameters of a rating system
+
+Rating system consists of:
+    1. A rating function which takes pairwise differences of player ratings and produces a probability distribution by taking softmax of output
+    2. A transition lookup table which takes outcome and produces a normalized vector w/ num dimensions equal to number of batter/pitcher stats
+
+To evaluate fitness of a rating function given a play dependency graph:
+    1. Topologically sort the graph
+    2. Initialize batting, pitching ratings of all players to 0
+    3. For each play in the graph:
+        1. Apply rating function to pairwise differences of the ratings of the players involved in the play
+            - this produces a probability distribution p over the possible outcomes
+        2. Compute the KL divergence d between p and the actual outcome distribution for the play
+        3. Lookup normalized vector v in transition lookup table
+        4. Scale v by d to get v'
+        5. Add v' to batter rating and substract v' from pitcher rating
+    Final fitness is sum of d's for every play
+
+Could gradient descent be used instead?
+    - Problematic because the inputs to the rating function depends on the rating function and transition function
+    - Loss function needs to minimize KL divergence between its predicted outcomes and actual outcomes
+
+What if, instead of running through the entire graph, the graph is evaluated in layers? 
+    - Instead of topologically sorting the graph, perform BFS and evaluate on the explored nodes at each iteration
+        - These nodes can be evaluated independently of one another within the layers
+    - This would allow a large number of rating systems to be evaluated early on, and lower fitness systems can be eliminated after each layer. Crossover and mutation occurs after each layer. This allows for a larger population and better coverage of the space
+    - For each layer, can treat transition function as constant and perform gradient descent on seen examples
+
+    - Since BFS layering is probably infeasible, why not instead do a BFS traversal and operate on fixed batches of nodes for all candidate solutions?
+        - If there are nodes that are dependent on one another in the same batch, the ratings for players would not be updated sequentially; rather, the updates would be batched and applied after both nodes are seen, with unupdated ratings
+
+    In this case, the algorithm would be:
+        initialize starting population
+        while not converged:
+            nodes <- starting nodes of graph
+            for each member of population:
+                zero ratings for all players
+            do while nodes have successors:
+                for each member of population:
+                    for each node in nodes:
+                        p <- rating(b-p diffs)
+                        k <- KLdiv(p, outcome)
+                        member fitness <- member fitness + 1/k
+                        delta <- k * transition[outcome]
+                        batter <- batter + delta
+                        pitcher <- pitcher - delta
+                    backprop rating function on seen nodes
+                nodes <- successors of nodes
+                cull least fit members
+                repopulate from most fit members, making 2 identical copies but with each parents' current ratings
+
+        - this algorithm uses backprop to train the rating function neural network and a genetic algorithm to train the transition function. best of both worlds?
