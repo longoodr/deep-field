@@ -9,7 +9,7 @@ logger = logging.getLogger()
 
 def main():
     parser = argparse.ArgumentParser(
-            description = "Builds a play dependency graph from database and saves it to disk."
+            description = "Reads plays from the database and saves a play dependency graph to it."
         )
     config_logging()
     init_db()

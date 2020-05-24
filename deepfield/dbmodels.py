@@ -48,13 +48,27 @@ class Play(DeepFieldModel):
     batter_id = ForeignKeyField(Player)
     pitcher_id = ForeignKeyField(Player)
 
-_MODELS = (Game, Play, Player, Team, Venue)
+class PlayNode(DeepFieldModel):
+    play_id = ForeignKeyField(Play, primary_key=True)   # supertype of Play
+    # note: not nullable, since plays with null outcomes should not be in graph anyway
+    outcome = SmallIntegerField()
+
+class PlayEdge(DeepFieldModel):
+    from_id = ForeignKeyField(PlayNode)
+    to_id = ForeignKeyField(PlayNode)
+
+_MODELS = (Game, Play, Player, Team, Venue, PlayNode, PlayEdge)
+_GRAPH_MODELS = (PlayNode, PlayEdge)
 
 def create_tables() -> None:
     db.create_tables(_MODELS)
     
 def drop_tables() -> None:
     db.drop_tables(_MODELS)
+
+def clean_graph() -> None:
+    db.drop_tables(_GRAPH_MODELS)
+    db.create_tables(_GRAPH_MODELS)
 
 def init_db() -> None:
     global _DB_NAME

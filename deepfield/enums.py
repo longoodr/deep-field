@@ -26,6 +26,16 @@ class OnBase(IntFlag):
     THIRD = 4
 
 class Outcome(Enum):
+    """Field agnostic outcomes for plays. "Field agnostic" means that outcomes
+    dependent on the field configuration should be ignored: for example, bunts.
+    This also means that errors should be treated as outs, because the errors
+    are due to the fielder and would have otherwise been an out.
+    """
+
+    """XXX Should these include wild pitches / hit by pitches? Those plays are
+    not technically field agnostic...
+    """
+    
     STRIKEOUT = 0
     LINEOUT = 1
     GROUNDOUT = 2
@@ -38,7 +48,9 @@ class Outcome(Enum):
 
     @classmethod
     def from_desc(cls, desc: str) -> Optional["Outcome"]:
-        """Converts a description to an Outcome, or returns None if can't."""
+        """Converts a description to an Outcome, or returns None if this
+        description can't be matched to one.
+        """
         desc = desc.lower().split(";")[0]
         if "double play" in desc or "triple play" in desc:
             return cls._parse_dbl_trpl_plays(desc)
@@ -63,6 +75,7 @@ class Outcome(Enum):
         if "fly" in desc:
             return cls.FLYOUT
         if "on foul ball" in desc:
+            # foul ball error: treat error as out
             return cls.FLYOUT
         if "groundout" in desc:
             return cls.GROUNDOUT
@@ -84,6 +97,7 @@ class Outcome(Enum):
 
     @classmethod
     def _parse_error(cls, desc: str) -> Optional["Outcome"]:
+        # in the interest of being field-agnostic, treat errors as outs
         if "ground ball" in desc:
             return cls.GROUNDOUT
         if "fly" in desc:

@@ -75,9 +75,6 @@ class TestPersistence:
         assert self.p._get_on_disk_graph() is None
         self.p.get_graph()
         assert self.p._get_on_disk_graph() is not None
-        with open(self.p._graph_filename, "a") as json_file:
-            json_file.write("bad data")
-        assert self.p._get_on_disk_graph() is None
         self.p.get_graph()
         assert self.p._get_on_disk_graph() is not None
         with open(self.p._hash_filename, "a") as hash_file:
