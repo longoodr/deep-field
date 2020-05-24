@@ -1,17 +1,12 @@
 import argparse
-import logging
-import sys
 from datetime import datetime
 from typing import Iterable
-
-from requests.exceptions import HTTPError
 
 from deepfield.dbmodels import create_tables, init_db
 from deepfield.scraping.bbref_pages import BBRefLink, SchedulePage
 from deepfield.scraping.nodes import ScrapeNode
 from deepfield.scraping.pages import Page
-
-logger = logging.getLogger()
+from deepfield.script_utils import config_logging, logger
 
 CUR_YEAR = datetime.now().year
 
@@ -56,23 +51,6 @@ def get_years(year: int, no_earlier: bool) -> Iterable[int]:
             yield y
     else:
         yield year
-        
-def config_logging():
-    hdlr = logging.StreamHandler(sys.stdout)
-    fmtr = logging.Formatter(
-            fmt =     "%(asctime)s - %(message)s",
-            datefmt = "%m-%d %H:%M:%S"
-        )
-    hdlr.setFormatter(fmtr)
-    logger.addHandler(hdlr)
-    hdlr = logging.FileHandler("log.log")
-    fmtr = logging.Formatter(
-            fmt =     "%(asctime)s - %(levelname)s - %(message)s",
-            datefmt = "%m-%d %H:%M:%S"
-        )
-    hdlr.setFormatter(fmtr)
-    logger.addHandler(hdlr)
-    logger.setLevel(logging.INFO)
 
 if __name__ == "__main__":
     args = parse_args()
