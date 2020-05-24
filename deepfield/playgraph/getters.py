@@ -91,16 +91,22 @@ class _PlayGraphDbReader(_GraphGetter):
 
     @staticmethod
     def _get_nodes() -> Iterable[Tuple[int, Dict[str, Any]]]:
-        for n in PlayNode.select():
+        query = PlayNode.select()
+        interval_logger = _IntervalLogger(query.count(), "{} of {} nodes read")
+        for i, n in enumerate(PlayNode.select()):
             yield (
                     n.play_id_id,
                     {"outcome": n.outcome}
                 )
+            interval_logger.log(i)
 
     @staticmethod
     def _get_edges() -> Iterable[Tuple[int, int]]:
-        for e in PlayEdge.select():
+        query = PlayEdge.select()
+        interval_logger = _IntervalLogger(query.count(), "{} of {} edges read")
+        for i, e in enumerate(query):
             yield (e.from_id_id, e.to_id_id)
+            interval_logger.log(i)
 
 class _PlayGraphDbWriter:
     """Writes a graph to the database."""
@@ -122,22 +128,26 @@ class _PlayGraphDbWriter:
             PlayNode.insert_many(batch).execute()
 
     def _get_node_data(self) -> Iterable[Dict[str, Any]]:
-        for play_id, data in self._graph.nodes(data=True):
+        interval_logger = _IntervalLogger(len(self._graph), "{} of {} nodes written")
+        for i, (play_id, data) in enumerate(self._graph.nodes(data=True)):
             yield {
                     "play_id": play_id,
                     "outcome": data["outcome"]
                 }
+            interval_logger.log(i)
 
     def _write_edges(self) -> None:
         for batch in chunked(self._get_edge_data(), self.__EDGES_PER_BATCH):
             PlayEdge.insert_many(batch).execute()
 
     def _get_edge_data(self) -> Iterable[Dict[str, Any]]:
-        for from_id, to_id in self._graph.edges:
+        interval_logger = _IntervalLogger(self._graph.number_of_edges(), "{} of {} edges written")
+        for i, (from_id, to_id) in enumerate(self._graph.edges):
             yield {
                 "from_id": from_id,
                 "to_id"  : to_id
             }
+            interval_logger.log(i)
 
 class _PlayGraphBuilder(_GraphGetter):
     """Builds a graph from plays in the database."""
@@ -153,10 +163,10 @@ class _PlayGraphBuilder(_GraphGetter):
         self._graph = nx.DiGraph()
         plays = self.__get_plays()
         play_ct = plays.count()
+        interval_logger = _IntervalLogger(play_ct, "{} of {} plays processed")
         for i, play in enumerate(plays):
             self.__add_play(play, p2lp)
-            if (i + 1) % 1000 == 0 or i + 1 == play_ct:
-                logger.info(f"{i + 1} of {play_ct} plays processed")
+            interval_logger.log(i)
         return self._graph
 
     def __add_play(self, play, p2lp: Dict[int, int]) -> None:
@@ -202,3 +212,15 @@ class _ChecksumGenerator:
             for chunk in iter(lambda: fileobj.read(self._BUFFER_SIZE), b""):
                 md5sum.update(chunk)
         self._checksum = md5sum.hexdigest()
+
+class _IntervalLogger:
+
+    def __init__(self, total: int, fmt: str, interval: int = 1000):
+        self._total = total
+        self._fmt = fmt
+        self._interval = interval
+
+    def log(self, i: int):
+        num = i + 1
+        if num % self._interval == 0 or num == self._total:
+                logger.info(self._fmt.format(num, self._total))
