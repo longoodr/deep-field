@@ -140,3 +140,6 @@ dmypy.json
 
 # playgraph files
 *_playgraph*
+
+# line count files
+.VSCodeCounter/
