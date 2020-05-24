@@ -5,7 +5,8 @@ from deepfield.dbmodels import (Player, create_tables, db, drop_tables,
                                 get_db_name, init_db)
 from deepfield.enums import Handedness
 from deepfield.scraping.bbref_pages import BBRefLink, GamePage
-from deepfield.scraping.pages import HtmlCache
+from deepfield.scraping.nodes import ScrapeNode
+from deepfield.scraping.pages import HtmlCache, Page
 
 
 def init_test_env() -> None:
@@ -20,6 +21,13 @@ def delete_db_file():
 def clean_db():
     drop_tables()
     create_tables()
+
+def insert_game(url: str) -> None:
+    link = BBRefLink(url)
+    page = Page.from_link(link)
+    insert_mock_players(page)  # type: ignore
+    ScrapeNode.from_page(page).scrape()
+
 
 def insert_mock_players(page: GamePage) -> None:
     ptables = page._player_tables
