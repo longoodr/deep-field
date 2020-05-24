@@ -137,3 +137,6 @@ dmypy.json
 
 # cached pages
 /deepfield/scraping/pages
+
+# playgraph files
+*playgraph*
