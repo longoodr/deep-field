@@ -3,9 +3,9 @@ from typing import Iterable, Tuple
 import networkx as nx
 import pytest
 
+from deepfield.dbmodels import Play
 from deepfield.playgraph.getters import PlayGraphPersistor, _PlayGraphBuilder
 from deepfield.scraping.bbref_pages import BBRefLink
-from deepfield.scraping.dbmodels import Play
 from deepfield.scraping.nodes import ScrapeNode
 from deepfield.scraping.pages import Page
 from tests import test_env

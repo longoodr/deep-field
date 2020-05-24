@@ -2,8 +2,8 @@ import argparse
 import logging
 import sys
 
+from deepfield.dbmodels import init_db
 from deepfield.playgraph.getters import PlayGraphPersistor
-from deepfield.scraping.dbmodels import init_db
 
 logger = logging.getLogger()
 

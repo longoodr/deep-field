@@ -10,8 +10,8 @@ import requests
 from bs4 import BeautifulSoup, Comment
 from peewee import Query, chunked
 
-from deepfield.scraping.dbmodels import (DeepFieldModel, Game, Play, Player, Team,
-                                     Venue, db)
+from deepfield.dbmodels import (DeepFieldModel, Game, Play, Player, Team,
+                                Venue, db)
 from deepfield.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.scraping.pages import InsertablePage, Link, Page
 

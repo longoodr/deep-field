@@ -6,8 +6,8 @@ from typing import Iterable
 
 from requests.exceptions import HTTPError
 
+from deepfield.dbmodels import create_tables, init_db
 from deepfield.scraping.bbref_pages import BBRefLink, SchedulePage
-from deepfield.scraping.dbmodels import create_tables, init_db
 from deepfield.scraping.nodes import ScrapeNode
 from deepfield.scraping.pages import Page
 

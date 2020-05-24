@@ -8,8 +8,8 @@ from typing import Dict, Optional
 import networkx as nx
 import networkx.readwrite.json_graph as json_graph
 
+from deepfield.dbmodels import Game, Play, get_db_name
 from deepfield.enums import Outcome
-from deepfield.scraping.dbmodels import Game, Play, get_db_name
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
