@@ -11,7 +11,7 @@ from deepfield.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.scraping.bbref_pages import (BBRefLink, BBRefPage, GamePage,
                                             PlayerPage, SchedulePage)
 from deepfield.scraping.pages import HtmlCache, Page
-from tests import test_env
+from tests import utils
 
 RES_URLS = [
     "https://www.baseball-reference.com/boxes/WAS/WAS201710120.shtml",
@@ -20,10 +20,10 @@ RES_URLS = [
 ]
 
 def setup_module(module):
-    test_env.init_test_env()
+    utils.init_test_env()
 
 def teardown_module(module):
-    test_env.delete_db_file()
+    utils.delete_db_file()
 
 class TestPageFromLink:
     
@@ -61,7 +61,7 @@ class TestPage:
     
     @classmethod
     def setup_method(cls):
-        test_env.clean_db()
+        utils.clean_db()
         html = HtmlCache.get().find_html(BBRefLink(cls.name))
         cls.page = cls.page_type(html)
 
@@ -162,7 +162,7 @@ class TestGamePage(AbstractTestGamePage):
     def test_queries(self):
         with raises(ValueError):
             self.page.update_db()
-        test_env.insert_mock_players(self.page)
+        utils.insert_mock_players(self.page)
         assert not self.page._exists_in_db()
         self.page.update_db()
         assert self.page._exists_in_db()
@@ -209,7 +209,7 @@ class TestGamePageNames(AbstractTestGamePage):
     plays: Iterable[Tuple[int, str]] # play_num, name_id
     
     def _test_queries(self):
-        test_env.insert_mock_players(self.page)
+        utils.insert_mock_players(self.page)
         self.page.update_db()
         assert self.page._exists_in_db()
         for play_num, name_id in self.plays:

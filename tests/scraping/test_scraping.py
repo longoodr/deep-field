@@ -8,14 +8,14 @@ from deepfield.scraping.bbref_pages import (BBRefLink, GamePage, PlayerPage,
                                             SchedulePage)
 from deepfield.scraping.nodes import InsertableScrapeNode, ScrapeNode
 from deepfield.scraping.pages import HtmlCache, Page
-from tests import test_env
+from tests import utils
 
 
 def setup_module(module):
-    test_env.init_test_env()
+    utils.init_test_env()
 
 def teardown_module(module):
-    test_env.delete_db_file()
+    utils.delete_db_file()
 
 class TestScrapeNode:
     
@@ -29,7 +29,7 @@ class TestScrapeNode:
         
     def test_no_visit_twice(self):
         # these games share the same lineups
-        test_env.clean_db()
+        utils.clean_db()
         games = [
             "WAS201710120.shtml",
             "CHN201710110.shtml"
@@ -57,11 +57,11 @@ class TestParseable:
     
     @pytest.mark.parametrize("url", PARSE_URLS)
     def test_can_parse(self, url: str):
-        test_env.clean_db()
+        utils.clean_db()
         link = BBRefLink(url)
         page = Page.from_link(link)
         if isinstance(page, GamePage):
-            test_env.insert_mock_players(page)
+            utils.insert_mock_players(page)
         ScrapeNode.from_page(page).scrape()
 
     def test_malformed_html(self):

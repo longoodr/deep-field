@@ -8,20 +8,20 @@ from deepfield.playgraph.getters import PlayGraphPersistor, _PlayGraphBuilder
 from deepfield.scraping.bbref_pages import BBRefLink
 from deepfield.scraping.nodes import ScrapeNode
 from deepfield.scraping.pages import Page
-from tests import test_env
+from tests import utils
 
 
 def setup_module(module):
-    test_env.init_test_env()
+    utils.init_test_env()
 
 def teardown_module(module):
-    test_env.delete_db_file()
+    utils.delete_db_file()
 
 class TestBuilder:
 
     @classmethod
     def setup_class(cls):
-        test_env.clean_db()
+        utils.clean_db()
         
     def test_builder(self):
         _add_game("WAS201710120.shtml")
@@ -57,7 +57,7 @@ class TestPersistence:
 
     def setup_method(self, _):
         self.p.remove_files()
-        test_env.clean_db()
+        utils.clean_db()
 
     def test_no_file_returns_none(self):
         assert self.p._get_on_disk_graph() is None
@@ -109,5 +109,5 @@ def _play_nums_to_id(play_nums: Tuple) -> Tuple:
 def _add_game(url: str) -> None:
     link = BBRefLink(url)
     page = Page.from_link(link)
-    test_env.insert_mock_players(page)  # type: ignore
+    utils.insert_mock_players(page)  # type: ignore
     ScrapeNode.from_page(page).scrape()
