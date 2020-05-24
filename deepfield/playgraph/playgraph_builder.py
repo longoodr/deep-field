@@ -13,8 +13,12 @@ def main():
         )
     config_logging()
     init_db()
-    PlayGraphPersistor().get_graph()
-    logger.info("Graph built")
+    persistor = PlayGraphPersistor()
+    if persistor.is_on_disk_consistent():
+        logging.info("Graph already built")
+    else:
+        persistor.get_graph()
+        logger.info("Graph built")
 
 def config_logging():
     hdlr = logging.StreamHandler(sys.stdout)
