@@ -51,11 +51,15 @@ class PlayGraphPersistor(_GraphGetter):
         except FileNotFoundError:
             pass
 
+    def is_on_disk_consistent(self) -> bool:
+        """Returns whether the saved graph is consistent with the database."""
+        return self._matches_db_hash()
+
     def _get_on_disk_graph(self) -> Optional[nx.DiGraph]:
         """If the on-disk graph is consistent with the database, return it;
         otherwise return None.
         """
-        if not self._matches_db_hash():
+        if not self.is_on_disk_consistent():
             return None
         return _PlayGraphDbReader().get_graph()
 
@@ -218,7 +222,7 @@ class _IntervalLogger:
     def __init__(self, total: int, fmt: str, intervals: int = 100):
         self._total = total
         self._fmt = fmt
-        self._interval = total // intervals
+        self._interval = max(1, total // intervals)
 
     def log(self, i: int):
         num = i + 1
