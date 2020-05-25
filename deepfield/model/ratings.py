@@ -20,6 +20,7 @@ class PlayerRatings:
     def get_batter_rating(self, bid: int) -> np.ndarray:
         if bid not in self._bratings:
             return np.zeros(self._num_stats)
+        return self._bratings[bid]
 
     def copy(self) -> "PlayerRatings":
         cp = PlayerRatings(self._num_stats)
