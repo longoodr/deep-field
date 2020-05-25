@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Tuple, Union
 
 import numpy as np
 
@@ -17,7 +17,8 @@ class TransitionGenotype:
             return self._vecs[outcome]
         return self._vecs[outcome.value]
 
-    def get_children(self, mate: "TransitionGenotype") -> List["TransitionGenotype"]:
+    def get_children(self, mate: "TransitionGenotype")\
+            -> Tuple["TransitionGenotype", "TransitionGenotype"]:
         """Returns children of this genotype when reproducing with the given
         mate.
         
@@ -30,11 +31,14 @@ class TransitionGenotype:
         child1_parents = [self if np.random.uniform() < 0.5 else mate
                                 for _ in range(len(self._vecs))]
         child2_parents = [self if p == mate else mate for p in child1_parents]
-        children: List[TransitionGenotype] = []
-        for child_parents in [child1_parents, child2_parents]:
-            child_vecs = [parent._vecs[i] for i, parent in enumerate(child_parents)]
-            children.append(TransitionGenotype(child_vecs))
-        return children
+        child1 = self._get_child(child1_parents)
+        child2 = self._get_child(child2_parents)
+        return (child1, child2,)
+
+    @staticmethod 
+    def _get_child(child_parents: List["TransitionGenotype"]) -> "TransitionGenotype":
+        child_vecs = [parent._vecs[i] for i, parent in enumerate(child_parents)]
+        return TransitionGenotype(child_vecs)
 
     def get_mutated(self, rate: float = 0.1) -> "TransitionGenotype":
         """Returns a mutated version of this TransitionGenotype.
