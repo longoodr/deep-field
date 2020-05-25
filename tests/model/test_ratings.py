@@ -6,7 +6,7 @@ from deepfield.model.ratings import PlayerRatings
 
 class TestPlayerRatings:
 
-    def test_update(self):
+    def test_update_access(self):
         for num_stats in range(3, 6):
             pr = PlayerRatings(num_stats)
             zero = np.zeros(num_stats)
