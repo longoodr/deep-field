@@ -31,8 +31,6 @@ class TestPlayerRatings:
                 assert (pr.get_batter_rating(i) == zero).all()
                 assert (pr.get_pitcher_rating(i) == zero).all()
 
-
-
     def test_copy(self):
         for num_stats in range(3, 6):
             pr = PlayerRatings(num_stats)
