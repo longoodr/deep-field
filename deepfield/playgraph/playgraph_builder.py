@@ -17,8 +17,6 @@ def main():
     else:
         persistor.get_graph()
         logger.info("Graph built")
-    for layer in GraphLayerer(persistor.get_graph()).get_layers():
-            logger.info(len(layer))
 
 if __name__ == "__main__":
     main()
