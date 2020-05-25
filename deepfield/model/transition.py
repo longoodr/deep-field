@@ -36,15 +36,18 @@ class TransitionGenotype:
             children.append(TransitionGenotype(child_vecs))
         return children
 
-    def get_mutated(self) -> "TransitionGenotype":
+    def get_mutated(self, rate: float = 0.1) -> "TransitionGenotype":
         """Returns a mutated version of this TransitionGenotype.
         
-        To mutate, a random entry in a random vector is regenerated.
+        To mutate, a random entry in a random vector is slightly perturbed, and
+        then the mutated vector is normalized.
         """
         mutated_vecs = [np.copy(v) for v in self._vecs]
         vec_to_mutate = mutated_vecs[np.random.randint(0, len(self._vecs))]
         vec_entry_to_mutate = np.random.randint(0, vec_to_mutate.size)
-        new_val = np.random.standard_normal()
+        old_val = vec_to_mutate[vec_entry_to_mutate]
+        # note new_val still has mean 0, variance 1
+        new_val = (1 - rate) * old_val + rate * np.random.standard_normal()
         vec_to_mutate[vec_entry_to_mutate] = new_val
         vec_to_mutate /= np.linalg.norm(vec_to_mutate)
         return TransitionGenotype(mutated_vecs)
