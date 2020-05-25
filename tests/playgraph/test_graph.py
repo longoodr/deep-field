@@ -23,7 +23,7 @@ class TestLayerer:
         utils.clean_db()
 
     def test_layers(self):
-        expected_in = [
+        expected_layers = [
             (1, 9),
             (3, 11),
             (4, 13),
@@ -33,6 +33,6 @@ class TestLayerer:
             (8,),
             (14,),
         ]
-        for layer, e_in in zip(self.layerer.get_layers(), expected_in):
-            for exp in e_in:
-                assert exp in layer
+        for layer, expected in zip(self.layerer.get_layers(), expected_layers):
+            for e in expected:
+                assert e in layer
