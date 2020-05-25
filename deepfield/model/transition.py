@@ -1,18 +1,24 @@
 from typing import List, Tuple, Union
-
+from abc import ABC, abstractmethod
 import numpy as np
 
 from deepfield.enums import Outcome
 
+class TransitionFunction(ABC):
+    """Can act as a map from outcomes to unit vectors."""
 
-class TransitionGenotype:
+    @abstractmethod
+    def __getitem__(self, outcome: Union[Outcome, int]) -> np.ndarray:
+        """Returns the unit vector associated with the given outcome."""
+        pass
+
+class TransitionGenotype(TransitionFunction):
     """A genotype for the transition function of a rating system."""
 
     def __init__(self, vecs: List[np.ndarray]):
         self._vecs = vecs
 
     def __getitem__(self, outcome: Union[Outcome, int]) -> np.ndarray:
-        """Returns the unit vector associated with the given outcome."""
         if isinstance(outcome, int):
             return self._vecs[outcome]
         return self._vecs[outcome.value]
