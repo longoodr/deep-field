@@ -9,7 +9,7 @@ class PlayerRatings:
     """
 
     def __init__(self, num_stats: int):
-        self._num_stats = 0
+        self._num_stats = num_stats
         self.reset()
 
     def get_pitcher_rating(self, pid: int) -> np.ndarray:
@@ -30,7 +30,7 @@ class PlayerRatings:
     
     @staticmethod
     def _copy_ratings(ratings: Dict[int, np.ndarray]) -> Dict[int, np.ndarray]:
-        return {id_: r for id_, r in ratings.items()}
+        return {id_: r.copy() for id_, r in ratings.items()}
 
     def reset(self):
         """Zeroes all player ratings."""
