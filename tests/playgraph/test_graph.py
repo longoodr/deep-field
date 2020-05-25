@@ -1,6 +1,6 @@
 from tests import utils
 from deepfield.playgraph.graph import GraphLayerer
-from deepfield.playgraph.getters import PlayGraphPersistor
+from deepfield.playgraph.getters import PlayGraphBuilder
 
 import pytest
 
@@ -21,7 +21,7 @@ class TestTraversal:
         utils.clean_db()
 
     def test_layers(self):
-        graph = PlayGraphPersistor().get_graph()
+        graph = PlayGraphBuilder().get_graph()
         layerer = GraphLayerer(graph)
         expected_in = [
             [1, 9],

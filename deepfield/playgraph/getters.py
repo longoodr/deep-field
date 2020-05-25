@@ -39,7 +39,7 @@ class PlayGraphPersistor(_GraphGetter):
         od_graph = self._get_on_disk_graph()
         if od_graph is not None:
             return od_graph
-        graph = _PlayGraphBuilder().get_graph()
+        graph = PlayGraphBuilder().get_graph()
         _PlayGraphDbWriter(graph).save_graph()
         self._write_hash()
         return graph
@@ -153,7 +153,7 @@ class _PlayGraphDbWriter:
             }
             interval_logger.log(i)
 
-class _PlayGraphBuilder(_GraphGetter):
+class PlayGraphBuilder(_GraphGetter):
     """Builds a graph from plays in the database."""
 
     def __init__(self):
