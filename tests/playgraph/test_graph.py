@@ -23,7 +23,6 @@ class TestLayerer:
         utils.clean_db()
 
     def test_layers(self):
-        
         expected_in = [
             [1, 9],
             [3, 11]
