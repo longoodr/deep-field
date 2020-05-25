@@ -10,19 +10,20 @@ def setup_module(module):
 def teardown_module(module):
     utils.delete_db_file()
 
-class TestTraversal:
+class TestLayerer:
     
     @classmethod
     def setup_class(cls):
         utils.insert_natls_game()
+        graph = PlayGraphBuilder().get_graph()
+        cls.layerer = GraphLayerer(graph)
 
     @classmethod
     def teardown_class(cls):
         utils.clean_db()
 
     def test_layers(self):
-        graph = PlayGraphBuilder().get_graph()
-        layerer = GraphLayerer(graph)
+        
         expected_in = [
             [1, 9],
             [3, 11]
@@ -31,7 +32,11 @@ class TestTraversal:
             [3, 11, 2],
             [10]
         ]
-        for layer, e_in, e_out in zip(layerer.get_layers(), expected_in, expected_out):
+        for layer, e_in, e_out in zip(
+                self.layerer.get_layers(),
+                expected_in,
+                expected_out
+            ):
             for exp in e_in:
                 assert exp in layer
             for exp in e_out:
