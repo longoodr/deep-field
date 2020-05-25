@@ -10,11 +10,13 @@ ___
 ### Play Dependency Graph Construction
 `deepfield/playgraph/playgraph_builder.py` is a script that will build a play dependency graph from the plays in `stats.db` and save the graph's nodes and edges to `stats.db`.
 
-The play dependency graph is a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph). For model evaluation, a modified breadth-first search of this graph is used to evaluate plays in layers, consisting of nodes which can be evaluated independently of one another. This ensures:
+The play dependency graph is a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph). Note that every directed acyclic graph is a [partially ordered set (poset)](https://en.wikipedia.org/wiki/Partially_ordered_set). The [maximal antichains](https://en.wikipedia.org/wiki/Antichain#Height_and_width) of this poset represent sets of plays which can evaluated independently of one another. 
 
-1. For any two plays involving the same player, the earlier of the two plays is evaluated in an earlier layer. This ensures for a given play, the ratings of the players are consistent with all previous plays involving those players.
+Note that these maximal antichains must still be evaluated in the proper sequence for player ratings to be up-to-date within each maximal antichain, with respect to all previous plays. Therefore, during model evaluation, the [lattice](https://en.wikipedia.org/wiki/Lattice_(order)) of maximal antichains of the poset is traversed. After each maximal antichain is evaluated, ratings are updated. Note that this ensures:
 
-2. Play counts are relatively evenly distributed across players for a given number of evaluated plays. This would not be the case if the plays were evaluated sequentially by time of occurrence.
+1. For any two plays involving the same player, the earlier of the two plays is evaluated in an earlier maximal antichain relative to the later play. Therefore, for a given play, the ratings of the players are up-to-date with respect to all previous plays involving those players.
 
-3. Each layer can be evaluated without updating the ratings of any players. This allows plays within a layer to be used as a training batch for the outcome prediction model.
+2. Play counts are relatively evenly distributed across players for a given number of evaluated plays. With the most basic play evaluation order where plays are merely evaluated sequentially by time of occurrence, this would not be the case.
+
+3. Each maximal antichain can be evaluated without updating the ratings of any players. This allows plays within a layer to be used as a training batch for the outcome prediction model.
 ___
