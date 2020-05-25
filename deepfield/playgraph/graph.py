@@ -22,7 +22,7 @@ class MaximalAntichainLattice:
         self._nodes = self._source_nodes
         return self
 
-    def __next__(self) -> Iterable[Iterable]:
+    def __next__(self) -> Iterable:
         if len(self._nodes) > 0:
             returned_nodes = self._nodes
             self._visited.update(self._nodes)
