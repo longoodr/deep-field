@@ -12,11 +12,11 @@ ___
 
 The play dependency graph is a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph). Note that every directed acyclic graph is a [partially ordered set (poset)](https://en.wikipedia.org/wiki/Partially_ordered_set). The [maximal antichains](https://en.wikipedia.org/wiki/Antichain#Height_and_width) of this poset represent sets of plays which can evaluated independently of one another. 
 
-Note that these maximal antichains must still be evaluated in the proper sequence for player ratings to be up-to-date within each maximal antichain, with respect to all previous plays. Therefore, during model evaluation, the [lattice](https://en.wikipedia.org/wiki/Lattice_(order)) of maximal antichains of the poset is traversed. After each maximal antichain is evaluated, ratings are updated. Note that this ensures:
+Note that these maximal antichains must still be evaluated in the proper sequence for player ratings to be up-to-date within each maximal antichain, with respect to all previous plays. Therefore, during model evaluation, the [lattice](https://en.wikipedia.org/wiki/Lattice_(order)) of maximal antichains of the poset is traversed, with each maximal antichain being evaluated as a unit. After each maximal antichain is evaluated, ratings are updated. This ensures that:
 
 1. For any two plays involving the same player, the earlier of the two plays is evaluated in an earlier maximal antichain relative to the later play. Therefore, for a given play, the ratings of the players are up-to-date with respect to all previous plays involving those players.
 
 2. Play counts are relatively evenly distributed across players for a given number of evaluated plays. With the most basic play evaluation order where plays are merely evaluated sequentially by time of occurrence, this would not be the case.
 
-3. Each maximal antichain can be evaluated without updating the ratings of any players. This allows plays within a layer to be used as a training batch for the outcome prediction model.
+3. Within each maximal antichain, plays can be evaluated without updating the ratings of any players. This allows plays within a maximal antichain to be used as a training batch for the outcome prediction model.
 ___
