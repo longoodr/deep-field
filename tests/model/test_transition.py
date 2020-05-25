@@ -15,7 +15,15 @@ class TestTransitionGenotype:
             
 
     def test_mutation(self):
-        pass
+        for num_stats in range(3, 6):
+            g = TransitionGenotype.get_random_genotype(num_stats)
+            m = g.get_mutated()
+            num_diff = 0
+            for gvec, mvec in zip(g._vecs, m._vecs):
+                for ge, me in zip(gvec, mvec):
+                    if ge != me:
+                        num_diff += 1
+            assert num_diff == num_stats
 
     def test_crossover(self):
         pass
