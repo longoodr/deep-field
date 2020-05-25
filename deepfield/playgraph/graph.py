@@ -3,8 +3,8 @@ from typing import Iterable, Set
 import networkx as nx
 
 
-class GraphLayerer:
-    """Returns layers of independent nodes in a DAG via BFS."""
+class MaximalAntichainLattice:
+    """Traverses the lattice of maximal antichains for a DAG."""
 
     def __init__(self, graph: nx.DiGraph):
         if not nx.is_directed_acyclic_graph(graph):
@@ -17,17 +17,22 @@ class GraphLayerer:
                 if indegree == 0
             ])
 
-    def get_layers(self) -> Iterable[Iterable]:
-        """Iterates over the layers in the graph."""
-        visited = set()
-        nodes = self._source_nodes
-        while len(nodes) > 0:
-            yield nodes
-            visited.update(nodes)
+    def __iter__(self):
+        self._visited = set()
+        self._nodes = self._source_nodes
+        return self
+
+    def __next__(self) -> Iterable[Iterable]:
+        if len(self._nodes) > 0:
+            returned_nodes = self._nodes
+            self._visited.update(self._nodes)
             succs = set()
-            for n in nodes:
+            for n in self._nodes:
                 succs.update([s for s in self._graph.successors(n)
-                        if s not in visited
-                        and visited.issuperset(self._graph.predecessors(s))]
+                        if s not in self._visited
+                        and self._visited.issuperset(self._graph.predecessors(s))]
                     )
-            nodes = succs
+            self._nodes = succs
+            return returned_nodes
+        else:
+            raise StopIteration

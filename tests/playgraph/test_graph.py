@@ -1,5 +1,5 @@
 from tests import utils
-from deepfield.playgraph.graph import GraphLayerer
+from deepfield.playgraph.graph import MaximalAntichainLattice
 from deepfield.playgraph.getters import PlayGraphBuilder
 
 import pytest
@@ -10,13 +10,13 @@ def setup_module(module):
 def teardown_module(module):
     utils.delete_db_file()
 
-class TestLayerer:
+class TestLattice:
     
     @classmethod
     def setup_class(cls):
         utils.insert_natls_game()
         graph = PlayGraphBuilder().get_graph()
-        cls.layerer = GraphLayerer(graph)
+        cls.lattice = MaximalAntichainLattice(graph)
 
     @classmethod
     def teardown_class(cls):
@@ -33,6 +33,6 @@ class TestLayerer:
             (8,),
             (14,),
         ]
-        for layer, expected in zip(self.layerer.get_layers(), expected_layers):
+        for antichain, expected in zip(self.lattice, expected_layers):
             for e in expected:
-                assert e in layer
+                assert e in antichain
