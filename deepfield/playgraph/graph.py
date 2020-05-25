@@ -27,6 +27,7 @@ class GraphLayerer:
             succs = set()
             for n in nodes:
                 succs.update([s for s in self._graph.successors(n)
-                        if s not in visited]
+                        if s not in visited
+                        and visited.issuperset(self._graph.predecessors(s))]
                     )
             nodes = succs

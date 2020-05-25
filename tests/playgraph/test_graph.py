@@ -24,19 +24,18 @@ class TestLayerer:
 
     def test_layers(self):
         expected_in = [
-            [1, 9],
-            [3, 11]
+            (1, 9),
+            (3, 11),
+            (4, 13),
+            (5,),
+            (6,),
+            (7,),
+            (8,),
+            (14,),
         ]
-        expected_out = [
-            [3, 11, 2],
-            [10]
-        ]
-        for layer, e_in, e_out in zip(
+        for layer, e_in in zip(
                 self.layerer.get_layers(),
-                expected_in,
-                expected_out
+                expected_in
             ):
             for exp in e_in:
                 assert exp in layer
-            for exp in e_out:
-                assert exp not in layer

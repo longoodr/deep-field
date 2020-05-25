@@ -3,7 +3,7 @@ import argparse
 from deepfield.dbmodels import init_db
 from deepfield.playgraph.getters import PlayGraphPersistor
 from deepfield.script_utils import config_logging, logger
-
+from deepfield.playgraph.graph import GraphLayerer
 
 def main():
     parser = argparse.ArgumentParser(
@@ -17,6 +17,8 @@ def main():
     else:
         persistor.get_graph()
         logger.info("Graph built")
+    for layer in GraphLayerer(persistor.get_graph()).get_layers():
+            logger.info(len(layer))
 
 if __name__ == "__main__":
     main()
