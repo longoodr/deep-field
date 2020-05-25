@@ -33,9 +33,6 @@ class TestLayerer:
             (8,),
             (14,),
         ]
-        for layer, e_in in zip(
-                self.layerer.get_layers(),
-                expected_in
-            ):
+        for layer, e_in in zip(self.layerer.get_layers(), expected_in):
             for exp in e_in:
                 assert exp in layer
