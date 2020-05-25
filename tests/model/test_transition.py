@@ -15,7 +15,6 @@ class TestTransitionGenotype:
                 assert g._vecs[val] is g[val]
                 assert g._vecs[val] is g[o]
             
-
     def test_mutation(self):
         for num_stats in range(3, 6):
             g = TransitionGenotype.get_random_genotype(num_stats)
