@@ -37,13 +37,12 @@ class PlayerRatings:
         self._bratings: Dict[int, np.ndarray] = {}
         self._pratings: Dict[int, np.ndarray] = {}
 
-    def update(self, kl_div: float, delta: np.ndarray, bid: int, pid: int)\
+    def update(self, delta: np.ndarray, bid: int, pid: int)\
             -> None:
         """Updates the ratings for the given players."""
-        scaled_delta = kl_div * delta
         if bid not in self._bratings:
             self._bratings[bid] = np.zeros(self._num_stats)
         if pid not in self._pratings:
             self._pratings[pid] = np.zeros(self._num_stats)
-        self._bratings[bid] += scaled_delta
-        self._pratings[pid] -= scaled_delta
+        self._bratings[bid] += delta
+        self._pratings[pid] -= delta
