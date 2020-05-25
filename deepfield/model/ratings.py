@@ -12,8 +12,16 @@ class PlayerRatings:
         self._num_stats = 0
         self.reset()
 
+    def get_pitcher_rating(self, pid: int) -> np.ndarray:
+        if pid not in self._pratings:
+            return np.zeros(self._num_stats)
+        return self._pratings[pid]
+
+    def get_batter_rating(self, bid: int) -> np.ndarray:
+        if bid not in self._bratings:
+            return np.zeros(self._num_stats)
+
     def copy(self) -> "PlayerRatings":
-        """Returns a copy of this PlayerRatings."""
         cp = PlayerRatings(self._num_stats)
         cp._bratings = self._copy_ratings(self._bratings)
         cp._pratings = self._copy_ratings(self._pratings)
