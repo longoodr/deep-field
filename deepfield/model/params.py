@@ -1,1 +1,0 @@
-NUM_STATS = 4
