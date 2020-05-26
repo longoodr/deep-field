@@ -17,6 +17,7 @@ def setup_module(module):
 
 def teardown_module(module):
     utils.delete_db_file()
+    PlayGraphPersistor().remove_files()
 
 class TestPersistence:
 
