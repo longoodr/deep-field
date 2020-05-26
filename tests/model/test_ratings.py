@@ -45,3 +45,17 @@ class TestPlayerRatings:
             assert (pr.get_pitcher_rating(1) == -2 * delta).all()
             assert (cp.get_batter_rating(0) == delta).all()
             assert (cp.get_pitcher_rating(1) == -1 * delta).all()
+
+    def test_pdiffs(self):
+        for num_stats in range(3, 6):
+            pr = PlayerRatings(num_stats)
+            should_be_zero = pr.get_pairwise_diffs(0, 0)
+            assert (should_be_zero == np.zeros((num_stats, num_stats))).all()
+            delta = np.arange(num_stats)
+            pr.update(delta, 0, 1)
+            pdiffs = pr.get_pairwise_diffs(0, 1)
+            bat = pr.get_batter_rating(0)
+            pit = pr.get_pitcher_rating(1)
+            for i in range(num_stats):
+                for j in range(num_stats):
+                    assert (pdiffs[i,j] == bat[i] - pit[j])

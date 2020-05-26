@@ -56,3 +56,11 @@ class PlayerRatings:
             self._pratings[pid] = np.zeros(self._num_stats)
         self._bratings[bid] += delta
         self._pratings[pid] -= delta
+
+    def get_pairwise_diffs(self, bid: int, pid: int) -> np.ndarray:
+        """Returns the pairwise difference matrix for the given players."""
+        brating = self.get_batter_rating(bid)
+        prating = self.get_pitcher_rating(pid)
+        b = np.tile(brating, (self._num_stats, 1))
+        p = np.tile(prating, (self._num_stats, 1))
+        return b - p.transpose()
