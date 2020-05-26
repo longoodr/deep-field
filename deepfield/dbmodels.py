@@ -54,12 +54,7 @@ class PlayNode(DeepFieldModel):
     outcome = SmallIntegerField()   # plays with None outcomes don't have nodes
     level = IntegerField()  # nodes of the same level are part of same maximal antichain
 
-class PlayEdge(DeepFieldModel):
-    from_id = ForeignKeyField(PlayNode)
-    to_id = ForeignKeyField(PlayNode)
-
-_MODELS = (Game, Play, Player, Team, Venue, PlayNode, PlayEdge)
-_GRAPH_MODELS = (PlayNode, PlayEdge)
+_MODELS = (Game, Play, Player, Team, Venue, PlayNode)
 
 def create_tables() -> None:
     db.create_tables(_MODELS)
@@ -68,8 +63,8 @@ def drop_tables() -> None:
     db.drop_tables(_MODELS)
 
 def clean_graph() -> None:
-    db.drop_tables(_GRAPH_MODELS)
-    db.create_tables(_GRAPH_MODELS)
+    db.drop_tables(PlayNode)
+    db.create_tables(PlayNode)
 
 def init_db() -> None:
     global _DB_NAME

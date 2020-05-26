@@ -2,16 +2,18 @@ import json
 import logging
 import os
 from abc import ABC, abstractmethod
+from collections import Counter
 from hashlib import md5
 from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Counter as CounterType
 
 import networkx as nx
 from peewee import chunked
 
-from deepfield.dbmodels import (Game, Play, PlayEdge, PlayNode, clean_graph,
+from deepfield.dbmodels import (Game, Play, PlayNode, clean_graph,
                                 db, get_db_name)
 from deepfield.enums import Outcome
-from deepfield.playgraph.graph import Node, EdgeList
+from deepfield.playgraph.graph import Node
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -32,7 +34,7 @@ class PlayGraphPersistor:
         """
         if self.is_on_disk_consistent():
             return False
-        PlayGraphDbWriter().write_graph()
+        _PlayGraphDbWriter().write_graph()
         self._write_graph_hash()
         return True
 
@@ -72,34 +74,25 @@ class PlayGraphPersistor:
     def _get_db_hash(self) -> str:
         return _ChecksumGenerator(get_db_name()).get_checksum()
 
-class GraphIterator(ABC):
+class _GraphIterator(ABC):
     """An iterable which returns tuples of nodes along with edges from previous
     nodes to the returned node.
     """
 
     @abstractmethod
-    def __iter__(self) -> "GraphIterator":
+    def __iter__(self) -> "_GraphIterator":
         pass
 
     @abstractmethod
-    def __next__(self) -> Tuple[Node, EdgeList]:
+    def __next__(self) -> Node:
         pass
 
-class DbPlayGraphIterator(GraphIterator):
-    """Reads the graph stored in the database."""
-
-    def __iter__(self) -> GraphIterator:
-        return self
-
-    def __next__(self) -> Tuple[Node, EdgeList]:
-        pass
-
-class PlayGraphDbWriter:
+class _PlayGraphDbWriter:
     """Reads plays from the database and writes the corresponding play graph to
     the database.
     """
 
-    __PER_BATCH = 200
+    _PER_BATCH = 300
 
     def write_graph(self) -> None:
         clean_graph()
@@ -107,47 +100,43 @@ class PlayGraphDbWriter:
             self._write()
     
     def _write(self) -> None:
-        for batch in chunked(DbPlaysToGraphIterator(), self.__PER_BATCH):
+        for batch in chunked(_DbPlaysToGraphIterator(), self._PER_BATCH):
             nodes, edges = batch
             PlayNode.insert_many(nodes).execute()
-            PlayEdge.insert_many(edges).execute()
 
-class DbPlaysToGraphIterator(GraphIterator):
-    """Reads plays from the database and produces the corresponding node and
-    edge data for the associated play graph.
+class _DbPlaysToGraphIterator(_GraphIterator):
+    """Reads plays from the database and produces the corresponding nodes for
+    the associated play graph.
     """
 
-    def __iter__(self) -> GraphIterator:
+    def __iter__(self) -> _GraphIterator:
         self._plays = self.__get_plays()
-        self._p2lp: Dict[int, int] = {} # short for "player to last play"
+        # maps player id to level of their last play + 1 (i.e. 0 => no plays)
+        self._player_to_lvl: CounterType[int] = Counter()
         return self
 
-    def __next__(self) -> Tuple[Node, EdgeList]:
-        node, play = self._get_next_node_and_play()
-        edges = self._get_edges_from_play(play)
-        return (node, edges)
-        
-    def _get_next_node_and_play(self) -> Tuple[Node, Any]:
+    def __next__(self) -> Node:
         node = None
         while node is None:
             play = next(self._plays)
             node = self._get_node_from_play(play)
-        return node, play
+        return node
 
-    def _get_edges_from_play(self, play) -> EdgeList:
-        edges: EdgeList = []
-        for player_id in [play.batter_id_id, play.pitcher_id_id]:
-            if player_id in self._p2lp:
-                edges.append((self._p2lp[player_id], play.id))
-            self._p2lp[player_id] = play.id
-        return edges
-
-    @staticmethod
-    def _get_node_from_play(play) -> Optional[Tuple[int, Dict[str, int]]]:
+    def _get_node_from_play(self, play) -> Optional[Tuple[int, Dict[str, int]]]:
         outcome = Outcome.from_desc(play.desc)
         if outcome is None:
             return None
-        return (play.id, {"outcome": outcome.value})
+        level = self._get_level(play)
+        self._player_to_lvl[play.batter_id_id] = level + 1
+        self._player_to_lvl[play.pitcher_id_id] = level + 1
+        return (play.id, {"outcome": outcome.value, "level": level})
+
+    def _get_level(self, play) -> int:
+        bid = play.batter_id_id
+        pid = play.pitcher_id_id
+        b_lvl = self._player_to_lvl[bid]
+        p_lvl = self._player_to_lvl[pid]
+        return max(b_lvl, p_lvl)
 
     @staticmethod
     def __get_plays():
