@@ -3,7 +3,7 @@ import logging
 import os
 from abc import ABC, abstractmethod
 from hashlib import md5
-from typing import Any, Dict, Iterable, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import networkx as nx
 from peewee import chunked
@@ -11,19 +11,12 @@ from peewee import chunked
 from deepfield.dbmodels import (Game, Play, PlayEdge, PlayNode, clean_graph,
                                 db, get_db_name)
 from deepfield.enums import Outcome
+from deepfield.playgraph.graph import Node, EdgeList
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-class _GraphGetter(ABC):
-    """An object which can return a play dependency graph."""
-
-    @abstractmethod
-    def get_graph(self) -> nx.DiGraph:
-        """Returns a play dependency graph."""
-        pass
-
-class PlayGraphPersistor(_GraphGetter):
+class PlayGraphPersistenceChecker:
     """Will try returning an on-disk graph if the database's checksum matches
     the checksum for the on-disk graph at its time of creation; otherwise, will
     build the graph from scratch.
@@ -37,8 +30,8 @@ class PlayGraphPersistor(_GraphGetter):
         od_graph = self._get_on_disk_graph()
         if od_graph is not None:
             return od_graph
-        graph = PlayGraphBuilder().get_graph()
-        _PlayGraphDbWriter(graph).save_graph()
+        graph = PlayGraphDbIterator().get_graph()
+        PlayGraphDbWriter(graph).save_graph()
         self._write_hash()
         return graph
 
@@ -82,7 +75,7 @@ class PlayGraphPersistor(_GraphGetter):
     def _get_db_hash(self) -> Optional[str]:
         return _ChecksumGenerator(get_db_name()).get_checksum()
 
-class _PlayGraphDbReader(_GraphGetter):
+class _PlayGraphDbReader:
     """Reads the graph stored in the database."""
 
     def get_graph(self) -> nx.DiGraph:
@@ -110,14 +103,11 @@ class _PlayGraphDbReader(_GraphGetter):
             yield (e.from_id_id, e.to_id_id)
             interval_logger.log(i)
 
-class _PlayGraphDbWriter:
+class PlayGraphDbWriter:
     """Writes a graph to the database."""
 
     __NODES_PER_BATCH = 400
     __EDGES_PER_BATCH = 400
-
-    def __init__(self, graph: nx.DiGraph):
-        self._graph = graph
 
     def save_graph(self) -> None:
         clean_graph()
@@ -151,38 +141,45 @@ class _PlayGraphDbWriter:
             }
             interval_logger.log(i)
 
-class PlayGraphBuilder(_GraphGetter):
-    """Builds a graph from plays in the database."""
+class PlayGraphDbIterator:
+    """Reads plays from the database and produces the corresponding node and
+    edge data.
+    """
 
     def __init__(self):
         self._graph: nx.DiGraph = None
 
-    def get_graph(self) -> nx.DiGraph:
-        if self._graph is not None:
-            return self._graph
-        player_to_last_play: Dict[int, int] = {}
-        p2lp = player_to_last_play  # a shorter alias
-        self._graph = nx.DiGraph()
-        plays = self.__get_plays()
-        play_ct = plays.count()
-        interval_logger = _IntervalLogger(play_ct, "{} of {} plays processed")
-        for i, play in enumerate(plays):
-            self.__add_play(play, p2lp)
-            interval_logger.log(i)
-        return self._graph
+    def __iter__(self):
+        self._plays = self.__get_plays()
+        self._p2lp = Dict[int, int] = {} # short for "player to last play"
+        return self
 
-    def __add_play(self, play, p2lp: Dict[int, int]) -> None:
+    def __next__(self) -> Tuple[Node, EdgeList]:
+        node, play = self._get_next_node_and_play()
+        edges = self._get_edges_from_play(play)
+        return (node, edges)
+        
+    def _get_next_node_and_play(self) -> Tuple[Node, Any]:
+        node = None
+        while node is None:
+            play = next(self._plays)
+            node = self._get_node_from_play(play)
+        return node, play
+
+    def _get_edges_from_play(self, play) -> EdgeList:
+        edges: EdgeList = []
+        for player_id in [play.batter_id_id, play.pitcher_id_id]:
+            if player_id in self._p2lp:
+                edges.append((self._p2lp[player_id], play.id))
+            self._p2lp[player_id] = play.id
+        return edges
+
+    @staticmethod
+    def _get_node_from_play(play) -> Optional[Tuple[int, Dict[str, int]]]:
         outcome = Outcome.from_desc(play.desc)
         if outcome is None:
-            return
-        self._graph.add_node(
-                play.id,
-                outcome = outcome.value
-            )
-        for player_id in [play.batter_id_id, play.pitcher_id_id]:
-            if player_id in p2lp:
-                self._graph.add_edge(p2lp[player_id], play.id)
-            p2lp[player_id] = play.id
+            return None
+        return (play.id, {"outcome": outcome.value})
 
     @staticmethod
     def __get_plays():
