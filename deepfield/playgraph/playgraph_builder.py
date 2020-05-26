@@ -6,16 +6,16 @@ from deepfield.script_utils import config_logging, logger
 
 def main():
     parser = argparse.ArgumentParser(
-            description = "Reads plays from the database and saves a play dependency graph to it."
+            description = "Reads plays from the database and saves the corresponding play dependency graph."
         )
     config_logging()
     init_db()
-    persistor = PlayGraphPersistor()
-    if persistor.is_on_disk_consistent():
-        logger.info("Graph already built")
+    rewritten = PlayGraphPersistor().ensure_consistency()
+    if rewritten:
+        logger.info("Graph built successfully")
     else:
-        persistor.get_graph()
-        logger.info("Graph built")
+        logger.info("Graph already built")
+        
 
 if __name__ == "__main__":
     main()
