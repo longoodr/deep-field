@@ -101,6 +101,8 @@ class _DbPlaysToGraphIterator():
     the associated play graph.
     """
 
+    LOG_FRAC_INTERVAL = 0.01
+
     def __iter__(self):
         query = self.__get_plays()
         self._plays = query.iterator()
@@ -109,6 +111,8 @@ class _DbPlaysToGraphIterator():
         # (+ 1, because node levels should be 0-indexed)
         self._player_to_lvl: CounterType[int] = Counter()
         self._num = 0
+        self._num_none = 0
+        self._next_frac = self.LOG_FRAC_INTERVAL
         return self
 
     def __next__(self) -> Node:
@@ -117,13 +121,20 @@ class _DbPlaysToGraphIterator():
             play = next(self._plays)
             node = self._get_node_from_play(play)
         self._num += 1
-        if self._num % 1000 == 0:
-            logger.info(f"{self._num} of roughly {self._ct} nodes processed")
+        self._log_progress()
         return node
+
+    def _log_progress(self):
+        if self._num % 1000 == 0:
+            est_ct = int(self._ct * (1 - self._num_none / self._num))
+            if self._num / est_ct >= self._next_frac:
+                logger.info(f"{self._num} of estimated total {est_ct} nodes processed")
+                self._next_frac += self.LOG_FRAC_INTERVAL
 
     def _get_node_from_play(self, play) -> Optional[Node]:
         outcome = Outcome.from_desc(play.desc)
         if outcome is None:
+            self._num_none += 1
             return None
         level = self._get_node_level(play)
         self._player_to_lvl[play.batter_id] = level + 1
