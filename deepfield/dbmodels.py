@@ -2,7 +2,8 @@ import os
 from typing import Optional
 
 from peewee import (CharField, DateField, FixedCharField, ForeignKeyField,
-                    Model, SmallIntegerField, SqliteDatabase, TimeField)
+                    IntegerField, Model, SmallIntegerField, SqliteDatabase,
+                    TimeField)
 
 _DB_NAME: Optional[str] = None
 _PROD_DB_NAME = "stats.db"
@@ -49,9 +50,9 @@ class Play(DeepFieldModel):
     pitcher_id = ForeignKeyField(Player)
 
 class PlayNode(DeepFieldModel):
-    play_id = ForeignKeyField(Play, primary_key=True)   # supertype of Play
-    # note: not nullable, since plays with null outcomes should not be in graph anyway
-    outcome = SmallIntegerField()
+    play_id = ForeignKeyField(Play, primary_key=True)
+    outcome = SmallIntegerField()   # plays with None outcomes don't have nodes
+    level = IntegerField()  # nodes of the same level are part of same maximal antichain
 
 class PlayEdge(DeepFieldModel):
     from_id = ForeignKeyField(PlayNode)
