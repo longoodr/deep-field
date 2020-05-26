@@ -1,7 +1,17 @@
-from typing import Dict
+from abc import ABC, abstractmethod
+from typing import Dict, Iterable
 
 import numpy as np
 
+
+class PredictionModel(ABC):
+    """A model which predicts outcome distributions from player stat pairwise
+    differences.
+    """
+
+    @abstractmethod
+    def backprop(self, pairwise_diffs) -> None:
+        pass
 
 class PlayerRatings:
     """A set of ratings for players that can be updated as plays are 
