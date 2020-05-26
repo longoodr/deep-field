@@ -86,8 +86,15 @@ class _PlayGraphDbWriter:
             self._write_nodes()
     
     def _write_nodes(self) -> None:
-        for batch in chunked(_DbPlaysToGraphIterator(), self._PER_BATCH):
-            PlayNode.insert_many(batch, fields = ("play_id", "outcome", "level")).execute()
+        nodes = iter(_DbPlaysToGraphIterator())
+        try:
+            while True:
+                batch = []
+                for _ in range(self._PER_BATCH):
+                    batch.append(next(nodes))
+                PlayNode.insert_many(batch, fields = ("play_id", "outcome", "level")).execute()
+        except StopIteration:
+            pass
 
 class _DbPlaysToGraphIterator():
     """Reads plays from the database and produces the corresponding nodes for
@@ -96,7 +103,7 @@ class _DbPlaysToGraphIterator():
 
     def __iter__(self):
         query = self.__get_plays()
-        self._plays = iter(query)
+        self._plays = query.iterator()
         self._ct = query.count()
         # maps player id to level of their last play + 1 (i.e. 0 => no plays)
         # (+ 1, because node levels should be 0-indexed)
