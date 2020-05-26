@@ -2,7 +2,7 @@ from typing import Dict, Iterable, List, Set, Tuple
 
 import networkx as nx
 
-Node = Tuple[int, Dict[str, int]]
+Node = Tuple[int, int, int]
 
 class MaximalAntichainLattice:
     """Traverses the lattice of maximal antichains for a DAG."""

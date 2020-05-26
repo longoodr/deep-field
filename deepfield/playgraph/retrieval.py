@@ -31,7 +31,7 @@ class PlayGraphPersistor:
         """If inconsistent, rewrites the graph; returns whether the graph was
         rewritten.
         """
-        if self.is_on_disk_consistent():
+        if self.is_consistent():
             return False
         _PlayGraphDbWriter().write_graph()
         self._write_graph_hash()
@@ -44,7 +44,7 @@ class PlayGraphPersistor:
         except FileNotFoundError:
             pass
 
-    def is_on_disk_consistent(self) -> bool:
+    def is_consistent(self) -> bool:
         """Returns whether the saved graph is consistent with the database."""
         return self._graph_and_db_hashes_match()
 
@@ -99,7 +99,7 @@ class _PlayGraphDbWriter:
     
     def _write_nodes(self) -> None:
         for batch in chunked(_DbPlaysToGraphIterator(), self._PER_BATCH):
-            PlayNode.insert_many(batch).execute()
+            PlayNode.insert_many(batch, fields = ("play_id", "outcome", "level")).execute()
 
 class _DbPlaysToGraphIterator(_GraphIterator):
     """Reads plays from the database and produces the corresponding nodes for
@@ -107,7 +107,7 @@ class _DbPlaysToGraphIterator(_GraphIterator):
     """
 
     def __iter__(self) -> _GraphIterator:
-        self._plays = self.__get_plays()
+        self._plays = iter(self.__get_plays())
         # maps player id to level of their last play + 1 (i.e. 0 => no plays)
         # (+ 1, because node levels should be 0-indexed)
         self._player_to_lvl: CounterType[int] = Counter()
@@ -120,14 +120,14 @@ class _DbPlaysToGraphIterator(_GraphIterator):
             node = self._get_node_from_play(play)
         return node
 
-    def _get_node_from_play(self, play) -> Optional[Tuple[int, Dict[str, int]]]:
+    def _get_node_from_play(self, play) -> Optional[Node]:
         outcome = Outcome.from_desc(play.desc)
         if outcome is None:
             return None
         level = self._get_node_level(play)
         self._player_to_lvl[play.batter_id_id] = level + 1
         self._player_to_lvl[play.pitcher_id_id] = level + 1
-        return (play.id, {"outcome": outcome.value, "level": level})
+        return (play.id, outcome.value, level)
 
     def _get_node_level(self, play) -> int:
         bid = play.batter_id_id

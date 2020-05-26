@@ -63,8 +63,8 @@ def drop_tables() -> None:
     db.drop_tables(_MODELS)
 
 def clean_graph() -> None:
-    db.drop_tables(PlayNode)
-    db.create_tables(PlayNode)
+    db.drop_tables((PlayNode,))
+    db.create_tables((PlayNode,))
 
 def init_db() -> None:
     global _DB_NAME

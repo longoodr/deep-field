@@ -23,8 +23,16 @@ class TestPersistence:
     def setup_class(cls):
         utils.clean_db()
 
-def _play_num_to_id(play_num: int) -> int:
-    return Play.get(Play.play_num == play_num).id
-
-def _play_nums_to_id(play_nums: Tuple) -> Tuple:
-    return tuple([_play_num_to_id(pnum) for pnum in play_nums])
+    def test_consistency(self):
+        p = PlayGraphPersistor()
+        for db_modification in [
+            lambda: None,
+            utils.insert_natls_game,
+            utils.insert_cubs_game,
+            lambda: Play.get().delete_instance()
+        ]:
+            db_modification()
+            assert not p.is_consistent()
+            rewritten = p.ensure_consistency()
+            assert rewritten
+            assert p.is_consistent()
