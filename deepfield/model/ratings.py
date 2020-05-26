@@ -57,6 +57,11 @@ class PlayerRatings:
         self._bratings[bid] += delta
         self._pratings[pid] -= delta
 
+    def get_node_pairwise_diffs(self, nodes: Iterable[Dict[str, int]]) -> Iterable[np.ndarray]:
+        """Returns the pairwise differences for the given nodes."""
+        for node in nodes:
+            yield self.get_pairwise_diffs(node["batter_id"], node["pitcher_id"])
+
     def get_pairwise_diffs(self, bid: int, pid: int) -> np.ndarray:
         """Returns the pairwise difference matrix for the given players."""
         brating = self.get_batter_rating(bid)
