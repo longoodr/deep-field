@@ -72,19 +72,6 @@ class PlayGraphPersistor:
     def _get_db_hash(self) -> str:
         return _ChecksumGenerator(get_db_name()).get_checksum()
 
-class _GraphIterator(ABC):
-    """An iterable which returns tuples of nodes along with edges from previous
-    nodes to the returned node.
-    """
-
-    @abstractmethod
-    def __iter__(self) -> "_GraphIterator":
-        pass
-
-    @abstractmethod
-    def __next__(self) -> Node:
-        pass
-
 class _PlayGraphDbWriter:
     """Reads plays from the database and writes the corresponding play graph to
     the database.
@@ -101,12 +88,12 @@ class _PlayGraphDbWriter:
         for batch in chunked(_DbPlaysToGraphIterator(), self._PER_BATCH):
             PlayNode.insert_many(batch, fields = ("play_id", "outcome", "level")).execute()
 
-class _DbPlaysToGraphIterator(_GraphIterator):
+class _DbPlaysToGraphIterator():
     """Reads plays from the database and produces the corresponding nodes for
     the associated play graph.
     """
 
-    def __iter__(self) -> _GraphIterator:
+    def __iter__(self):
         self._plays = iter(self.__get_plays())
         # maps player id to level of their last play + 1 (i.e. 0 => no plays)
         # (+ 1, because node levels should be 0-indexed)
