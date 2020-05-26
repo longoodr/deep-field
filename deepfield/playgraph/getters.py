@@ -29,8 +29,6 @@ class PlayGraphPersistor(_GraphGetter):
     build the graph from scratch.
     """
 
-    __ROWS_PER_BATCH = 400
-
     def __init__(self):
         db_name = os.path.splitext(get_db_name())[0]
         self._hash_filename = f"{db_name}_playgraph_hash.txt"
