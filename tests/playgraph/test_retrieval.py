@@ -4,8 +4,8 @@ import networkx as nx
 import pytest
 
 from deepfield.dbmodels import Play
-from deepfield.playgraph.retrieval import PlayGraphPersistor
 from deepfield.playgraph.graph import LevelOrderTraversal
+from deepfield.playgraph.retrieval import PlayGraphPersistor
 from deepfield.scraping.bbref_pages import BBRefLink
 from deepfield.scraping.nodes import ScrapeNode
 from deepfield.scraping.pages import Page

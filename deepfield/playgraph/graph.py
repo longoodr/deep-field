@@ -1,5 +1,6 @@
-from deepfield.dbmodels import PlayNode, Play
 from typing import Dict, Iterable, Tuple
+
+from deepfield.dbmodels import Play, PlayNode
 
 Node = Tuple[int, int, int]
 
