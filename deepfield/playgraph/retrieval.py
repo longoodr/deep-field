@@ -29,8 +29,7 @@ class PlayGraphPersistor:
 
     def ensure_consistency(self) -> bool:
         """If inconsistent, rewrites the graph; returns whether the graph was
-        rewritten. After calling this, the graph is guaranteed to be
-        consistent.
+        rewritten.
         """
         if self.is_on_disk_consistent():
             return False
@@ -68,8 +67,7 @@ class PlayGraphPersistor:
 
     def _write_graph_hash(self) -> None:
         with open(self._hash_filename, "w") as hash_file:
-            # file must exist at this point (would have exited if not)
-            hash_file.write(self._get_db_hash())    # type: ignore
+            hash_file.write(self._get_db_hash())
 
     def _get_db_hash(self) -> str:
         return _ChecksumGenerator(get_db_name()).get_checksum()
@@ -97,12 +95,11 @@ class _PlayGraphDbWriter:
     def write_graph(self) -> None:
         clean_graph()
         with db.atomic():
-            self._write()
+            self._write_nodes()
     
-    def _write(self) -> None:
+    def _write_nodes(self) -> None:
         for batch in chunked(_DbPlaysToGraphIterator(), self._PER_BATCH):
-            nodes, edges = batch
-            PlayNode.insert_many(nodes).execute()
+            PlayNode.insert_many(batch).execute()
 
 class _DbPlaysToGraphIterator(_GraphIterator):
     """Reads plays from the database and produces the corresponding nodes for
@@ -112,6 +109,7 @@ class _DbPlaysToGraphIterator(_GraphIterator):
     def __iter__(self) -> _GraphIterator:
         self._plays = self.__get_plays()
         # maps player id to level of their last play + 1 (i.e. 0 => no plays)
+        # (+ 1, because node levels should be 0-indexed)
         self._player_to_lvl: CounterType[int] = Counter()
         return self
 
@@ -126,12 +124,12 @@ class _DbPlaysToGraphIterator(_GraphIterator):
         outcome = Outcome.from_desc(play.desc)
         if outcome is None:
             return None
-        level = self._get_level(play)
+        level = self._get_node_level(play)
         self._player_to_lvl[play.batter_id_id] = level + 1
         self._player_to_lvl[play.pitcher_id_id] = level + 1
         return (play.id, {"outcome": outcome.value, "level": level})
 
-    def _get_level(self, play) -> int:
+    def _get_node_level(self, play) -> int:
         bid = play.batter_id_id
         pid = play.pitcher_id_id
         b_lvl = self._player_to_lvl[bid]
@@ -160,15 +158,3 @@ class _ChecksumGenerator:
             for chunk in iter(lambda: fileobj.read(self._BUFFER_SIZE), b""):
                 md5sum.update(chunk)
         return md5sum.hexdigest()
-
-class _IntervalLogger:
-
-    def __init__(self, total: int, fmt: str, intervals: int = 100):
-        self._total = total
-        self._fmt = fmt
-        self._interval = max(1, total // intervals)
-
-    def log(self, i: int):
-        num = i + 1
-        if num % self._interval == 0 or num == self._total:
-                logger.info(self._fmt.format(num, self._total))
