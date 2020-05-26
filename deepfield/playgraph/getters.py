@@ -72,40 +72,34 @@ class PlayGraphPersistor:
     def _get_db_hash(self) -> str:
         return _ChecksumGenerator(get_db_name()).get_checksum()
 
-class _PlayGraphDbReader:
+class GraphIterator(ABC):
+    """An iterable which returns tuples of nodes along with edges from previous
+    nodes to the returned node.
+    """
+
+    @abstractmethod
+    def __iter__(self) -> "GraphIterator":
+        pass
+
+    @abstractmethod
+    def __next__(self) -> Tuple[Node, EdgeList]:
+        pass
+
+class DbPlayGraphIterator(GraphIterator):
     """Reads the graph stored in the database."""
 
-    def get_graph(self) -> nx.DiGraph:
-        graph = nx.DiGraph()
-        graph.add_nodes_from(self._get_nodes())
-        graph.add_edges_from(self._get_edges())
-        return graph
+    def __iter__(self) -> GraphIterator:
+        return self
 
-    @staticmethod
-    def _get_nodes() -> Iterable[Tuple[int, Dict[str, Any]]]:
-        query = PlayNode.select()
-        interval_logger = _IntervalLogger(query.count(), "{} of {} nodes read")
-        for i, n in enumerate(PlayNode.select()):
-            yield (
-                    n.play_id_id,
-                    {"outcome": n.outcome}
-                )
-            interval_logger.log(i)
-
-    @staticmethod
-    def _get_edges() -> Iterable[Tuple[int, int]]:
-        query = PlayEdge.select()
-        interval_logger = _IntervalLogger(query.count(), "{} of {} edges read")
-        for i, e in enumerate(query):
-            yield (e.from_id_id, e.to_id_id)
-            interval_logger.log(i)
+    def __next__(self) -> Tuple[Node, EdgeList]:
+        pass
 
 class PlayGraphDbWriter:
     """Reads plays from the database and writes the corresponding play graph to
     the database.
     """
 
-    __PER_BATCH = 400
+    __PER_BATCH = 200
 
     def write_graph(self) -> None:
         clean_graph()
@@ -113,16 +107,19 @@ class PlayGraphDbWriter:
             self._write()
     
     def _write(self) -> None:
-        for batch in chunked(PlayGraphDbIterator(), )
+        for batch in chunked(DbPlaysToGraphIterator(), self.__PER_BATCH):
+            nodes, edges = batch
+            PlayNode.insert_many(nodes).execute()
+            PlayEdge.insert_many(edges).execute()
 
-class PlayGraphDbIterator:
+class DbPlaysToGraphIterator(GraphIterator):
     """Reads plays from the database and produces the corresponding node and
-    edge data.
+    edge data for the associated play graph.
     """
 
-    def __iter__(self):
+    def __iter__(self) -> GraphIterator:
         self._plays = self.__get_plays()
-        self._p2lp = Dict[int, int] = {} # short for "player to last play"
+        self._p2lp: Dict[int, int] = {} # short for "player to last play"
         return self
 
     def __next__(self) -> Tuple[Node, EdgeList]:
