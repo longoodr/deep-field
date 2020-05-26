@@ -1,39 +1,27 @@
-from typing import Dict, Iterable, List, Set, Tuple
-
-import networkx as nx
+from deepfield.dbmodels import PlayNode, Play
+from typing import Dict, Iterable, Tuple
 
 Node = Tuple[int, int, int]
 
-class MaximalAntichainLattice:
-    """Traverses the lattice of maximal antichains for a DAG."""
+class LevelOrderTraversal:
+    """Iterates over the maximal antichains of the saved play graph."""
 
-    def __init__(self, graph: nx.DiGraph):
-        if not nx.is_directed_acyclic_graph(graph):
-            raise ValueError("Must be DAG")
-        self._graph = graph
-        self._source_nodes = set([
-                node 
-                for node, indegree
-                in self._graph.in_degree(self._graph.nodes())
-                if indegree == 0
-            ])
+    _FIELDS = (PlayNode.play_id, PlayNode.outcome, Play.batter_id, Play.pitcher_id)
 
     def __iter__(self):
-        self._visited = set()
-        self._nodes = self._source_nodes
+        self._cur_level = 0
         return self
 
-    def __next__(self) -> Iterable:
-        if len(self._nodes) > 0:
-            returned_nodes = self._nodes
-            self._visited.update(self._nodes)
-            succs = set()
-            for n in self._nodes:
-                succs.update([s for s in self._graph.successors(n)
-                        if s not in self._visited
-                        and self._visited.issuperset(self._graph.predecessors(s))]
-                    )
-            self._nodes = succs
-            return returned_nodes
-        else:
+    def __next__(self) -> Iterable[Dict[str, int]]:
+        """Returns a generator which contains the dicts of the batter_id, 
+        pitcher_id, play_id, and outcome of each node in the next level.
+        """
+        query = (PlayNode.select(*self._FIELDS)
+                .join(Play)
+                .where(PlayNode.level == self._cur_level)
+                .dicts()
+            )
+        if query.count() == 0:
             raise StopIteration
+        self._cur_level += 1
+        return query.iterator()
