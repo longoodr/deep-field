@@ -10,7 +10,7 @@ ___
 ### Play Dependency Graph Construction
 `deepfield/playgraph/playgraph_builder.py` is a script that will build a play dependency graph from the plays in `stats.db` and save the graph's nodes and edges to `stats.db`.
 
-The play dependency graph is a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph). This directed acyclic graph can also be represented a [partially ordered set (poset)](https://en.wikipedia.org/wiki/Partially_ordered_set). Then, the [maximal antichains](https://en.wikipedia.org/wiki/Antichain#Height_and_width) of this poset represent sets of plays which can evaluated independently of one another, without requiring any rating updates for the involved players. 
+The play dependency graph is a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph). This directed acyclic graph can also be represented as a [partially ordered set (poset)](https://en.wikipedia.org/wiki/Partially_ordered_set). Then, the [maximal antichains](https://en.wikipedia.org/wiki/Antichain#Height_and_width) of this poset represent sets of plays which can evaluated independently of one another, without requiring any rating updates for the involved players. 
 
 Note that these maximal antichains must still be evaluated in the proper sequence for player ratings to be up-to-date within each maximal antichain, with respect to all previous plays. Therefore, during model evaluation, the [lattice](https://en.wikipedia.org/wiki/Lattice_(order)) of maximal antichains of the poset is traversed, with each maximal antichain being evaluated as a unit. After each maximal antichain is evaluated, ratings are updated. This ensures that:
 
