@@ -5,7 +5,7 @@ import networkx as nx
 
 from deepfield.model.ratings import PlayerRatings, PredictionModel
 from deepfield.model.transition import TransitionGenotype
-from deepfield.playgraph.graph import MaximalAntichainLattice
+from deepfield.playgraph.graph import LevelTraversal
 
 """
 (Parametrized by:
@@ -36,17 +36,16 @@ class Trainer(ABC):
     _Candidate = Tuple[PredictionModel, TransitionGenotype, PlayerRatings]
 
     def __init__(self,
-                 graph: nx.DiGraph,
                  pop_size: int,
                  num_stats: int):
-        self._lattice = MaximalAntichainLattice(graph)
+        self._levels = LevelTraversal()
         self._pop_size = pop_size
         self._num_stats = num_stats
 
     def train(self):
         self._population = self._generate_inital_population()
         while not self._is_converged():
-            for antichain in self._lattice:
+            for level in self._levels:
                 for member in self._population:
                     pass
 

@@ -4,7 +4,7 @@ from deepfield.dbmodels import Play, PlayNode
 
 Node = Tuple[int, int, int]
 
-class LevelOrderTraversal:
+class LevelTraversal:
     """Iterates over the maximal antichains of the saved play graph."""
 
     _FIELDS = (PlayNode.play_id, PlayNode.outcome, Play.batter_id, Play.pitcher_id)

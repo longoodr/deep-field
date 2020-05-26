@@ -4,7 +4,7 @@ import networkx as nx
 import pytest
 
 from deepfield.dbmodels import Play
-from deepfield.playgraph.graph import LevelOrderTraversal
+from deepfield.playgraph.graph import LevelTraversal
 from deepfield.playgraph.retrieval import PlayGraphPersistor
 from deepfield.scraping.bbref_pages import BBRefLink
 from deepfield.scraping.nodes import ScrapeNode
@@ -41,7 +41,7 @@ class TestPersistence:
     def test_correctness(self):
         utils.insert_natls_game()
         PlayGraphPersistor().ensure_consistency()
-        t = LevelOrderTraversal()
+        t = LevelTraversal()
         expected_layers = [
             (1, 9),
             (3, 11),
