@@ -20,7 +20,7 @@ class Mateable(ABC):
         pass
 
     def _random_parent(self, mate):
-        return self if np.random.uniform < 0.5 else mate
+        return self if np.random.uniform() < 0.5 else mate
 
 class Copyable(ABC):
     
@@ -49,9 +49,9 @@ class Candidate(Genotype):
     """A candidate set of models used by the Trainer."""
 
     def __init__(self, 
-                 pm: PredictionModel, 
-                 tf: TransitionFunction, 
-                 pr: PlayerRatings):
+                 pm: "PredictionModel", 
+                 tf: "TransitionFunction", 
+                 pr: "PlayerRatings"):
         self.pred_model = pm
         self.trans_func = tf
         self.ratings = pr
@@ -159,10 +159,9 @@ class TransitionFunction(Genotype):
         receives the outcome vector from the unselected parent for that
         outcome.
         """
-        for _ in range(2):
-            vec_parents = [self._random_parent(mate)
-                    for _ in range(len(self._vecs))]
-            child_vecs = [parent._vecs[i] for i, parent in enumerate(vec_parents)]
+        vec_parents = [self._random_parent(mate) for _ in range(len(self._vecs))]
+        for parents in [vec_parents, [mate if p == self else self for p in vec_parents]]:
+            child_vecs = [parent._vecs[i] for i, parent in enumerate(parents)]
             yield TransitionFunction(child_vecs)
 
     def get_mutated(self, rate: float = 0.1) -> "TransitionFunction":
