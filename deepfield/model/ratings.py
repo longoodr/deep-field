@@ -52,10 +52,10 @@ class KerasPredictionModel:
         y = to_categorical(outcomes, num_classes=len(Outcome))
         self._model.train_on_batch(pairwise_diffs, y)
         predictions = self.predict(pairwise_diffs)
-        return K.eval(kl_div(K.variable(y), K.variable(predictions)))
+        return K.eval(kl_div(K.variable(y), self._model(pairwise_diffs)))
 
     def predict(self, pairwise_diffs: np.ndarray) -> np.ndarray:
-        return self._model(pairwise_diffs)
+        return K.eval(self._model(pairwise_diffs))
 
 class PlayerRatings:
     """A set of ratings for players that can be updated as plays are 
