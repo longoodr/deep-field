@@ -38,14 +38,22 @@ class TestTransitionFunction:
                 assert np.any((vc1 == x).all() for x in parent_vecs)
                 assert np.any((vc2 == x).all() for x in parent_vecs)
 
+    def test_copy(self):
+        for num_stats in range(3, 6):
+            a = TransitionFunction.get_initial(num_stats)
+            b = a.copy()
+            assert a is not b
+            assert a == b
+            b._vecs[0] *= 2
+            assert a != b
+
 class TestPredictionModel:
 
     def test_backprop(self):
         seen_out = Outcome.STRIKEOUT.value
         for num_stats in range(3, 6):
             m = KerasPredictionModel.from_params(num_stats, [6, 6])
-            pdiffs = np.asarray([PlayerRatings(num_stats).get_pairwise_diffs(0, 0)])
-            outcomes = np.asarray([seen_out])
+            pdiffs, outcomes = self._get_basic_data(num_stats, seen_out)
             kl_div = m.backprop(pdiffs, outcomes)
             p1 = m.predict(pdiffs)
             # backprop should reduce kl_div after 2nd session
@@ -54,6 +62,23 @@ class TestPredictionModel:
             p2 = m.predict(pdiffs)
             # seen outcome probability should be higher after backprop
             assert p2[0,seen_out] > p1[0,seen_out]
+
+    def test_copy(self):
+        seen_out = Outcome.STRIKEOUT.value
+        for num_stats in range(3, 6):
+            a = KerasPredictionModel.from_params(num_stats, [6, 6])
+            b = a.copy()
+            assert a == b
+            assert a is not b
+            pdiffs, outcomes = self._get_basic_data(num_stats, seen_out)
+            b.backprop(pdiffs, outcomes)
+            assert a != b
+
+    @staticmethod
+    def _get_basic_data(num_stats: int, seen_out: int):
+        pdiffs = np.asarray([PlayerRatings(num_stats).get_pairwise_diffs(0, 0)])
+        outcomes = np.asarray([seen_out])
+        return pdiffs, outcomes
 
 class TestPlayerRatings:
 
@@ -88,6 +113,8 @@ class TestPlayerRatings:
             delta = np.ones(num_stats)
             pr.update(delta, 0, 1)
             cp = pr.copy()
+            assert cp is not pr
+            assert cp == pr
             for r in [pr, cp]:
                 assert (r.get_batter_rating(0) == delta).all()
                 assert (r.get_pitcher_rating(1) == -1 * delta).all()
@@ -96,6 +123,7 @@ class TestPlayerRatings:
             assert (pr.get_pitcher_rating(1) == -2 * delta).all()
             assert (cp.get_batter_rating(0) == delta).all()
             assert (cp.get_pitcher_rating(1) == -1 * delta).all()
+            assert cp != pr
 
     def test_pdiffs(self):
         for num_stats in range(3, 6):

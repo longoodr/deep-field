@@ -85,6 +85,13 @@ class Candidate(_Genotype):
         pr = self.ratings.copy()
         return Candidate(pm, tf, pr)
 
+    def __eq__(self, other):
+        return (self.__class__ == other.__class__
+                and self.pred_model == other.pred_model
+                and self.trans_func == other.trans_func
+                and self.ratings == other.ratings
+            )
+
 class PredictionModel(_RandomlyChooseParent):
     """A model which predicts outcome distributions from player stat pairwise
     differences.
@@ -119,7 +126,7 @@ class KerasPredictionModel(PredictionModel):
             m.add(Dense(num_units, activation="relu"))
         m.add(Dense(len(Outcome)))
         m.add(Activation("softmax"))
-        m.compile("adam", loss=kl_div)
+        cls._compile_model(m)
         return cls(m)
 
     def __init__(self, model: Model):
@@ -137,7 +144,23 @@ class KerasPredictionModel(PredictionModel):
 
     def copy(self) -> "KerasPredictionModel":
         copied_model = clone_model(self._model)
+        self._compile_model(copied_model)
+        copied_model.set_weights(self._model.get_weights())
         return KerasPredictionModel(copied_model)
+
+    def __eq__(self, other):
+        input_layer_shape = self._model.get_layer(index=0).input_shape
+        shape = tuple([1] + list(input_layer_shape)[1:])
+        rand_input = np.random.random_sample(shape)
+        self_out = self.predict(rand_input)
+        other_out = other.predict(rand_input)
+        return (self.__class__ == other.__class__
+                and (self_out == other_out).all()
+            )
+
+    @staticmethod
+    def _compile_model(model: Model):
+        model.compile("adam", loss=kl_div)
 
 class TransitionFunction(_Genotype):
     """A genotype for the transition function of a rating system."""
@@ -194,6 +217,11 @@ class TransitionFunction(_Genotype):
         """
         x = np.random.standard_normal(dims)
         return x / np.linalg.norm(x)
+
+    def __eq__(self, other):
+        return (self.__class__ == other.__class__
+                and (self._vecs == other._vecs).all()
+            )
 
 class PlayerRatings(_RandomlyChooseParent):
     """A set of ratings for players that can be updated as plays are 
@@ -252,3 +280,9 @@ class PlayerRatings(_RandomlyChooseParent):
         b = np.tile(brating, (self._num_stats, 1))
         p = np.tile(prating, (self._num_stats, 1))
         return b - p.transpose()
+
+    def __eq__(self, other):
+        return (self.__class__ == other.__class__
+                and (self._bratings == other._bratings).all()
+                and (self._pratings == other._pratings).all()
+            )
