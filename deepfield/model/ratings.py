@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Iterable
+from typing import Dict, Iterable, List
 
 import numpy as np
 
@@ -23,6 +23,12 @@ class PredictionModel(ABC):
         """Returns the predicted probability distribution for the given 
         pairwise differences.
         """
+        pass
+
+class KerasPredictionModel:
+    """A prediction model backed by a Keras NN."""
+
+    def __init__(self, num_stats: int, layer_lengths: List[int]):
         pass
 
 class PlayerRatings:
