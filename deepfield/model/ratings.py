@@ -33,7 +33,7 @@ class PredictionModel(ABC):
         """
         pass
 
-class KerasPredictionModel:
+class KerasPredictionModel(PredictionModel):
     """A prediction model backed by a Keras NN."""
 
     def __init__(self, num_stats: int, layer_lengths: List[int]):
