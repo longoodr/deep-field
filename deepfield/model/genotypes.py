@@ -15,7 +15,7 @@ class Mateable:
     """A point in a parameter space which can be crossed with a mate."""
 
     @abstractmethod
-    def crossover(self, mate) -> Iterable:
+    def crossover(self, mate):
         """Returns two children that result when crossed with the given mate."""
         pass
 
