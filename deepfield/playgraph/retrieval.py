@@ -124,14 +124,15 @@ class _DbPlaysToGraphIterator():
         return node
 
     def _log_progress(self):
-        if self._num % 1000 == 0:
-            frac_none = self._num_none / self._num
-            frac_not_none = 1 - frac_none
-            est_ct = int(self._ct * frac_not_none)
-            frac_processed = self._num / est_ct
-            if frac_processed >= self._next_frac:
-                logger.info(f"{self._num} of estimated total {est_ct} nodes processed")
-                self._next_frac += self.LOG_FRAC_INTERVAL
+        if self._num % 1000 != 0:
+            return
+        frac_none = self._num_none / self._num
+        frac_not_none = 1 - frac_none
+        est_ct = int(self._ct * frac_not_none)
+        frac_processed = self._num / est_ct
+        if frac_processed >= self._next_frac:
+            logger.info(f"{self._num} of estimated total {est_ct} nodes processed")
+            self._next_frac += self.LOG_FRAC_INTERVAL
 
     def _get_node_from_play(self, play) -> Optional[Node]:
         outcome = Outcome.from_desc(play.desc)
