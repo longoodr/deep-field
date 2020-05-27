@@ -63,6 +63,16 @@ class TestPredictionModel:
             # seen outcome probability should be higher after backprop
             assert p2[0,seen_out] > p1[0,seen_out]
 
+    def test_crossover(self):
+        for num_stats in range(3, 6):
+            a = KerasPredictionModel.from_params(num_stats, [6, 6])
+            b = KerasPredictionModel.from_params(num_stats, [6, 6])
+            assert a != b
+            children = a.crossover(b)
+            for c in children:
+                assert c == a or c == b
+                assert c is not a or c is not b
+
     def test_copy(self):
         seen_out = Outcome.STRIKEOUT.value
         for num_stats in range(3, 6):
@@ -138,3 +148,14 @@ class TestPlayerRatings:
             for i in range(num_stats):
                 for j in range(num_stats):
                     assert (pdiffs[i,j] == bat[i] - pit[j])
+
+    def test_crossover(self):
+        for num_stats in range(3, 6):
+            a = PlayerRatings(num_stats)
+            b = PlayerRatings(num_stats)
+            b.update(np.ones(num_stats), 0, 1)
+            assert a != b
+            children = a.crossover(b)
+            for c in children:
+                assert c == a or c == b
+                assert c is not a and c is not b

@@ -283,6 +283,16 @@ class PlayerRatings(_RandomlyChooseParent):
 
     def __eq__(self, other):
         return (self.__class__ == other.__class__
-                and (self._bratings == other._bratings).all()
-                and (self._pratings == other._pratings).all()
+                and self._ratings_eq(self._bratings, other._bratings)
+                and self._ratings_eq(self._pratings, other._pratings)
             )
+    
+    @staticmethod
+    def _ratings_eq(ratings1, ratings2) -> bool:
+        if len(ratings1) != len(ratings2):
+            return False
+        return False not in [
+                p1 == p2 and (r1 == r2).all() 
+                for (p1, r1), (p2, r2)
+                in zip(ratings1.items(), ratings2.items())
+            ]
