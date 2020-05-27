@@ -11,7 +11,7 @@ from tensorflow.keras.utils import to_categorical
 from deepfield.enums import Outcome
 
 
-class Mateable:
+class Mateable(ABC):
     """A point in a parameter space which can be crossed with a mate."""
 
     @abstractmethod
@@ -19,15 +19,26 @@ class Mateable:
         """Returns two children that result when crossed with the given mate."""
         pass
 
-class Genotype(Mateable):
+    def _random_parent(self, mate):
+        return self if np.random.uniform < 0.5 else mate
+
+class Copyable(ABC):
+    
+    @abstractmethod
+    def copy(self):
+        pass
+
+class RandomlyChooseParent(Mateable, Copyable):
+    """When mated, will return copies of parents, chosen at random."""
+
+    def crossover(self, mate):
+        for _ in range(2):
+            yield self._random_parent(mate).copy()
+
+class Genotype(Mateable, Copyable):
     """A point in a parameter space which can be subjected to genetic algorithm
     optimization.
     """
-
-    @abstractmethod
-    def copy(self):
-        """Returns a copy of this Genotype."""
-        pass
 
     @abstractmethod
     def get_mutated(self):
@@ -55,7 +66,7 @@ class Candidate(Genotype):
         pr = PlayerRatings(num_stats)
         return Candidate(pm, tg, pr)
 
-class PredictionModel(Mateable):
+class PredictionModel(RandomlyChooseParent):
     """A model which predicts outcome distributions from player stat pairwise
     differences.
     """
@@ -74,11 +85,6 @@ class PredictionModel(Mateable):
         """Returns the predicted probability distribution for the given 
         pairwise differences.
         """
-        pass
-
-    @abstractmethod
-    def copy(self) -> "PredictionModel":
-        """Returns a copy of this PredictionModel."""
         pass
 
 class KerasPredictionModel(PredictionModel):
@@ -110,6 +116,9 @@ class KerasPredictionModel(PredictionModel):
     def predict(self, pairwise_diffs: np.ndarray) -> np.ndarray:
         return K.eval(self._model(pairwise_diffs))
 
+    def crossover(self, mate: "KerasPredictionModel") -> "KerasPredictionModel":
+        return self._random_parent(mate).copy()
+
     def copy(self) -> "KerasPredictionModel":
         copied_model = clone_model(self._model)
         return KerasPredictionModel(copied_model)
@@ -123,8 +132,8 @@ class TransitionFunction(Genotype):
     def __getitem__(self, outcome: int) -> np.ndarray:
         return self._vecs[outcome]
 
-    def get_children(self, mate: "TransitionFunction")\
-            -> List["TransitionFunction"]:
+    def crossover(self, mate: "TransitionFunction")\
+            -> Iterable["TransitionFunction"]:
         """Returns children of this genotype when reproducing with the given
         mate.
         
@@ -134,17 +143,11 @@ class TransitionFunction(Genotype):
         receives the outcome vector from the unselected parent for that
         outcome.
         """
-        child1_parents = [self if np.random.uniform() < 0.5 else mate
-                                for _ in range(len(self._vecs))]
-        child2_parents = [self if p == mate else mate for p in child1_parents]
-        child1 = self._get_child(child1_parents)
-        child2 = self._get_child(child2_parents)
-        return (child1, child2,)
-
-    @staticmethod 
-    def _get_child(child_parents: List["TransitionFunction"]) -> "TransitionFunction":
-        child_vecs = [parent._vecs[i] for i, parent in enumerate(child_parents)]
-        return TransitionFunction(child_vecs)
+        for _ in range(2):
+            vec_parents = [self._random_parent(mate)
+                    for _ in range(len(self._vecs))]
+            child_vecs = [parent._vecs[i] for i, parent in enumerate(vec_parents)]
+            yield TransitionFunction(child_vecs)
 
     def get_mutated(self, rate: float = 0.1) -> "TransitionFunction":
         """Returns a mutated version of this TransitionFunction.
@@ -176,7 +179,7 @@ class TransitionFunction(Genotype):
         x = np.random.standard_normal(dims)
         return x / np.linalg.norm(x)
 
-class PlayerRatings(Mateable):
+class PlayerRatings(RandomlyChooseParent):
     """A set of ratings for players that can be updated as plays are 
     evaluated.
     """
