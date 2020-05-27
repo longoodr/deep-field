@@ -29,7 +29,7 @@ class Copyable(ABC):
         pass
 
 class RandomlyChooseParent(Mateable, Copyable):
-    """When mated, will return copies of parents, chosen at random."""
+    """When mated, will return two copies of parents, chosen at random."""
 
     def crossover(self, mate):
         for _ in range(2):
@@ -150,20 +150,21 @@ class TransitionFunction(Genotype):
             yield TransitionFunction(child_vecs)
 
     def get_mutated(self, rate: float = 0.1) -> "TransitionFunction":
-        """Returns a mutated version of this TransitionFunction.
-        
-        To mutate, a random entry in a random vector is slightly perturbed, and
+        """To mutate, a random entry in a random vector is slightly perturbed, and
         then the mutated vector is normalized.
         """
-        mutated_vecs = [np.copy(v) for v in self._vecs]
-        vec_to_mutate = mutated_vecs[np.random.randint(0, len(self._vecs))]
+        cp = self.copy()
+        vec_to_mutate = cp._vecs[np.random.randint(0, len(self._vecs))]
         vec_entry_to_mutate = np.random.randint(0, vec_to_mutate.size)
         old_val = vec_to_mutate[vec_entry_to_mutate]
         # note new_val still has mean 0, variance 1
         new_val = (1 - rate) * old_val + rate * np.random.standard_normal()
         vec_to_mutate[vec_entry_to_mutate] = new_val
         vec_to_mutate /= np.linalg.norm(vec_to_mutate)
-        return TransitionFunction(mutated_vecs)
+        return cp
+
+    def copy(self) -> "TransitionFunction":
+        return TransitionFunction(np.copy(self._vecs))
 
     @classmethod
     def get_random_genotype(cls, num_stats: int) -> "TransitionFunction":
