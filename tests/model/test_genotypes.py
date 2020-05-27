@@ -2,9 +2,20 @@ import numpy as np
 import pytest
 
 from deepfield.enums import Outcome
-from deepfield.model.genotypes import (KerasPredictionModel, PlayerRatings,
-                                       TransitionFunction)
+from deepfield.model.genotypes import (Candidate, KerasPredictionModel,
+                                       PlayerRatings, TransitionFunction)
 
+
+class TestCandidate:
+
+    def test_mutation(self):
+        for num_stats in range(3, 6):
+            c = Candidate.get_initial(num_stats, [6, 6])
+            m = c.get_mutated()
+            assert c != m
+            assert c.pred_model == m.pred_model
+            assert c.trans_func != m.trans_func
+            assert c.ratings == m.ratings
 
 class TestTransitionFunction:
 
