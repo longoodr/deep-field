@@ -8,20 +8,18 @@ class TransitionFunction(ABC):
     """Can act as a map from outcomes to unit vectors."""
 
     @abstractmethod
-    def __getitem__(self, outcome: Union[Outcome, int]) -> np.ndarray:
+    def __getitem__(self, outcome: int) -> np.ndarray:
         """Returns the unit vector associated with the given outcome."""
         pass
 
 class TransitionGenotype(TransitionFunction):
     """A genotype for the transition function of a rating system."""
 
-    def __init__(self, vecs: List[np.ndarray]):
+    def __init__(self, vecs: np.ndarray):
         self._vecs = vecs
 
-    def __getitem__(self, outcome: Union[Outcome, int]) -> np.ndarray:
-        if isinstance(outcome, int):
-            return self._vecs[outcome]
-        return self._vecs[outcome.value]
+    def __getitem__(self, outcome: int) -> np.ndarray:
+        return self._vecs[outcome]
 
     def get_children(self, mate: "TransitionGenotype")\
             -> Tuple["TransitionGenotype", "TransitionGenotype"]:
@@ -64,7 +62,8 @@ class TransitionGenotype(TransitionFunction):
 
     @classmethod
     def get_random_genotype(cls, num_stats: int) -> "TransitionGenotype":
-        vecs = [cls.rand_unit_sphere_vec(num_stats) for _ in range(len(Outcome))]
+        vecs = np.asarray([cls.rand_unit_sphere_vec(num_stats)
+                           for _ in range(len(Outcome))])
         return TransitionGenotype(vecs)
 
     @staticmethod

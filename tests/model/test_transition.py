@@ -12,8 +12,7 @@ class TestTransitionGenotype:
             g = TransitionGenotype.get_random_genotype(num_stats)
             for o in Outcome:
                 val = o.value
-                assert g._vecs[val] is g[val]
-                assert g._vecs[val] is g[o]
+                assert (g._vecs[val] == g[val]).all()
             
     def test_mutation(self):
         for num_stats in range(3, 6):
