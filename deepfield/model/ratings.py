@@ -41,7 +41,7 @@ class KerasPredictionModel:
         m.add(InputLayer((num_stats, num_stats,)))
         m.add(Flatten())
         for num_units in layer_lengths:
-            m.add(Dense(num_units), activation="relu")
+            m.add(Dense(num_units, activation="relu"))
         m.add(Dense(len(Outcome)))
         m.add(Activation("softmax"))
         m.compile("adam", loss=kl_div, metrics=["kullback_leibler_divergence"])
