@@ -63,7 +63,7 @@ class TestPage:
     def setup_method(cls):
         utils.clean_db()
         html = HtmlCache.get().find_html(BBRefLink(cls.name))
-        cls.page = cls.page_type(html)
+        cls.page = cls.page_type(html)  # type: ignore
 
     @classmethod
     def test_urls(cls, on_list_suffixes: Iterable[str], not_on_list_suffixes: Iterable[str]):
@@ -118,7 +118,8 @@ class TestPlayerPage(TestPage):
     
     name = "vendipa01.shtml"
     page_type = PlayerPage
-    
+    page: PlayerPage
+
     def test_hash_eq(self):
         self._test_hash_eq(TestGamePage.name)
     
@@ -134,6 +135,7 @@ class TestPlayerPage(TestPage):
 class AbstractTestGamePage(TestPage):
     
     page_type = GamePage
+    page: GamePage
     
     @staticmethod
     def _id_of_name_id(name_id: str) -> int:
@@ -254,6 +256,7 @@ class TestPlayerTables(TestPage):
     
     name = "OAK201903200.shtml"
     page_type = GamePage
+    page: GamePage
     
     def test_players(self):
         away = [
