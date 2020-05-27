@@ -31,7 +31,7 @@ class Copyable(ABC):
 class RandomlyChooseParent(Mateable, Copyable):
     """When mated, will return two copies of parents, chosen at random."""
 
-    def crossover(self, mate):
+    def crossover(self, mate) -> Iterable:
         for _ in range(2):
             yield self._random_parent(mate).copy()
 
@@ -50,10 +50,10 @@ class Candidate(Genotype):
 
     def __init__(self, 
                  pm: PredictionModel, 
-                 tg: TransitionFunction, 
+                 tf: TransitionFunction, 
                  pr: PlayerRatings):
         self.pred_model = pm
-        self.trans_geno = tg
+        self.trans_func = tf
         self.ratings = pr
         self.fitness = 0
 
@@ -62,9 +62,28 @@ class Candidate(Genotype):
             -> "Candidate":
         """Returns a random candidate."""
         pm = KerasPredictionModel.from_params(num_stats, layer_lengths)
-        tg = TransitionFunction.get_random_genotype(num_stats)
+        tf = TransitionFunction.get_initial(num_stats)
         pr = PlayerRatings(num_stats)
-        return Candidate(pm, tg, pr)
+        return Candidate(pm, tf, pr)
+
+    def copy(self) -> "Candidate":
+        pm = self.pred_model.copy()
+        tf = self.trans_func.copy()
+        pr = self.ratings.copy()
+        return Candidate(pm, tf, pr)
+
+    def crossover(self, mate: "Candidate") -> Iterable["Candidate"]:
+        crossed_pms = self.pred_model.crossover(mate.pred_model)
+        crossed_tfs = self.trans_func.crossover(mate.trans_func)
+        crossed_prs = self.ratings.crossover(mate.ratings)
+        for pm, tf, pr in zip(crossed_pms, crossed_tfs, crossed_prs):
+            yield Candidate(pm, tf, pr)
+
+    def get_mutated(self) -> "Candidate":
+        pm = self.pred_model.copy()
+        tf = self.trans_func.get_mutated()
+        pr = self.ratings.copy()
+        return Candidate(pm, tf, pr)
 
 class PredictionModel(RandomlyChooseParent):
     """A model which predicts outcome distributions from player stat pairwise
@@ -116,9 +135,6 @@ class KerasPredictionModel(PredictionModel):
     def predict(self, pairwise_diffs: np.ndarray) -> np.ndarray:
         return K.eval(self._model(pairwise_diffs))
 
-    def crossover(self, mate: "KerasPredictionModel") -> "KerasPredictionModel":
-        return self._random_parent(mate).copy()
-
     def copy(self) -> "KerasPredictionModel":
         copied_model = clone_model(self._model)
         return KerasPredictionModel(copied_model)
@@ -167,7 +183,7 @@ class TransitionFunction(Genotype):
         return TransitionFunction(np.copy(self._vecs))
 
     @classmethod
-    def get_random_genotype(cls, num_stats: int) -> "TransitionFunction":
+    def get_initial(cls, num_stats: int) -> "TransitionFunction":
         vecs = np.asarray([cls.rand_unit_sphere_vec(num_stats)
                            for _ in range(len(Outcome))])
         return TransitionFunction(vecs)
