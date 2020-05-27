@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, TypeVar
 
 import numpy as np
 from tensorflow.keras import backend as K
@@ -15,6 +15,23 @@ class Genotype(ABC):
     """A point in a parameter space which can be subjected to genetic algorithm
     optimization.
     """
+
+    T = TypeVar("T", bound="Genotype")
+
+    @abstractmethod
+    def copy(self) -> T:
+        """Returns a copy of this Genotype."""
+        pass
+
+    @abstractmethod
+    def get_mutated(self) -> T:
+        """Returns a mutated copy of this Genotype."""
+        pass
+
+    @abstractmethod
+    def crossover(self, mate: T) -> Iterable[T]:
+        """Returns two children that result when crossed with the given mate."""
+        pass
 
 class Candidate(Genotype):
     """A candidate set of models used by the Trainer."""
