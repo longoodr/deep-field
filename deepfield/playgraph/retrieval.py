@@ -6,7 +6,7 @@ from collections import Counter
 from hashlib import md5
 from typing import Any
 from typing import Counter as CounterType
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, Iterator, List, Optional, Tuple
 
 from peewee import chunked
 
@@ -88,12 +88,16 @@ class _PlayGraphDbWriter:
         nodes = iter(_DbPlaysToGraphIterator())
         try:
             while True:
-                batch = []
-                for _ in range(self._PER_BATCH):
-                    batch.append(next(nodes))
-                PlayNode.insert_many(batch, fields = ("play_id", "outcome", "level")).execute()
+                self._write_next_batch(nodes)
         except StopIteration:
-            pass
+            return
+
+    @classmethod
+    def _write_next_batch(cls, nodes: Iterator) -> None:
+        batch = []
+        for _ in range(cls._PER_BATCH):
+            batch.append(next(nodes))
+        PlayNode.insert_many(batch, fields = ("play_id", "outcome", "level")).execute()
 
 class _DbPlaysToGraphIterator():
     """Reads plays from the database and produces the corresponding nodes for
