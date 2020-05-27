@@ -27,7 +27,7 @@ class Trainer(ABC):
 
     def train(self):
         self._population = self._generate_inital_population()
-        seen = 0
+        num_seen = 0
         while not self._is_converged():
             self._zero_ratings()
             for level in LevelTraversal():
@@ -35,10 +35,10 @@ class Trainer(ABC):
                 outcomes = np.asarray([n["outcome"] for n in level])
                 for cand in self._population:
                     self._train_and_update(cand, level, outcomes)
-                seen += len(level)
-                if seen >= self._resample_after:
+                num_seen += len(level)
+                if num_seen >= self._resample_after:
                     self._resample_population()
-                    seen = 0
+                    num_seen = 0
 
     def _train_and_update(self,
                           cand: Candidate,
@@ -47,7 +47,7 @@ class Trainer(ABC):
         diffs = cand.ratings.get_node_pairwise_diffs(level)
         kl_divs = cand.pred_model.backprop(diffs, outcomes)
         tot_kl_div = np.sum(kl_divs)
-        cand.fitness -= tot_kl_div
+        cand.fitness -= tot_kl_div  # less divergence is better
         for i, node in enumerate(level):
             delta = cand.trans_geno[node["outcome"]] * kl_divs[i]
             cand.ratings.update(delta, node["batter_id"], node["pitcher_id"])
