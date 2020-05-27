@@ -4,9 +4,8 @@ from typing import Any, Dict, Iterable, List, Tuple
 import numpy as np
 from scipy.special import softmax
 
-from deepfield.model.ratings import (KerasPredictionModel, PlayerRatings,
-                                     PredictionModel)
-from deepfield.model.transition import Candidate
+from deepfield.dbmodels import init_db
+from deepfield.model.genotypes import Candidate
 from deepfield.playgraph.graph import LevelTraversal
 
 
@@ -66,8 +65,7 @@ class Population:
                               key=lambda cand: cand.fitness,
                               reverse=True)
         best_n = int(self._ga_params.best_n_frac * self._pop_size)
-        for c, _ in sorted_cands[:best_n]:
-            yield c
+        return sorted_cands[:best_n]
 
     def _repopulate(self, new_pop: List[Candidate]) -> None:
         fitness_probs = softmax([c.fitness for c in self._pop])
@@ -115,8 +113,10 @@ class Trainer(ABC):
         while not self._is_converged():
             pop.zero_ratings()
             for level in LevelTraversal():
+                level = list(level)
                 pop.process_level(level)
                 num_seen += len(level)
+                print([c.fitness for c in pop])
                 if num_seen >= self._ga_params.resample_after:
                     pop.resample()
                     num_seen = 0
@@ -125,3 +125,9 @@ class Trainer(ABC):
     def _is_converged(self) -> bool:
         self._iterations += 1
         return self._iterations > 100
+
+init_db()
+params = GenAlgParams(0.2, 0.5, 1000, 4)
+trainer = Trainer(20, [], params)
+pop = trainer.train()
+pass
