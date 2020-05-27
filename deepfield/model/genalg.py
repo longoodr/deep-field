@@ -29,7 +29,7 @@ class Candidate:
     def get_initial(cls, num_stats: int, layer_lengths: List[int])\
             -> "Candidate":
         """Returns a random candidate."""
-        pm = KerasPredictionModel(num_stats, layer_lengths)
+        pm = KerasPredictionModel.from_params(num_stats, layer_lengths)
         tg = TransitionGenotype.get_random_genotype(num_stats)
         pr = PlayerRatings(num_stats)
         return Candidate(pm, tg, pr)

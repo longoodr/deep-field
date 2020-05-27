@@ -10,7 +10,7 @@ class TestPredictionModel:
     def test_backprop(self):
         seen_out = Outcome.STRIKEOUT.value
         for num_stats in range(3, 6):
-            m = KerasPredictionModel(num_stats, [6, 6])
+            m = KerasPredictionModel.from_params(num_stats, [6, 6])
             pdiffs = np.asarray([PlayerRatings(num_stats).get_pairwise_diffs(0, 0)])
             outcomes = np.asarray([seen_out])
             kl_div = m.backprop(pdiffs, outcomes)

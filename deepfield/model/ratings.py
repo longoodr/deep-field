@@ -2,12 +2,11 @@ from abc import ABC, abstractmethod
 from typing import Dict, Iterable, List
 
 import numpy as np
-from tensorflow.keras.layers import Activation, Dense, Flatten, InputLayer
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.utils import to_categorical
 from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Activation, Dense, Flatten, InputLayer
 from tensorflow.keras.losses import kullback_leibler_divergence as kl_div
-
+from tensorflow.keras.models import Model, Sequential, clone_model
+from tensorflow.keras.utils import to_categorical
 
 from deepfield.enums import Outcome
 
@@ -33,10 +32,17 @@ class PredictionModel(ABC):
         """
         pass
 
+    @abstractmethod
+    def copy(self) -> "PredictionModel":
+        """Returns a copy of this PredictionModel."""
+        pass
+
 class KerasPredictionModel(PredictionModel):
     """A prediction model backed by a Keras NN."""
 
-    def __init__(self, num_stats: int, layer_lengths: List[int]):
+    @classmethod
+    def from_params(cls, num_stats: int, layer_lengths: List[int])\
+            -> "KerasPredictionModel":
         m = Sequential()
         m.add(InputLayer((num_stats, num_stats,)))
         m.add(Flatten())
@@ -45,7 +51,10 @@ class KerasPredictionModel(PredictionModel):
         m.add(Dense(len(Outcome)))
         m.add(Activation("softmax"))
         m.compile("adam", loss=kl_div)
-        self._model = m
+        return cls(m)
+
+    def __init__(self, model: Model):
+        self._model = model
 
     def backprop(self, pairwise_diffs: np.ndarray, outcomes: np.ndarray)\
             -> np.ndarray:
@@ -56,6 +65,10 @@ class KerasPredictionModel(PredictionModel):
 
     def predict(self, pairwise_diffs: np.ndarray) -> np.ndarray:
         return K.eval(self._model(pairwise_diffs))
+
+    def copy(self) -> "KerasPredictionModel":
+        copied_model = clone_model(self._model)
+        return KerasPredictionModel(copied_model)
 
 class PlayerRatings:
     """A set of ratings for players that can be updated as plays are 
