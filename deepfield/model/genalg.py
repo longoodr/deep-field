@@ -103,24 +103,25 @@ class Trainer(ABC):
         self._pop_size = pop_size
         self._layer_lengths = layer_lengths
         self._ga_params = ga_params
+        self._iterations = 0
 
-    def train(self):
-        self._pop = Population(
+    def train(self) -> Population:
+        pop = Population(
                 self._pop_size,
                 self._layer_lengths,
                 self._ga_params
             )
         num_seen = 0
         while not self._is_converged():
-            self._pop.zero_ratings()
+            pop.zero_ratings()
             for level in LevelTraversal():
-                self._pop.process_level(level)
+                pop.process_level(level)
                 num_seen += len(level)
                 if num_seen >= self._ga_params.resample_after:
-                    self._pop.resample()
+                    pop.resample()
                     num_seen = 0
-                               
+        return pop
 
-    def _is_converged(self):
-        # TODO
-        pass
+    def _is_converged(self) -> bool:
+        self._iterations += 1
+        return self._iterations > 100
