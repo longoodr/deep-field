@@ -10,7 +10,19 @@ class PredictionModel(ABC):
     """
 
     @abstractmethod
-    def backprop(self, pairwise_diffs) -> None:
+    def backprop(self, pairwise_diffs: np.ndarray, outcomes: np.ndarray)\
+            -> np.ndarray:
+        """Performs backpropagation using the pairwise diffs as input and
+        outcomes as output. Returns the KL-divergence between each expected and
+        actual outcome distribution.
+        """
+        pass
+        
+    @abstractmethod
+    def predict(self, pairwise_diffs: np.ndarray) -> np.ndarray:
+        """Returns the predicted probability distribution for the given 
+        pairwise differences.
+        """
         pass
 
 class PlayerRatings:
@@ -57,10 +69,11 @@ class PlayerRatings:
         self._bratings[bid] += delta
         self._pratings[pid] -= delta
 
-    def get_node_pairwise_diffs(self, nodes: Iterable[Dict[str, int]]) -> Iterable[np.ndarray]:
+    def get_node_pairwise_diffs(self, nodes: Iterable[Dict[str, int]]) -> np.ndarray:
         """Returns the pairwise differences for the given nodes."""
-        for node in nodes:
-            yield self.get_pairwise_diffs(node["batter_id"], node["pitcher_id"])
+        diffs = [self.get_pairwise_diffs(n["batter_id"], n["pitcher_id"])
+                 for n in nodes]
+        return np.stack(diffs)
 
     def get_pairwise_diffs(self, bid: int, pid: int) -> np.ndarray:
         """Returns the pairwise difference matrix for the given players."""
