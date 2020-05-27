@@ -11,7 +11,7 @@ from tensorflow.keras.utils import to_categorical
 from deepfield.enums import Outcome
 
 
-class Mateable(ABC):
+class _Mateable(ABC):
     """A point in a parameter space which can be crossed with a mate."""
 
     @abstractmethod
@@ -22,20 +22,20 @@ class Mateable(ABC):
     def _random_parent(self, mate):
         return self if np.random.uniform() < 0.5 else mate
 
-class Copyable(ABC):
-    
+class _Copyable(ABC):
+
     @abstractmethod
     def copy(self):
         pass
 
-class RandomlyChooseParent(Mateable, Copyable):
+class _RandomlyChooseParent(_Mateable, _Copyable):
     """When mated, will return two copies of parents, chosen at random."""
 
     def crossover(self, mate) -> Iterable:
         for _ in range(2):
             yield self._random_parent(mate).copy()
 
-class Genotype(Mateable, Copyable):
+class _Genotype(_Mateable, _Copyable):
     """A point in a parameter space which can be subjected to genetic algorithm
     optimization.
     """
@@ -45,7 +45,7 @@ class Genotype(Mateable, Copyable):
         """Returns a mutated copy of this Genotype."""
         pass
 
-class Candidate(Genotype):
+class Candidate(_Genotype):
     """A candidate set of models used by the Trainer."""
 
     def __init__(self, 
@@ -85,7 +85,7 @@ class Candidate(Genotype):
         pr = self.ratings.copy()
         return Candidate(pm, tf, pr)
 
-class PredictionModel(RandomlyChooseParent):
+class PredictionModel(_RandomlyChooseParent):
     """A model which predicts outcome distributions from player stat pairwise
     differences.
     """
@@ -139,7 +139,7 @@ class KerasPredictionModel(PredictionModel):
         copied_model = clone_model(self._model)
         return KerasPredictionModel(copied_model)
 
-class TransitionFunction(Genotype):
+class TransitionFunction(_Genotype):
     """A genotype for the transition function of a rating system."""
 
     def __init__(self, vecs: np.ndarray):
@@ -195,7 +195,7 @@ class TransitionFunction(Genotype):
         x = np.random.standard_normal(dims)
         return x / np.linalg.norm(x)
 
-class PlayerRatings(RandomlyChooseParent):
+class PlayerRatings(_RandomlyChooseParent):
     """A set of ratings for players that can be updated as plays are 
     evaluated.
     """
