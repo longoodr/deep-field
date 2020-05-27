@@ -1,15 +1,26 @@
 import numpy as np
 import pytest
 
+from deepfield.enums import Outcome
 from deepfield.model.ratings import KerasPredictionModel, PlayerRatings
 
 
 class TestPredictionModel:
 
     def test_backprop(self):
-        m = KerasPredictionModel(4, [6, 6])
-        # TODO
-        pass
+        seen_out = Outcome.STRIKEOUT.value
+        for num_stats in range(3, 6):
+            m = KerasPredictionModel(num_stats, [6, 6])
+            pdiffs = np.asarray([PlayerRatings(num_stats).get_pairwise_diffs(0, 0)])
+            outcomes = np.asarray([seen_out])
+            kl_div = m.backprop(pdiffs, outcomes)
+            p1 = m.predict(pdiffs)
+            # backprop should reduce kl_div after 2nd session
+            kl_div2 = m.backprop(pdiffs, outcomes)
+            assert kl_div > kl_div2
+            p2 = m.predict(pdiffs)
+            # seen outcome probability should be higher after backprop
+            assert p2[0,seen_out] > p1[0,seen_out]
 
 class TestPlayerRatings:
 
