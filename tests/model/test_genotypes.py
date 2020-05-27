@@ -6,6 +6,12 @@ from deepfield.model.genotypes import (Candidate, KerasPredictionModel,
                                        PlayerRatings, TransitionFunction)
 
 
+def setup_module(_):
+    np.random.seed(1)
+
+def teardown_module(_):
+    np.random.seed(None)
+
 class TestCandidate:
 
     def test_mutation(self):
@@ -16,6 +22,36 @@ class TestCandidate:
             assert c.pred_model == m.pred_model
             assert c.trans_func != m.trans_func
             assert c.ratings == m.ratings
+
+    def test_crossover(self):
+        for num_stats in range(3, 6):
+            c1 = Candidate.get_initial(num_stats, [6, 6])
+            c2 = Candidate.get_initial(num_stats, [6, 6])
+            assert c1 != c2
+            children = c1.crossover(c2)
+            for c in children:
+                assert (
+                        c.pred_model == c1.pred_model
+                        or c.pred_model == c2.pred_model
+                    )
+                assert (
+                        c.trans_func != c1.trans_func
+                        and c.trans_func != c2.trans_func
+                )
+                assert (
+                        c.ratings == c1.ratings
+                        or c.ratings == c2.ratings
+                )
+
+    def test_copy(self):
+        for num_stats in range(3, 6):
+            cand = Candidate.get_initial(num_stats, [6, 6])
+            cp = cand.copy()
+            assert cand is not cp
+            assert cand == cp
+            cp.ratings.update(np.ones(num_stats), 0, 1)
+            assert cand != cp
+
 
 class TestTransitionFunction:
 
