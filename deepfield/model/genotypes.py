@@ -85,6 +85,17 @@ class Candidate(_Genotype):
         pr = self.ratings.copy()
         return Candidate(pm, tf, pr)
 
+    def train_and_update(self, level: List[Dict[str, int]], outcomes: np.ndarray)\
+            -> None:
+        """Backprops against the level data and updates ratings."""
+        diffs = self.ratings.get_node_pairwise_diffs(level)
+        kl_divs = self.pred_model.backprop(diffs, outcomes)
+        tot_kl_div = np.sum(kl_divs)
+        self.fitness -= tot_kl_div  # less divergence is better
+        for i, node in enumerate(level):
+            delta = self.trans_func[node["outcome"]] * kl_divs[i]
+            self.ratings.update(delta, node["batter_id"], node["pitcher_id"])
+
     def __eq__(self, other):
         return (self.__class__ == other.__class__
                 and self.pred_model == other.pred_model
