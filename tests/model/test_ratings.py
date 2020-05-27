@@ -1,8 +1,15 @@
 import numpy as np
 import pytest
 
-from deepfield.model.ratings import PlayerRatings
+from deepfield.model.ratings import KerasPredictionModel, PlayerRatings
 
+
+class TestPredictionModel:
+
+    def test_backprop(self):
+        m = KerasPredictionModel(4, [6, 6])
+        # TODO
+        pass
 
 class TestPlayerRatings:
 
