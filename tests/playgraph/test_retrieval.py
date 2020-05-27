@@ -1,6 +1,5 @@
 from typing import Iterable, Tuple
 
-import networkx as nx
 import pytest
 
 from deepfield.dbmodels import Play

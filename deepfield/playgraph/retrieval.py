@@ -8,7 +8,6 @@ from typing import Any
 from typing import Counter as CounterType
 from typing import Dict, Iterable, List, Optional, Tuple
 
-import networkx as nx
 from peewee import chunked
 
 from deepfield.dbmodels import (Game, Play, PlayNode, clean_graph, db,
