@@ -5,34 +5,13 @@ import numpy as np
 
 from deepfield.model.ratings import (KerasPredictionModel, PlayerRatings,
                                      PredictionModel)
-from deepfield.model.transition import TransitionGenotype
+from deepfield.model.transition import TransitionFunction
 from deepfield.playgraph.graph import LevelTraversal
 
 
 class Population:
     """A set of candidates."""
     pass
-
-class Candidate:
-    """A candidate set of models used by the Trainer."""
-
-    def __init__(self, 
-                 pm: PredictionModel, 
-                 tg: TransitionGenotype, 
-                 pr: PlayerRatings):
-        self.pred_model = pm
-        self.trans_geno = tg
-        self.ratings = pr
-        self.fitness = 0
-
-    @classmethod
-    def get_initial(cls, num_stats: int, layer_lengths: List[int])\
-            -> "Candidate":
-        """Returns a random candidate."""
-        pm = KerasPredictionModel.from_params(num_stats, layer_lengths)
-        tg = TransitionGenotype.get_random_genotype(num_stats)
-        pr = PlayerRatings(num_stats)
-        return Candidate(pm, tg, pr)
 
 class Trainer(ABC):
     """Implements model training loop."""
@@ -89,7 +68,7 @@ class Trainer(ABC):
         pass
 
     @abstractmethod
-    def _generate_initial_transition_genotype(self) -> TransitionGenotype:
+    def _generate_initial_transition_genotype(self) -> TransitionFunction:
         pass
 
     @abstractmethod

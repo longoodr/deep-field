@@ -2,21 +2,21 @@ import numpy as np
 import pytest
 
 from deepfield.enums import Outcome
-from deepfield.model.transition import TransitionGenotype
+from deepfield.model.transition import TransitionFunction
 
 
-class TestTransitionGenotype:
+class TestTransitionFunction:
 
     def test_access(self):
         for num_stats in range(3, 6):
-            g = TransitionGenotype.get_random_genotype(num_stats)
+            g = TransitionFunction.get_random_genotype(num_stats)
             for o in Outcome:
                 val = o.value
                 assert (g._vecs[val] == g[val]).all()
             
     def test_mutation(self):
         for num_stats in range(3, 6):
-            g = TransitionGenotype.get_random_genotype(num_stats)
+            g = TransitionFunction.get_random_genotype(num_stats)
             m = g.get_mutated()
             num_diff = 0
             for gvec, mvec in zip(g._vecs, m._vecs):
@@ -27,8 +27,8 @@ class TestTransitionGenotype:
 
     def test_crossover(self):
         for num_stats in range(3, 6):
-            a = TransitionGenotype.get_random_genotype(num_stats)
-            b = TransitionGenotype.get_random_genotype(num_stats)
+            a = TransitionFunction.get_random_genotype(num_stats)
+            b = TransitionFunction.get_random_genotype(num_stats)
             c1, c2 = a.get_children(b)
             parent_vecs = a._vecs + b._vecs
             for vc1, vc2 in zip(c1._vecs, c2._vecs):

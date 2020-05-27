@@ -11,7 +11,33 @@ from tensorflow.keras.utils import to_categorical
 from deepfield.enums import Outcome
 
 
-class PredictionModel(ABC):
+class Genotype(ABC):
+    """A point in a parameter space which can be subjected to genetic algorithm
+    optimization.
+    """
+
+class Candidate(Genotype):
+    """A candidate set of models used by the Trainer."""
+
+    def __init__(self, 
+                 pm: PredictionModel, 
+                 tg: TransitionFunction, 
+                 pr: PlayerRatings):
+        self.pred_model = pm
+        self.trans_geno = tg
+        self.ratings = pr
+        self.fitness = 0
+
+    @classmethod
+    def get_initial(cls, num_stats: int, layer_lengths: List[int])\
+            -> "Candidate":
+        """Returns a random candidate."""
+        pm = KerasPredictionModel.from_params(num_stats, layer_lengths)
+        tg = TransitionFunction.get_random_genotype(num_stats)
+        pr = PlayerRatings(num_stats)
+        return Candidate(pm, tg, pr)
+
+class PredictionModel(Genotype):
     """A model which predicts outcome distributions from player stat pairwise
     differences.
     """
@@ -70,7 +96,69 @@ class KerasPredictionModel(PredictionModel):
         copied_model = clone_model(self._model)
         return KerasPredictionModel(copied_model)
 
-class PlayerRatings:
+class TransitionFunction(Genotype):
+    """A genotype for the transition function of a rating system."""
+
+    def __init__(self, vecs: np.ndarray):
+        self._vecs = vecs
+
+    def __getitem__(self, outcome: int) -> np.ndarray:
+        return self._vecs[outcome]
+
+    def get_children(self, mate: "TransitionFunction")\
+            -> List["TransitionFunction"]:
+        """Returns children of this genotype when reproducing with the given
+        mate.
+        
+        Two children are produced. For the first child, a random parent is
+        selected for each outcome, and the child inherits the associated
+        outcome vector from its parent for that outcome. The second child
+        receives the outcome vector from the unselected parent for that
+        outcome.
+        """
+        child1_parents = [self if np.random.uniform() < 0.5 else mate
+                                for _ in range(len(self._vecs))]
+        child2_parents = [self if p == mate else mate for p in child1_parents]
+        child1 = self._get_child(child1_parents)
+        child2 = self._get_child(child2_parents)
+        return (child1, child2,)
+
+    @staticmethod 
+    def _get_child(child_parents: List["TransitionFunction"]) -> "TransitionFunction":
+        child_vecs = [parent._vecs[i] for i, parent in enumerate(child_parents)]
+        return TransitionFunction(child_vecs)
+
+    def get_mutated(self, rate: float = 0.1) -> "TransitionFunction":
+        """Returns a mutated version of this TransitionFunction.
+        
+        To mutate, a random entry in a random vector is slightly perturbed, and
+        then the mutated vector is normalized.
+        """
+        mutated_vecs = [np.copy(v) for v in self._vecs]
+        vec_to_mutate = mutated_vecs[np.random.randint(0, len(self._vecs))]
+        vec_entry_to_mutate = np.random.randint(0, vec_to_mutate.size)
+        old_val = vec_to_mutate[vec_entry_to_mutate]
+        # note new_val still has mean 0, variance 1
+        new_val = (1 - rate) * old_val + rate * np.random.standard_normal()
+        vec_to_mutate[vec_entry_to_mutate] = new_val
+        vec_to_mutate /= np.linalg.norm(vec_to_mutate)
+        return TransitionFunction(mutated_vecs)
+
+    @classmethod
+    def get_random_genotype(cls, num_stats: int) -> "TransitionFunction":
+        vecs = np.asarray([cls.rand_unit_sphere_vec(num_stats)
+                           for _ in range(len(Outcome))])
+        return TransitionFunction(vecs)
+
+    @staticmethod
+    def rand_unit_sphere_vec(dims: int) -> np.ndarray:
+        """Returns a random vector on the unit sphere in the given number of
+        dimensions.
+        """
+        x = np.random.standard_normal(dims)
+        return x / np.linalg.norm(x)
+
+class PlayerRatings(Genotype):
     """A set of ratings for players that can be updated as plays are 
     evaluated.
     """
