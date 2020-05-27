@@ -44,7 +44,7 @@ class KerasPredictionModel:
             m.add(Dense(num_units, activation="relu"))
         m.add(Dense(len(Outcome)))
         m.add(Activation("softmax"))
-        m.compile("adam", loss=kl_div, metrics=["kullback_leibler_divergence"])
+        m.compile("adam", loss=kl_div)
         self._model = m
 
     def backprop(self, pairwise_diffs: np.ndarray, outcomes: np.ndarray)\
