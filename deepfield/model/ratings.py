@@ -2,6 +2,14 @@ from abc import ABC, abstractmethod
 from typing import Dict, Iterable, List
 
 import numpy as np
+from tensorflow.keras.layers import Activation, Dense, Flatten, InputLayer
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras import backend as K
+from tensorflow.keras.losses import kullback_leibler_divergence as kl_div
+
+
+from deepfield.enums import Outcome
 
 
 class PredictionModel(ABC):
@@ -14,7 +22,7 @@ class PredictionModel(ABC):
             -> np.ndarray:
         """Performs backpropagation using the pairwise diffs as input and
         outcomes as output. Returns the KL-divergence between each expected and
-        actual outcome distribution.
+        actual outcome distribution after backpropagation is performed.
         """
         pass
         
@@ -29,7 +37,25 @@ class KerasPredictionModel:
     """A prediction model backed by a Keras NN."""
 
     def __init__(self, num_stats: int, layer_lengths: List[int]):
-        pass
+        m = Sequential()
+        m.add(InputLayer((num_stats, num_stats,)))
+        m.add(Flatten())
+        for num_units in layer_lengths:
+            m.add(Dense(num_units), activation="relu")
+        m.add(Dense(len(Outcome)))
+        m.add(Activation("softmax"))
+        m.compile("adam", loss=kl_div, metrics=["kullback_leibler_divergence"])
+        self._model = m
+
+    def backprop(self, pairwise_diffs: np.ndarray, outcomes: np.ndarray)\
+            -> np.ndarray:
+        y = to_categorical(outcomes, num_classes=len(Outcome))
+        self._model.train_on_batch(pairwise_diffs, y)
+        predictions = self.predict(pairwise_diffs)
+        return K.eval(kl_div(K.variable(y), K.variable(predictions)))
+
+    def predict(self, pairwise_diffs: np.ndarray) -> np.ndarray:
+        return self._model(pairwise_diffs)
 
 class PlayerRatings:
     """A set of ratings for players that can be updated as plays are 
