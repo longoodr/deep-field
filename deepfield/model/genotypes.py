@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Iterable, List, TypeVar
+from typing import Dict, Iterable, List
 
 import numpy as np
 from tensorflow.keras import backend as K
@@ -11,26 +11,27 @@ from tensorflow.keras.utils import to_categorical
 from deepfield.enums import Outcome
 
 
-class Genotype(ABC):
+class Mateable:
+    """A point in a parameter space which can be crossed with a mate."""
+
+    @abstractmethod
+    def crossover(self, mate) -> Iterable:
+        """Returns two children that result when crossed with the given mate."""
+        pass
+
+class Genotype(Mateable):
     """A point in a parameter space which can be subjected to genetic algorithm
     optimization.
     """
 
-    T = TypeVar("T", bound="Genotype")
-
     @abstractmethod
-    def copy(self) -> T:
+    def copy(self):
         """Returns a copy of this Genotype."""
         pass
 
     @abstractmethod
-    def get_mutated(self) -> T:
+    def get_mutated(self):
         """Returns a mutated copy of this Genotype."""
-        pass
-
-    @abstractmethod
-    def crossover(self, mate: T) -> Iterable[T]:
-        """Returns two children that result when crossed with the given mate."""
         pass
 
 class Candidate(Genotype):
@@ -54,7 +55,7 @@ class Candidate(Genotype):
         pr = PlayerRatings(num_stats)
         return Candidate(pm, tg, pr)
 
-class PredictionModel(Genotype):
+class PredictionModel(Mateable):
     """A model which predicts outcome distributions from player stat pairwise
     differences.
     """
@@ -175,7 +176,7 @@ class TransitionFunction(Genotype):
         x = np.random.standard_normal(dims)
         return x / np.linalg.norm(x)
 
-class PlayerRatings(Genotype):
+class PlayerRatings(Mateable):
     """A set of ratings for players that can be updated as plays are 
     evaluated.
     """
