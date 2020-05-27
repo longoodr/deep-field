@@ -5,41 +5,68 @@ import numpy as np
 
 from deepfield.model.ratings import (KerasPredictionModel, PlayerRatings,
                                      PredictionModel)
-from deepfield.model.transition import TransitionFunction
+from deepfield.model.transition import Candidate
 from deepfield.playgraph.graph import LevelTraversal
-
 
 class Population:
     """A set of candidates."""
-    pass
+
+    def __init__(self, pop_size: int, num_stats: int, layer_lengths: List[int]):
+        self._pop = [
+                Candidate.get_initial(num_stats, layer_lengths)
+                for _ in range(pop_size)
+            ]
+
+    def zero_ratings(self) -> None:
+        for cand in self._pop:
+            cand.fitness = 0
+
+    def resample(self) -> None:
+        """Resamples the population according to member fitness."""
+        # TODO
+        pass
+
+    def __iter__(self):
+        self._cur = 0
+        return self
+
+    def __next__(self):
+        return self._pop[self._cur]
 
 class Trainer(ABC):
     """Implements model training loop."""
 
-    def __init__(self, pop_size: int, num_stats: int, resample_after: int):
+    def __init__(self, 
+                 pop_size: int,
+                 num_stats: int,
+                 layer_lengths: List[int],
+                 resample_after: int):
         self._pop_size = pop_size
         self._num_stats = num_stats
+        self._layer_lengths = layer_lengths
         self._resample_after = resample_after
 
     def train(self):
-        self._population = self._generate_inital_population()
+        self._pop = Population(
+                self._pop_size, self._num_stats, self._layer_lengths)
         num_seen = 0
         while not self._is_converged():
-            self._zero_ratings()
+            self._pop.zero_ratings()
             for level in LevelTraversal():
                 level = list(level)
                 outcomes = np.asarray([n["outcome"] for n in level])
-                for cand in self._population:
-                    self._train_and_update(cand, level, outcomes)
+                for cand in self._pop:
+                    self._train_and_update_cand(cand, level, outcomes)
                 num_seen += len(level)
                 if num_seen >= self._resample_after:
-                    self._resample_population()
+                    self._pop.resample()
                     num_seen = 0
 
-    def _train_and_update(self,
-                          cand: Candidate,
-                          level: Iterable[Dict[str, int]],
-                          outcomes: np.ndarray) -> None:
+    @staticmethod
+    def _train_and_update_cand(cand: Candidate,
+                               level: Iterable[Dict[str, int]],
+                               outcomes: np.ndarray)\
+                               -> None:
         diffs = cand.ratings.get_node_pairwise_diffs(level)
         kl_divs = cand.pred_model.backprop(diffs, outcomes)
         tot_kl_div = np.sum(kl_divs)
@@ -48,29 +75,6 @@ class Trainer(ABC):
             delta = cand.trans_geno[node["outcome"]] * kl_divs[i]
             cand.ratings.update(delta, node["batter_id"], node["pitcher_id"])
 
-    def _generate_inital_population(self) -> List[Candidate]:
-        return [Candidate(
-                self._generate_initial_prediction_model(),
-                self._generate_initial_transition_genotype(),
-                PlayerRatings(self._num_stats)
-            ) for _ in range(self._pop_size)]
-    
-    def _zero_ratings(self) -> None:
-        for cand in self._population:
-            cand.fitness = 0
-
-    @abstractmethod
-    def _resample_population(self) -> None:
-        pass
-
-    @abstractmethod
-    def _generate_initial_prediction_model(self) -> PredictionModel:
-        pass
-
-    @abstractmethod
-    def _generate_initial_transition_genotype(self) -> TransitionFunction:
-        pass
-
-    @abstractmethod
     def _is_converged(self):
+        # TODO
         pass
