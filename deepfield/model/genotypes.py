@@ -195,7 +195,7 @@ class TransitionFunction(_Genotype):
         """
         vec_parents = [self._random_parent(mate) for _ in range(len(self._vecs))]
         for parents in [vec_parents, [mate if p == self else self for p in vec_parents]]:
-            child_vecs = [parent._vecs[i] for i, parent in enumerate(parents)]
+            child_vecs = np.asarray([parent._vecs[i] for i, parent in enumerate(parents)])
             yield TransitionFunction(child_vecs)
 
     def get_mutated(self, rate: float = 0.1) -> "TransitionFunction":
@@ -203,7 +203,7 @@ class TransitionFunction(_Genotype):
         then the mutated vector is normalized.
         """
         cp = self.copy()
-        vec_to_mutate = cp._vecs[np.random.randint(0, len(self._vecs))]
+        vec_to_mutate = cp._vecs[np.random.randint(0, self._vecs.shape[0])]
         vec_entry_to_mutate = np.random.randint(0, vec_to_mutate.size)
         old_val = vec_to_mutate[vec_entry_to_mutate]
         # note new_val still has mean 0, variance 1
