@@ -28,26 +28,6 @@ class GenAlgParams:
         self.resample_after = resample_after
         self.num_stats = num_stats
 
-class ModelPool:
-    """Holds a set of Keras models which can be assigned to candidates
-    dynamically.
-    """
-
-    def __init__(self, pop_size: int):
-        self._models = [self._create_model() for _ in range(pop_size)]
-    
-    def _create_model(self) -> Model:
-        # TODO
-        pass
-
-    def get_model(self):
-        if len(self._models) == 0:
-            raise ValueError
-        return self._models.pop(0)
-
-    def release_model(self, m: Model):
-        self._models.append(m)
-
 class Population:
     """A set of candidates."""
 
@@ -59,10 +39,10 @@ class Population:
         self._layer_lengths = layer_lengths
         self._ga_params = ga_params
         self._top_n = int(self._ga_params.best_n_frac * self._pop_size)
-        self._pool = ModelPool(pop_size)
+        self._pool = self._create_model
         self._pop = [
                 {
-                    "pred_model": self._pool.get_model(),
+                    "pred_model": self._create_model(),
                     "trans_func": TransitionFunction \
                             .get_initial(ga_params.num_stats),
                     "ratings": PlayerRatings(ga_params.num_stats),
@@ -70,6 +50,18 @@ class Population:
                 }
                 for _ in range(pop_size)
             ]
+
+    def _create_model(self) -> Model:
+        m = Sequential()
+        num_stats = self._ga_params.num_stats
+        m.add(InputLayer((num_stats, num_stats,)))
+        m.add(Flatten())
+        for num_units in self._layer_lengths:
+            m.add(Dense(num_units, activation="relu"))
+        m.add(Dense(len(Outcome)))
+        m.add(Activation("softmax"))
+        m.compile("adam", kl_div)
+        return PredictionModel(m)
 
     def zero_ratings(self) -> None:
         for cand in self._pop:
@@ -82,8 +74,9 @@ class Population:
         y = Batcher.pad_batch(one_hots)
         for cand in self:
             diffs = cand["ratings"].get_node_pairwise_diffs(level)
-            x = Batcher.pad_batch(diffs.shape[0])
-            kl_divs = cand["pred_model"].backprop(x, y)
+            x = Batcher.pad_batch(diffs)
+            weights = Batcher.get_padded_weights(diffs.shape[0])
+            kl_divs = cand["pred_model"].backprop(x, y, weights)
             tot_kl_div = np.sum(kl_divs)
             cand["fitness"] += 1 / tot_kl_div  # less kl_div implies more fit
             for i, node in enumerate(level):
@@ -94,7 +87,7 @@ class Population:
         """Performs genetic algorithm optimization on the population."""
         most_fit_indices = self._get_most_fit_indices()
         old_trans_funcs = [cand["trans_func"] for cand in self._pop]
-        old_weights = [cand["pred_model"].get_weights() for cand in self._pop]
+        old_weights = [cand["pred_model"].model.get_weights() for cand in self._pop]
         fitness_probs = softmax([cand["fitness"] for cand in self._pop])
         for i, cand in enumerate(self._pop):
             if i in most_fit_indices:
@@ -105,11 +98,14 @@ class Population:
                     replace=False,
                     p=fitness_probs
                 )
-            cand["trans_func"] = trans_mother.crossover(trans_father) # so progressive!
-            weights = np.random.choice(old_weights, fitness_probs)
-            cand["pred_model"].set_weights(weights)
+            trans_child = trans_mother.crossover(trans_father) # so progressive!
+            if (np.random.uniform() < self._ga_params.mutation_frac):
+                trans_child.mutate()
+            cand["trans_func"] = trans_child
+            weight_ind = np.random.choice(len(old_weights), p=fitness_probs)
+            cand["pred_model"].model.set_weights(old_weights[weight_ind])
             cand["ratings"].reset()
-            cand["fitness"] = 0
+        self.zero_ratings()
         
     def _get_most_fit_indices(self) -> Set[int]:
         """Returns the indices of the most fit candidates in the population."""
@@ -140,16 +136,17 @@ class Batcher:
     need to be made uniform size.
     """
 
+    PAD_SIZE = 2 ** 6
+
     @classmethod
     def pad_batch(cls, batch: np.ndarray) -> np.ndarray:
         """Rounds the given batch size up to the next power of 2 by padding the
         empty batch samples with zeroes. Returns the padded batch.
         """
         unpadded_size: int = batch.shape[0]
-        if cls._is_power_of_two(unpadded_size):
+        if unpadded_size == cls.PAD_SIZE:
             return batch
-        padded_size = 2 ** unpadded_size.bit_length()
-        pad_length = padded_size - unpadded_size
+        pad_length = cls.PAD_SIZE - unpadded_size
         sample_shape = batch.shape[1:]
         dup_samples = np.stack([np.zeros(sample_shape)for _ in range(pad_length)])
         padded_batch = np.concatenate([batch, dup_samples])
@@ -160,15 +157,10 @@ class Batcher:
         """Returns the sample weight array to ignore the samples when the given
         batch is padded.
         """
-        if cls._is_power_of_two(unpadded_size):
-            return np.ones(unpadded_size)
-        padded_size = 2 ** unpadded_size.bit_length()
-        pad_length = padded_size - unpadded_size
+        if unpadded_size == cls.PAD_SIZE:
+            return np.ones(cls.PAD_SIZE)
+        pad_length = cls.PAD_SIZE - unpadded_size
         return cls._get_padded_weights(unpadded_size, pad_length)
-
-    @staticmethod
-    def _is_power_of_two(num: int) -> bool:
-        return num & (num - 1) == 0
 
     @staticmethod
     def _get_padded_weights(unpadded_size: int, pad_length: int) -> np.ndarray:
@@ -184,8 +176,11 @@ class PredictionModel:
     def __init__(self, model: Model):
         self.model = model
 
-    def backprop(self, pairwise_diffs: np.ndarray, outcomes: np.ndarray) \
-            -> np.ndarray:
+    def backprop(self,
+                 pairwise_diffs: np.ndarray,
+                 outcomes: np.ndarray, 
+                 weights: np.ndarray
+            ) -> np.ndarray:
         self.model.train_on_batch(pairwise_diffs, outcomes)
         return K.eval(kl_div(K.variable(outcomes), self.model(pairwise_diffs)))
 
