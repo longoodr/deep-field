@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, Iterable, List, Set, Tuple
 
 import numpy as np
+from scipy.special import softmax
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Activation, Dense, Flatten, InputLayer
 from tensorflow.keras.losses import kullback_leibler_divergence as kl_div
@@ -57,11 +58,13 @@ class Population:
         self._pop_size = pop_size
         self._layer_lengths = layer_lengths
         self._ga_params = ga_params
+        self._top_n = int(self._ga_params.best_n_frac * self._pop_size)
         self._pool = ModelPool(pop_size)
         self._pop = [
                 {
                     "pred_model": self._pool.get_model(),
-                    "trans_func": TransitionFunction.get_initial(ga_params.num_stats),
+                    "trans_func": TransitionFunction \
+                            .get_initial(ga_params.num_stats),
                     "ratings": PlayerRatings(ga_params.num_stats),
                     "fitness": 0
                 }
@@ -88,8 +91,35 @@ class Population:
                 cand["ratings"].update(delta, node["batter_id"], node["pitcher_id"])
 
     def resample(self) -> None:
-        """Resamples the population according to member fitness."""
-        pass
+        """Performs genetic algorithm optimization on the population."""
+        most_fit_indices = self._get_most_fit_indices()
+        old_trans_funcs = [cand["trans_func"] for cand in self._pop]
+        old_weights = [cand["pred_model"].get_weights() for cand in self._pop]
+        fitness_probs = softmax([cand["fitness"] for cand in self._pop])
+        for i, cand in enumerate(self._pop):
+            if i in most_fit_indices:
+                continue
+            trans_mother, trans_father = np.random.choice(
+                    old_trans_funcs,
+                    size=2,
+                    replace=False,
+                    p=fitness_probs
+                )
+            cand["trans_func"] = trans_mother.crossover(trans_father) # so progressive!
+            weights = np.random.choice(old_weights, fitness_probs)
+            cand["pred_model"].set_weights(weights)
+            cand["ratings"].reset()
+            cand["fitness"] = 0
+        
+    def _get_most_fit_indices(self) -> Set[int]:
+        """Returns the indices of the most fit candidates in the population."""
+        pop_w_indices = [(i, cand) for i, cand in enumerate(self._pop)]
+        sorted_by_fitness = sorted(
+                pop_w_indices,
+                key=lambda x: x[1]["fitness"],
+                reverse=True
+            )
+        return set([i for i, _ in sorted_by_fitness[:self._top_n]])
 
     def __iter__(self):
         self._cur = 0
@@ -147,39 +177,20 @@ class Batcher:
         return np.concatenate([unpadded_weights, weight_padding])
 
 class PredictionModel:
-    """A model which predicts outcome distributions from player stat pairwise
-    differences.
+    """A wrapper around a model which predicts outcome distributions from 
+    player stat pairwise differences.
     """
 
-    @abstractmethod
-    def backprop(self, pairwise_diffs: np.ndarray, outcomes: np.ndarray)\
-            -> np.ndarray:
-        """Performs backpropagation using the pairwise diffs as input and
-        outcomes as output. Returns the KL-divergence between each expected and
-        actual outcome distribution after backpropagation is performed.
-        """
-        pass
-        
-    @abstractmethod
-    def predict(self, pairwise_diffs: np.ndarray) -> np.ndarray:
-        """Returns the predicted probability distribution for the given 
-        pairwise differences.
-        """
-        pass
-
-class NNetPredictionModel(PredictionModel):
-    """A prediction model backed by a Keras NN."""
-
     def __init__(self, model: Model):
-        self._model = model
+        self.model = model
 
     def backprop(self, pairwise_diffs: np.ndarray, outcomes: np.ndarray) \
             -> np.ndarray:
-        self._model.train_on_batch(pairwise_diffs, outcomes)
-        return K.eval(kl_div(K.variable(outcomes), self._model(pairwise_diffs)))
+        self.model.train_on_batch(pairwise_diffs, outcomes)
+        return K.eval(kl_div(K.variable(outcomes), self.model(pairwise_diffs)))
 
     def predict(self, pairwise_diffs: np.ndarray) -> np.ndarray:
-        return K.eval(self._model(pairwise_diffs))
+        return K.eval(self.model(pairwise_diffs))
 
 class TransitionFunction:
     """A genotype for the transition function of a rating system."""
