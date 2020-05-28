@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from deepfield.enums import Outcome
-from deepfield.model.population import Batcher, NNetPredictionModel, PlayerRatings, TransitionFunction
+from deepfield.model.population import Batcher, PredictionModel, PlayerRatings, TransitionFunction
 
 
 def setup_module(_):
@@ -47,14 +47,13 @@ class TestBatcher:
 
     def test_no_pad_needed(self):
         for sample_shape in [(2,), (3, 2), (4, 3, 6)]:
-            batch_size = 1
-            while batch_size <= 64:
-                batch = np.ones((batch_size, *sample_shape))
-                padded_batch = Batcher.pad_batch(batch)
-                padded_weights = Batcher.get_padded_weights(batch_size)
-                assert (padded_batch == batch).all()
-                assert (padded_weights == np.ones(batch_size)).all()
-                batch_size *= 2
+            batch_size = Batcher.PAD_SIZE
+            batch = np.ones((batch_size, *sample_shape))
+            padded_batch = Batcher.pad_batch(batch)
+            padded_weights = Batcher.get_padded_weights(batch_size)
+            assert (padded_batch == batch).all()
+            assert (padded_weights == np.ones(batch_size)).all()
+            batch_size *= 2
 
     def test_pad(self):
         for sample_shape in [(2,), (3, 2), (4, 3, 6)]:
