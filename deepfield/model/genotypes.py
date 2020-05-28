@@ -133,21 +133,31 @@ class Batcher:
     """
 
     @classmethod
-    def pad_batch(cls, batch: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def pad_batch(cls, batch: np.ndarray) -> np.ndarray:
         """Rounds the given batch size up to the next power of 2 by padding the
-        empty batch samples with zeroes. Returns the padded batch, along with 
-        sample weights to ignore the padded samples.
+        empty batch samples with zeroes. Returns the padded batch.
         """
         unpadded_size: int = batch.shape[0]
         if cls._is_power_of_two(unpadded_size):
-            return (batch, np.ones(unpadded_size))
+            return batch
         padded_size = 2 ** unpadded_size.bit_length()
         pad_length = padded_size - unpadded_size
         sample_shape = batch.shape[1:]
         dup_samples = np.stack([np.zeros(sample_shape)for _ in range(pad_length)])
         padded_batch = np.concatenate([batch, dup_samples])
-        padded_weights = cls._get_padded_weights(unpadded_size, pad_length)
-        return (padded_batch, padded_weights)
+        return padded_batch
+
+    @classmethod
+    def get_padded_weights(cls, batch: np.ndarray):
+        """Returns the sample weight array to ignore the samples when the given
+        batch is padded.
+        """
+        unpadded_size: int = batch.shape[0]
+        if cls._is_power_of_two(unpadded_size):
+            return np.ones(unpadded_size)
+        padded_size = 2 ** unpadded_size.bit_length()
+        pad_length = padded_size - unpadded_size
+        return cls._get_padded_weights(unpadded_size, pad_length)
 
     @staticmethod
     def _is_power_of_two(num: int) -> bool:
@@ -182,6 +192,7 @@ class NNetPredictionModel(PredictionModel):
     def backprop(self, pairwise_diffs: np.ndarray, outcomes: np.ndarray)\
             -> np.ndarray:
         y = to_categorical(outcomes, num_classes=len(Outcome))
+
         self._model.train_on_batch(pairwise_diffs, y)
         predictions = self.predict(pairwise_diffs)
         return K.eval(kl_div(K.variable(y), self._model(pairwise_diffs)))

@@ -100,7 +100,8 @@ class TestBatcher:
             batch_size = 1
             while batch_size <= 64:
                 batch = np.ones((batch_size, *sample_shape))
-                padded_batch, padded_weights = Batcher.pad_batch(batch)
+                padded_batch = Batcher.pad_batch(batch)
+                padded_weights = Batcher.get_padded_weights(batch)
                 assert (padded_batch == batch).all()
                 assert (padded_weights == np.ones(batch_size)).all()
                 batch_size *= 2
@@ -110,7 +111,8 @@ class TestBatcher:
             for batch_size in range(33, 64, 5):
                 batch = np.ones((batch_size, *sample_shape))
                 pad_length = 64 - batch_size
-                padded_batch, padded_weights = Batcher.pad_batch(batch)
+                padded_batch = Batcher.pad_batch(batch)
+                padded_weights = Batcher.get_padded_weights(batch)
                 expected_batch = \
                         np.concatenate([batch, np.zeros((pad_length, *sample_shape))])
                 expected_weights = \
