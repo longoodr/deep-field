@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Tuple
 
 import numpy as np
 from tensorflow.keras import backend as K
@@ -123,6 +123,42 @@ class PredictionModel(_RandomlyChooseParent):
         pairwise differences.
         """
         pass
+
+class Batcher:
+    """Because of the variable-length levels inherent in the structure of
+    the play dependency graph, batch size is variable among training and
+    prediction calls to the model, which triggers retracing of the 
+    computation graph and slows down training. For this reason, batches
+    need to be made uniform size.
+    """
+
+    @classmethod
+    def pad_batch(cls, batch: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        """Rounds the given batch size up to the next power of 2 by padding the
+        empty batch samples with zeroes. Returns the padded batch, along with 
+        sample weights to ignore the padded samples.
+        """
+        unpadded_size: int = batch.shape[0]
+        if cls._is_power_of_two(unpadded_size):
+            return (batch, np.ones(unpadded_size))
+        padded_size = 2 ** unpadded_size.bit_length()
+        pad_length = padded_size - unpadded_size
+        sample_shape = batch.shape[1:]
+        dup_samples = np.stack([np.zeros(sample_shape)for _ in range(pad_length)])
+        padded_batch = np.concatenate([batch, dup_samples])
+        padded_weights = cls._get_padded_weights(unpadded_size, pad_length)
+        return (padded_batch, padded_weights)
+
+    @staticmethod
+    def _is_power_of_two(num: int) -> bool:
+        return num & (num - 1) == 0
+
+    @staticmethod
+    def _get_padded_weights(unpadded_size: int, pad_length: int) -> np.ndarray:
+        unpadded_weights = np.ones(unpadded_size)
+        weight_padding = np.zeros(pad_length)
+        return np.concatenate([unpadded_weights, weight_padding])
+
 
 class NNetPredictionModel(PredictionModel):
     """A prediction model backed by a Keras NN."""

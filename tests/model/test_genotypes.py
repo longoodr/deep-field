@@ -2,8 +2,7 @@ import numpy as np
 import pytest
 
 from deepfield.enums import Outcome
-from deepfield.model.genotypes import (Candidate, NNetPredictionModel,
-                                       PlayerRatings, TransitionFunction)
+from deepfield.model.genotypes import Batcher, Candidate, NNetPredictionModel, PlayerRatings, TransitionFunction
 
 
 def setup_module(_):
@@ -93,6 +92,31 @@ class TestTransitionFunction:
             assert a == b
             b._vecs[0] *= 2
             assert a != b
+
+class TestBatcher:
+
+    def test_no_pad_needed(self):
+        for sample_shape in [(2,), (3, 2), (4, 3, 6)]:
+            batch_size = 1
+            while batch_size <= 64:
+                batch = np.ones((batch_size, *sample_shape))
+                padded_batch, padded_weights = Batcher.pad_batch(batch)
+                assert (padded_batch == batch).all()
+                assert (padded_weights == np.ones(batch_size)).all()
+                batch_size *= 2
+
+    def test_pad(self):
+        for sample_shape in [(2,), (3, 2), (4, 3, 6)]:
+            for batch_size in range(33, 64, 5):
+                batch = np.ones((batch_size, *sample_shape))
+                pad_length = 64 - batch_size
+                padded_batch, padded_weights = Batcher.pad_batch(batch)
+                expected_batch = \
+                        np.concatenate([batch, np.zeros((pad_length, *sample_shape))])
+                expected_weights = \
+                        np.concatenate([np.ones(batch_size), np.zeros(pad_length)])
+                assert (padded_batch == expected_batch).all()
+                assert (padded_weights == expected_weights).all()
 
 class TestPredictionModel:
 
