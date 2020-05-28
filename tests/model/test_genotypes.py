@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from deepfield.enums import Outcome
-from deepfield.model.genotypes import Batcher, Candidate, NNetPredictionModel, PlayerRatings, TransitionFunction
+from deepfield.model.population import Batcher, NNetPredictionModel, PlayerRatings, TransitionFunction
 
 
 def setup_module(_):
@@ -10,46 +10,6 @@ def setup_module(_):
 
 def teardown_module(_):
     np.random.seed(None)
-
-class TestCandidate:
-
-    def test_mutation(self):
-        for num_stats in range(3, 6):
-            c = Candidate.get_initial(num_stats, [6, 6])
-            m = c.get_mutated()
-            assert c != m
-            assert c.pred_model == m.pred_model
-            assert c.trans_func != m.trans_func
-            assert c.ratings == m.ratings
-
-    def test_crossover(self):
-        for num_stats in range(3, 6):
-            c1 = Candidate.get_initial(num_stats, [6, 6])
-            c2 = Candidate.get_initial(num_stats, [6, 6])
-            assert c1 != c2
-            children = c1.crossover(c2)
-            for c in children:
-                assert (
-                        c.pred_model == c1.pred_model
-                        or c.pred_model == c2.pred_model
-                    )
-                assert (
-                        c.trans_func != c1.trans_func
-                        and c.trans_func != c2.trans_func
-                )
-                assert (
-                        c.ratings == c1.ratings
-                        or c.ratings == c2.ratings
-                )
-
-    def test_copy(self):
-        for num_stats in range(3, 6):
-            cand = Candidate.get_initial(num_stats, [6, 6])
-            cp = cand.copy()
-            assert cand is not cp
-            assert cand == cp
-            cp.ratings.update(np.ones(num_stats), 0, 1)
-            assert cand != cp
 
 
 class TestTransitionFunction:
@@ -64,9 +24,10 @@ class TestTransitionFunction:
     def test_mutation(self):
         for num_stats in range(3, 6):
             g = TransitionFunction.get_initial(num_stats)
-            m = g.get_mutated()
+            orig_vecs = np.copy(g._vecs)
+            g.mutate()
             num_diff = 0
-            for gvec, mvec in zip(g._vecs, m._vecs):
+            for gvec, mvec in zip(orig_vecs, g._vecs):
                 for ge, me in zip(gvec, mvec):
                     if ge != me:
                         num_diff += 1
@@ -76,22 +37,11 @@ class TestTransitionFunction:
         for num_stats in range(3, 6):
             a = TransitionFunction.get_initial(num_stats)
             b = TransitionFunction.get_initial(num_stats)
-            c1, c2 = a.crossover(b)
+            c = a.crossover(b)
             parent_vecs = a._vecs + b._vecs
-            for vc1, vc2 in zip(c1._vecs, c2._vecs):
-                for evc1, evc2 in zip(vc1, vc2):
-                    assert evc1 != evc2
-                assert np.any((vc1 == x).all() for x in parent_vecs)
-                assert np.any((vc2 == x).all() for x in parent_vecs)
-
-    def test_copy(self):
-        for num_stats in range(3, 6):
-            a = TransitionFunction.get_initial(num_stats)
-            b = a.copy()
-            assert a is not b
-            assert a == b
-            b._vecs[0] *= 2
-            assert a != b
+            for v in c._vecs:
+                assert np.any((v == pv).all() for pv in parent_vecs)
+                assert np.any((v == pv).all() for pv in parent_vecs)
 
 class TestBatcher:
 
@@ -101,7 +51,7 @@ class TestBatcher:
             while batch_size <= 64:
                 batch = np.ones((batch_size, *sample_shape))
                 padded_batch = Batcher.pad_batch(batch)
-                padded_weights = Batcher.get_padded_weights(batch)
+                padded_weights = Batcher.get_padded_weights(batch_size)
                 assert (padded_batch == batch).all()
                 assert (padded_weights == np.ones(batch_size)).all()
                 batch_size *= 2
@@ -112,56 +62,13 @@ class TestBatcher:
                 batch = np.ones((batch_size, *sample_shape))
                 pad_length = 64 - batch_size
                 padded_batch = Batcher.pad_batch(batch)
-                padded_weights = Batcher.get_padded_weights(batch)
+                padded_weights = Batcher.get_padded_weights(batch_size)
                 expected_batch = \
                         np.concatenate([batch, np.zeros((pad_length, *sample_shape))])
                 expected_weights = \
                         np.concatenate([np.ones(batch_size), np.zeros(pad_length)])
                 assert (padded_batch == expected_batch).all()
                 assert (padded_weights == expected_weights).all()
-
-class TestPredictionModel:
-
-    def test_backprop(self):
-        seen_out = Outcome.STRIKEOUT.value
-        for num_stats in range(3, 6):
-            m = NNetPredictionModel.from_params(num_stats, [6, 6])
-            pdiffs, outcomes = self._get_basic_data(num_stats, seen_out)
-            kl_div = m.backprop(pdiffs, outcomes)
-            p1 = m.predict(pdiffs)
-            # backprop should reduce kl_div after 2nd session
-            kl_div2 = m.backprop(pdiffs, outcomes)
-            assert kl_div > kl_div2
-            p2 = m.predict(pdiffs)
-            # seen outcome probability should be higher after backprop
-            assert p2[0,seen_out] > p1[0,seen_out]
-
-    def test_crossover(self):
-        for num_stats in range(3, 6):
-            a = NNetPredictionModel.from_params(num_stats, [6, 6])
-            b = NNetPredictionModel.from_params(num_stats, [6, 6])
-            assert a != b
-            children = a.crossover(b)
-            for c in children:
-                assert c == a or c == b
-                assert c is not a or c is not b
-
-    def test_copy(self):
-        seen_out = Outcome.STRIKEOUT.value
-        for num_stats in range(3, 6):
-            a = NNetPredictionModel.from_params(num_stats, [6, 6])
-            b = a.copy()
-            assert a == b
-            assert a is not b
-            pdiffs, outcomes = self._get_basic_data(num_stats, seen_out)
-            b.backprop(pdiffs, outcomes)
-            assert a != b
-
-    @staticmethod
-    def _get_basic_data(num_stats: int, seen_out: int):
-        pdiffs = np.asarray([PlayerRatings(num_stats).get_pairwise_diffs(0, 0)])
-        outcomes = np.asarray([seen_out])
-        return pdiffs, outcomes
 
 class TestPlayerRatings:
 
@@ -190,24 +97,6 @@ class TestPlayerRatings:
                 assert (pr.get_batter_rating(i) == zero).all()
                 assert (pr.get_pitcher_rating(i) == zero).all()
 
-    def test_copy(self):
-        for num_stats in range(3, 6):
-            pr = PlayerRatings(num_stats)
-            delta = np.ones(num_stats)
-            pr.update(delta, 0, 1)
-            cp = pr.copy()
-            assert cp is not pr
-            assert cp == pr
-            for r in [pr, cp]:
-                assert (r.get_batter_rating(0) == delta).all()
-                assert (r.get_pitcher_rating(1) == -1 * delta).all()
-            pr.update(delta, 0, 1)
-            assert (pr.get_batter_rating(0) == 2 * delta).all()
-            assert (pr.get_pitcher_rating(1) == -2 * delta).all()
-            assert (cp.get_batter_rating(0) == delta).all()
-            assert (cp.get_pitcher_rating(1) == -1 * delta).all()
-            assert cp != pr
-
     def test_pdiffs(self):
         for num_stats in range(3, 6):
             pr = PlayerRatings(num_stats)
@@ -221,14 +110,3 @@ class TestPlayerRatings:
             for i in range(num_stats):
                 for j in range(num_stats):
                     assert (pdiffs[i,j] == bat[i] - pit[j])
-
-    def test_crossover(self):
-        for num_stats in range(3, 6):
-            a = PlayerRatings(num_stats)
-            b = PlayerRatings(num_stats)
-            b.update(np.ones(num_stats), 0, 1)
-            assert a != b
-            children = a.crossover(b)
-            for c in children:
-                assert c == a or c == b
-                assert c is not a and c is not b
