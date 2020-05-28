@@ -173,6 +173,8 @@ class Batcher:
 class NNetPredictionModel(PredictionModel):
     """A prediction model backed by a Keras NN."""
 
+    # TODO use functional API to instantiate models from graph. Hopefully this
+    # will fix the remaining retracing issues
     @classmethod
     def from_params(cls, num_stats: int, layer_lengths: List[int])\
             -> "NNetPredictionModel":
@@ -286,6 +288,8 @@ class PlayerRatings(_RandomlyChooseParent):
     evaluated.
     """
 
+    # TODO increase resample_after, and then just zero the player ratings for
+    # resampled candidates
     def __init__(self, num_stats: int):
         self._num_stats = num_stats
         self.reset()
