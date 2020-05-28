@@ -91,7 +91,7 @@ class Candidate(_Genotype):
         diffs = self.ratings.get_node_pairwise_diffs(level)
         kl_divs = self.pred_model.backprop(diffs, outcomes)
         tot_kl_div = np.sum(kl_divs)
-        self.fitness -= tot_kl_div  # less divergence is better
+        self.fitness += 1 / tot_kl_div  # less kl_div implies more fit
         for i, node in enumerate(level):
             delta = self.trans_func[node["outcome"]] * kl_divs[i]
             self.ratings.update(delta, node["batter_id"], node["pitcher_id"])
