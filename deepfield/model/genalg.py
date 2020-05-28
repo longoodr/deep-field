@@ -44,22 +44,21 @@ class Population:
         for cand in self._pop:
             cand.fitness = 0
 
-    def process_level(self, level: Iterable[Dict[str, int]]) -> None:
+    def process_level(self, level: List[Dict[str, int]]) -> None:
         """Backprops the level data for each candidate and updates ratings."""
-        level = list(level)
         outcomes = np.asarray([n["outcome"] for n in level])
         for cand in self._pop:
             cand.train_and_update(level, outcomes)
 
     def resample(self) -> None:
         """Resamples the population according to member fitness."""
-        new_pop = list(self._get_best_n())
+        new_pop = self._get_best_n()
         self._repopulate(new_pop)
         self._apply_mutations(new_pop)
         self._pop = new_pop
         self.zero_ratings()
 
-    def _get_best_n(self) -> Iterable[Candidate]:
+    def _get_best_n(self) -> List[Candidate]:
         # XXX could this be made faster with quick select?
         sorted_cands = sorted(self._pop,
                               key=lambda cand: cand.fitness,
@@ -71,14 +70,14 @@ class Population:
         fitness_probs = softmax([c.fitness for c in self._pop])
         while len(new_pop) < self._pop_size:
             mother, father = np.random.choice(self._pop, size=2, p=fitness_probs)
-            new_pop.append(mother.crossover(father))
+            new_pop.extend(mother.crossover(father))
 
     def _apply_mutations(self, new_pop: List[Candidate]) -> None:
         num_to_mutate = int(self._ga_params.mutation_frac * self._pop_size)
         for _ in range(num_to_mutate):
             mutate_ind = np.random.choice(self._pop_size)
             cand_to_mutate = new_pop[mutate_ind]
-            new_pop[mutate_ind] = cand_to_mutate.mutate()
+            new_pop[mutate_ind] = cand_to_mutate.get_mutated()
 
     def __iter__(self):
         self._cur = 0
@@ -127,7 +126,7 @@ class Trainer(ABC):
         return self._iterations > 100
 
 init_db()
-params = GenAlgParams(0.2, 0.5, 1000, 4)
-trainer = Trainer(20, [], params)
+params = GenAlgParams(0.2, 0.5, 200, 4)
+trainer = Trainer(5, [], params)
 pop = trainer.train()
 pass
