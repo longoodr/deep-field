@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from deepfield.enums import Outcome
-from deepfield.model.genotypes import (Candidate, KerasPredictionModel,
+from deepfield.model.genotypes import (Candidate, NNetPredictionModel,
                                        PlayerRatings, TransitionFunction)
 
 
@@ -99,7 +99,7 @@ class TestPredictionModel:
     def test_backprop(self):
         seen_out = Outcome.STRIKEOUT.value
         for num_stats in range(3, 6):
-            m = KerasPredictionModel.from_params(num_stats, [6, 6])
+            m = NNetPredictionModel.from_params(num_stats, [6, 6])
             pdiffs, outcomes = self._get_basic_data(num_stats, seen_out)
             kl_div = m.backprop(pdiffs, outcomes)
             p1 = m.predict(pdiffs)
@@ -112,8 +112,8 @@ class TestPredictionModel:
 
     def test_crossover(self):
         for num_stats in range(3, 6):
-            a = KerasPredictionModel.from_params(num_stats, [6, 6])
-            b = KerasPredictionModel.from_params(num_stats, [6, 6])
+            a = NNetPredictionModel.from_params(num_stats, [6, 6])
+            b = NNetPredictionModel.from_params(num_stats, [6, 6])
             assert a != b
             children = a.crossover(b)
             for c in children:
@@ -123,7 +123,7 @@ class TestPredictionModel:
     def test_copy(self):
         seen_out = Outcome.STRIKEOUT.value
         for num_stats in range(3, 6):
-            a = KerasPredictionModel.from_params(num_stats, [6, 6])
+            a = NNetPredictionModel.from_params(num_stats, [6, 6])
             b = a.copy()
             assert a == b
             assert a is not b

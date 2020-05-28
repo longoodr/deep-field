@@ -61,7 +61,7 @@ class Candidate(_Genotype):
     def get_initial(cls, num_stats: int, layer_lengths: List[int])\
             -> "Candidate":
         """Returns a random candidate."""
-        pm = KerasPredictionModel.from_params(num_stats, layer_lengths)
+        pm = NNetPredictionModel.from_params(num_stats, layer_lengths)
         tf = TransitionFunction.get_initial(num_stats)
         pr = PlayerRatings(num_stats)
         return Candidate(pm, tf, pr)
@@ -124,12 +124,12 @@ class PredictionModel(_RandomlyChooseParent):
         """
         pass
 
-class KerasPredictionModel(PredictionModel):
+class NNetPredictionModel(PredictionModel):
     """A prediction model backed by a Keras NN."""
 
     @classmethod
     def from_params(cls, num_stats: int, layer_lengths: List[int])\
-            -> "KerasPredictionModel":
+            -> "NNetPredictionModel":
         m = Sequential()
         m.add(InputLayer((num_stats, num_stats,)))
         m.add(Flatten())
@@ -153,11 +153,11 @@ class KerasPredictionModel(PredictionModel):
     def predict(self, pairwise_diffs: np.ndarray) -> np.ndarray:
         return K.eval(self._model(pairwise_diffs))
 
-    def copy(self) -> "KerasPredictionModel":
+    def copy(self) -> "NNetPredictionModel":
         copied_model = clone_model(self._model)
         self._compile_model(copied_model)
         copied_model.set_weights(self._model.get_weights())
-        return KerasPredictionModel(copied_model)
+        return NNetPredictionModel(copied_model)
 
     def __eq__(self, other):
         input_layer_shape = self._model.get_layer(index=0).input_shape
