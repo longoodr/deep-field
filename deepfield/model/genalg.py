@@ -34,12 +34,13 @@ class Trainer(ABC):
                 level = list(level)
                 pop.process_level(level)
                 num_seen += len(level)
-                print("\n".join(
-                        [f"{c['fitness']:.3f}" 
-                        for c in sorted(list(pop),
-                        key=lambda x: x["fitness"],
-                        reverse=True)]))
-                print()
+                print(" ".join(
+                            [f"{c['fitness']:.3f}" 
+                            for c in sorted(list(pop)[:10],
+                            key=lambda x: x["fitness"],
+                            reverse=True)]),
+                        f" {num_seen} of {self._ga_params.resample_after}"
+                    )
                 if num_seen >= self._ga_params.resample_after:
                     pop.resample()
                     num_seen = 0
@@ -56,6 +57,6 @@ params = GenAlgParams(
         resample_after=2000,
         num_stats=4
     )
-trainer = Trainer(100, [], params)
+trainer = Trainer(5, [], params)
 pop = trainer.train()
 pass
