@@ -55,3 +55,4 @@ class TestPersistence:
             layer_ids = set([n["play_id"] for n in layer])
             for exp in expected_layer:
                 assert exp in layer_ids
+        assert list(iter(LevelTraversal())) == 38
