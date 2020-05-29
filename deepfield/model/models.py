@@ -98,20 +98,20 @@ class PlayerRatings:
     def update(self, delta: np.ndarray, bid: int, pid: int)\
             -> None:
         """Updates the ratings for the given players."""
-        if bid not in self._bratings:
-            self._bratings[bid] = [np.zeros(self._num_stats), 0]
-        if pid not in self._pratings:
-            self._pratings[pid] = [np.zeros(self._num_stats), 0]
-        brating, b_apps = self._bratings[bid]
-        b_delta_weight = (1 / (b_apps + 1))
-        new_brating = b_delta_weight * delta + (1 - b_delta_weight) * brating
-        self._bratings[bid][0] = new_brating
-        prating, p_apps = self._pratings[pid]
-        p_delta_weight = (1 / (p_apps + 1))
-        new_prating = p_delta_weight * -1 * delta + (1 - p_delta_weight) * prating
-        self._pratings[pid][0] = new_prating
-        self._bratings[bid][1] += 1
-        self._pratings[pid][1] += 1
+        self._update(delta, self._bratings, bid)
+        self._update(-1 * delta, self._pratings, pid)
+
+    def _update(self, delta, ratings: np.ndarray, id_: int) -> None:
+        if id_ not in ratings:
+            ratings[id_] = {
+                    "rating": np.zeros(self._num_stats),
+                    "appearances": 0
+                }
+        rating = ratings[id_]["rating"]
+        delta_weight = (1 / 1000)
+        new_rating = delta_weight * delta + (1 - delta_weight) * rating
+        ratings[id_]["rating"] = new_rating
+        ratings[id_]["appearances"] += 1
 
     def get_node_pairwise_diffs(self, nodes: Iterable[Dict[str, int]]) -> np.ndarray:
         """Returns the pairwise differences for the given nodes."""
