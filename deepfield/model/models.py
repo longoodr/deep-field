@@ -83,27 +83,35 @@ class PlayerRatings:
     def get_pitcher_rating(self, pid: int) -> np.ndarray:
         if pid not in self._pratings:
             return np.zeros(self._num_stats)
-        return self._pratings[pid]
+        return self._pratings[pid][0]
 
     def get_batter_rating(self, bid: int) -> np.ndarray:
         if bid not in self._bratings:
             return np.zeros(self._num_stats)
-        return self._bratings[bid]
+        return self._bratings[bid][0]
 
     def reset(self):
         """Zeroes all player ratings."""
-        self._bratings: Dict[int, np.ndarray] = {}
-        self._pratings: Dict[int, np.ndarray] = {}
+        self._bratings: Dict[int, List] = {}
+        self._pratings: Dict[int, List] = {}
 
     def update(self, delta: np.ndarray, bid: int, pid: int)\
             -> None:
         """Updates the ratings for the given players."""
         if bid not in self._bratings:
-            self._bratings[bid] = np.zeros(self._num_stats)
+            self._bratings[bid] = [np.zeros(self._num_stats), 0]
         if pid not in self._pratings:
-            self._pratings[pid] = np.zeros(self._num_stats)
-        self._bratings[bid] += delta
-        self._pratings[pid] -= delta
+            self._pratings[pid] = [np.zeros(self._num_stats), 0]
+        brating, b_apps = self._bratings[bid]
+        b_delta_weight = (1 / (b_apps + 1))
+        new_brating = b_delta_weight * delta + (1 - b_delta_weight) * brating
+        self._bratings[bid][0] = new_brating
+        prating, p_apps = self._pratings[pid]
+        p_delta_weight = (1 / (p_apps + 1))
+        new_prating = p_delta_weight * delta + (1 - p_delta_weight) * prating
+        self._pratings[pid][0] = -1 * new_prating
+        self._bratings[bid][1] += 1
+        self._pratings[pid][1] += 1
 
     def get_node_pairwise_diffs(self, nodes: Iterable[Dict[str, int]]) -> np.ndarray:
         """Returns the pairwise differences for the given nodes."""
