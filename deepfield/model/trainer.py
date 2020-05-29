@@ -3,14 +3,16 @@ from typing import Any, Dict, Iterable, List, Tuple
 
 import numpy as np
 from scipy.special import softmax
-from tensorflow.keras.layers import Activation, Dense, Flatten, InputLayer, Dropout
+from tensorflow.keras.layers import (Activation, Dense, Dropout, Flatten,
+                                     InputLayer)
 from tensorflow.keras.losses import kullback_leibler_divergence as kl_div
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.utils import to_categorical
 
 from deepfield.dbmodels import init_db
 from deepfield.enums import Outcome
-from deepfield.model.models import Batcher, PlayerRatings, PredictionModel
+from deepfield.model.models import (Batcher, PlayerRating, PlayerRatings,
+                                    PredictionModel)
 from deepfield.playgraph.graph import LevelTraversal
 
 NUM_STATS = len(Outcome)
@@ -18,7 +20,8 @@ LAYER_LENGTHS = [32]
 
 init_db()
 m = Sequential()
-m.add(InputLayer((NUM_STATS, NUM_STATS,)))
+rating_width = PlayerRating.NUM_RATINGS * NUM_STATS
+m.add(InputLayer((rating_width, rating_width)))
 m.add(Flatten())
 for num_units in LAYER_LENGTHS:
     m.add(Dense(num_units, activation="relu"))
