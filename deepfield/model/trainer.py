@@ -21,8 +21,7 @@ LAYER_LENGTHS = [32]
 init_db()
 m = Sequential()
 rating_width = PlayerRating.NUM_RATINGS * NUM_STATS
-m.add(InputLayer((rating_width, rating_width)))
-m.add(Flatten())
+m.add(InputLayer((2 * rating_width)))
 for num_units in LAYER_LENGTHS:
     m.add(Dense(num_units, activation="relu"))
     m.add(Dropout(0.5))
