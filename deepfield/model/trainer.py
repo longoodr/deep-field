@@ -3,7 +3,7 @@ from typing import Any, Dict, Iterable, List, Tuple
 
 import numpy as np
 from scipy.special import softmax
-from tensorflow.keras.layers import Activation, Dense, Flatten, InputLayer
+from tensorflow.keras.layers import Activation, Dense, Flatten, InputLayer, Dropout
 from tensorflow.keras.losses import kullback_leibler_divergence as kl_div
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.utils import to_categorical
@@ -14,7 +14,7 @@ from deepfield.model.models import Batcher, PlayerRatings, PredictionModel
 from deepfield.playgraph.graph import LevelTraversal
 
 NUM_STATS = len(Outcome)
-LAYER_LENGTHS = [32, 16]
+LAYER_LENGTHS = [32]
 
 init_db()
 m = Sequential()
@@ -22,15 +22,18 @@ m.add(InputLayer((NUM_STATS, NUM_STATS,)))
 m.add(Flatten())
 for num_units in LAYER_LENGTHS:
     m.add(Dense(num_units, activation="relu"))
+    m.add(Dropout(0.5))
 m.add(Dense(len(Outcome)))
 m.add(Activation("softmax"))
 m.compile("adam", kl_div)
 model = PredictionModel(m)
 ratings = PlayerRatings(NUM_STATS)
 
+tot_seen = 0
 num_seen = 0
-reset_after = 32
+reset_after = 32.0
 tot_kl_div = 0
+passes = 0
 while True:
     ratings.reset()
     for level in LevelTraversal():
@@ -47,8 +50,11 @@ while True:
             delta = to_categorical(node["outcome"], NUM_STATS) * kl_divs[i]
             ratings.update(delta, node["batter_id"], node["pitcher_id"])
         num_seen += len(level)
+        tot_seen += len(level)
         if num_seen >= reset_after:
-            reset_after = int(reset_after * 1.1)
-            print(f"{tot_kl_div / num_seen:1.3f}, {num_seen:7d}")
+            reset_after = reset_after * 1.25
+            print(f"{tot_kl_div / num_seen:1.3f}, {num_seen:7d}, {passes:3d}, {tot_seen}")
+            ratings.reset()
             num_seen = 0
             tot_kl_div = 0
+    passes += 1
