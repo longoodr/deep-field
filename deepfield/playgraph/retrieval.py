@@ -95,8 +95,12 @@ class _PlayGraphDbWriter:
     @classmethod
     def _write_next_batch(cls, nodes: Iterator) -> None:
         batch = []
-        for _ in range(cls._PER_BATCH):
-            batch.append(next(nodes))
+        try:
+            for _ in range(cls._PER_BATCH):
+                batch.append(next(nodes))
+        except StopIteration:
+            PlayNode.insert_many(batch, fields = ("play_id", "outcome", "level")).execute()
+            raise StopIteration
         PlayNode.insert_many(batch, fields = ("play_id", "outcome", "level")).execute()
 
 class _DbPlaysToGraphIterator():
