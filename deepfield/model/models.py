@@ -108,8 +108,8 @@ class PlayerRatings:
         self._bratings[bid][0] = new_brating
         prating, p_apps = self._pratings[pid]
         p_delta_weight = (1 / (p_apps + 1))
-        new_prating = p_delta_weight * delta + (1 - p_delta_weight) * prating
-        self._pratings[pid][0] = -1 * new_prating
+        new_prating = p_delta_weight * -1 * delta + (1 - p_delta_weight) * prating
+        self._pratings[pid][0] = new_prating
         self._bratings[bid][1] += 1
         self._pratings[pid][1] += 1
 

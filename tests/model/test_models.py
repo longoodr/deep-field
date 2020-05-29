@@ -51,6 +51,9 @@ class TestPlayerRatings:
             assert (pr.get_batter_rating(1) == zero).all()
             assert (pr.get_pitcher_rating(0) == zero).all()
             assert (pr.get_pitcher_rating(1) == -1 * delta).all()
+            pr.update(-1 * delta, 0, 1)
+            assert (pr.get_batter_rating(0) == zero).all()
+            assert (pr.get_pitcher_rating(1) == zero).all()
 
     def test_reset(self):
         for num_stats in range(3, 6):
