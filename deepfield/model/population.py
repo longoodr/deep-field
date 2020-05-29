@@ -181,7 +181,7 @@ class PredictionModel:
                  outcomes: np.ndarray, 
                  weights: np.ndarray
             ) -> np.ndarray:
-        self.model.train_on_batch(pairwise_diffs, outcomes)
+        self.model.train_on_batch(pairwise_diffs, outcomes, weights)
         return K.eval(kl_div(K.variable(outcomes), self.model(pairwise_diffs)))
 
     def predict(self, pairwise_diffs: np.ndarray) -> np.ndarray:
