@@ -34,7 +34,7 @@ class LevelTraversal:
                 self._peek = row
                 return level
             level.append(row)
-        if self._done:
+        if self._done or len(level) == 0:
             raise StopIteration
         self._done = True
         return level
