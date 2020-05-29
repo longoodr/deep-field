@@ -78,22 +78,27 @@ class PlayerRatings:
 
     def __init__(self, num_stats: int):
         self._num_stats = num_stats
+        self._empty_rating = PlayerRating(num_stats)
         self.reset()
 
     def get_pitcher_rating(self, pid: int) -> np.ndarray:
-        if pid not in self._pratings:
-            return np.zeros(self._num_stats)
-        return self._pratings[pid][0]
+        return self._get_player_rating(self._pratings, pid)
 
     def get_batter_rating(self, bid: int) -> np.ndarray:
-        if bid not in self._bratings:
-            return np.zeros(self._num_stats)
-        return self._bratings[bid][0]
+        return self._get_player_rating(self._bratings, bid)
+
+    def _get_player_rating(self,
+                           ratings: Dict[int, "PlayerRating"],
+                           id_: int
+                           ) -> np.ndarray:
+        if id_ not in ratings:
+            return self._empty_rating.get_agg_rating()
+        return ratings[id_].get_agg_rating()
 
     def reset(self):
         """Zeroes all player ratings."""
-        self._bratings: Dict[int, List] = {}
-        self._pratings: Dict[int, List] = {}
+        self._bratings: Dict[int, "PlayerRating"] = {}
+        self._pratings: Dict[int, "PlayerRating"] = {}
 
     def update(self, delta: np.ndarray, bid: int, pid: int)\
             -> None:
@@ -103,15 +108,8 @@ class PlayerRatings:
 
     def _update(self, delta, ratings: np.ndarray, id_: int) -> None:
         if id_ not in ratings:
-            ratings[id_] = {
-                    "rating": np.zeros(self._num_stats),
-                    "appearances": 0
-                }
-        rating = ratings[id_]["rating"]
-        delta_weight = (1 / 1000)
-        new_rating = delta_weight * delta + (1 - delta_weight) * rating
-        ratings[id_]["rating"] = new_rating
-        ratings[id_]["appearances"] += 1
+            ratings[id_] = PlayerRating(self._num_stats)
+        ratings[id_].update(delta)
 
     def get_node_pairwise_diffs(self, nodes: Iterable[Dict[str, int]]) -> np.ndarray:
         """Returns the pairwise differences for the given nodes."""
@@ -126,3 +124,37 @@ class PlayerRatings:
         b = np.tile(brating, (self._num_stats, 1))
         p = np.tile(prating, (self._num_stats, 1))
         return b - p.transpose()
+
+class PlayerRating:
+    """A set of rating data for a given player."""
+
+    SHORT_TERM_LENGTH = 100
+    LONG_TERM_LENGTH = 1000
+
+    SHORT_TERM_WEIGHT = 1 / SHORT_TERM_LENGTH
+    LONG_TERM_WEIGHT = 1 / LONG_TERM_LENGTH
+
+    def __init__(self, num_stats: int):
+        self._num_stats = num_stats
+        self.reset()
+
+    def reset(self) -> None:
+        """Resets this player's ratings and appearances to zero."""
+        self._short_term = np.zeros(self._num_stats)
+        self._long_term = np.zeros(self._num_stats)
+        self._career = np.zeros(self._num_stats)
+        self._appearances = 0
+
+    def update(self, delta: np.ndarray) -> None:
+        """Updates the player's ratings with the given delta."""
+        for rating, weight in [
+                (self._short_term, self.SHORT_TERM_WEIGHT),
+                (self._long_term , self.LONG_TERM_WEIGHT),
+                (self._career    , 1 / self._appearances),
+            ]:
+            rating = weight * delta + (1 - weight) * rating
+        self._appearances += 1
+
+    def get_agg_rating(self) -> np.ndarray:
+        ratings = [self._short_term, self._long_term, self._career]
+        return np.concatenate(ratings, axis=None)
