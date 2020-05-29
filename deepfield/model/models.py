@@ -99,12 +99,16 @@ class PlayerRatings:
         """Zeroes all player ratings."""
         self._bratings: Dict[int, "PlayerRating"] = {}
         self._pratings: Dict[int, "PlayerRating"] = {}
+        self._avg_batter = PlayerRating(self._num_stats)
+        self._avg_pitcher = PlayerRating(self._num_stats)
 
     def update(self, delta: np.ndarray, bid: int, pid: int)\
             -> None:
         """Updates the ratings for the given players."""
         self._update(delta, self._bratings, bid)
-        self._update(-1 * delta, self._pratings, pid)
+        self._update(delta, self._pratings, pid)
+        self._avg_batter.update(delta)
+        self._avg_pitcher.update(delta)
 
     def _update(self, delta, ratings: np.ndarray, id_: int) -> None:
         if id_ not in ratings:
@@ -121,18 +125,20 @@ class PlayerRatings:
         """Returns the pairwise difference matrix for the given players."""
         brating = self.get_batter_rating(bid)
         prating = self.get_pitcher_rating(pid)
-        return np.concatenate([brating, prating], axis=None)
+        avg_pr = self._avg_pitcher.get_agg_rating()
+        avg_br = self._avg_batter.get_agg_rating()
+        return np.concatenate([brating, prating, avg_br, avg_pr], axis=None)
 
 class PlayerRating:
     """A set of rating data for a given player."""
 
-    NUM_RATINGS = 3
-
     SHORT_TERM_LENGTH = 100
     LONG_TERM_LENGTH = 1000
+    CAREER_TERM_LENGTH = 10000
 
     SHORT_TERM_WEIGHT = 1 / SHORT_TERM_LENGTH
     LONG_TERM_WEIGHT = 1 / LONG_TERM_LENGTH
+    CAREER_TERM_WEIGHT = 1 / CAREER_TERM_LENGTH
 
     def __init__(self, num_stats: int):
         self._num_stats = num_stats
@@ -143,17 +149,15 @@ class PlayerRating:
         self._short_term = np.zeros(self._num_stats)
         self._long_term = np.zeros(self._num_stats)
         self._career = np.zeros(self._num_stats)
-        self._appearances = 0
 
     def update(self, delta: np.ndarray) -> None:
         """Updates the player's ratings with the given delta."""
-        for rating, weight in [
-                (self._short_term, self.SHORT_TERM_WEIGHT),
-                (self._long_term , self.LONG_TERM_WEIGHT),
-                (self._career    , 1 / (self._appearances + 1)),
-            ]:
-            rating = weight * delta + (1 - weight) * rating
-        self._appearances += 1
+        self._short_term = self.SHORT_TERM_WEIGHT * delta \
+                + (1 - self.SHORT_TERM_WEIGHT) * self._short_term
+        self._long_term = self.LONG_TERM_WEIGHT * delta \
+                + (1 - self.LONG_TERM_WEIGHT) * self._long_term
+        self._career = self.CAREER_TERM_WEIGHT * delta \
+                + (1 - self.CAREER_TERM_WEIGHT) * self._career
 
     def get_agg_rating(self) -> np.ndarray:
         ratings = [self._short_term, self._long_term, self._career]
