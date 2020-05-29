@@ -121,12 +121,14 @@ class PlayerRatings:
         """Returns the pairwise difference matrix for the given players."""
         brating = self.get_batter_rating(bid)
         prating = self.get_pitcher_rating(pid)
-        b = np.tile(brating, (self._num_stats, 1))
-        p = np.tile(prating, (self._num_stats, 1))
+        b = np.tile(brating, (PlayerRating.NUM_RATINGS * self._num_stats, 1))
+        p = np.tile(prating, (PlayerRating.NUM_RATINGS * self._num_stats, 1))
         return b - p.transpose()
 
 class PlayerRating:
     """A set of rating data for a given player."""
+
+    NUM_RATINGS = 3
 
     SHORT_TERM_LENGTH = 100
     LONG_TERM_LENGTH = 1000
@@ -150,7 +152,7 @@ class PlayerRating:
         for rating, weight in [
                 (self._short_term, self.SHORT_TERM_WEIGHT),
                 (self._long_term , self.LONG_TERM_WEIGHT),
-                (self._career    , 1 / self._appearances),
+                (self._career    , 1 / (self._appearances + 1)),
             ]:
             rating = weight * delta + (1 - weight) * rating
         self._appearances += 1
