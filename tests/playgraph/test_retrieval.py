@@ -42,7 +42,7 @@ class TestPersistence:
         PlayGraphPersistor().ensure_consistency()
         t = LevelTraversal()
         expected_layers = [
-            (1, 9),
+            (1, 9, 78),
             (3, 11),
             (4, 13),
             (5,),
