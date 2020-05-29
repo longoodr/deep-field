@@ -49,6 +49,6 @@ while True:
         num_seen += len(level)
         if num_seen >= reset_after:
             reset_after = int(reset_after * 1.1)
-            print(f"{tot_kl_div / num_seen:.3f}")
+            print(f"{tot_kl_div / num_seen:1.3f}, {num_seen:7d}")
             num_seen = 0
             tot_kl_div = 0
