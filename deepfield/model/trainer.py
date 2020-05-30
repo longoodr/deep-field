@@ -6,7 +6,7 @@ import numpy as np
 from scipy.special import softmax
 from tensorflow.keras.layers import (Activation, Dense, Dropout, Flatten,
                                      GaussianNoise, InputLayer,
-                                     LayerNormalization)
+                                     LayerNormalization, LeakyReLU)
 from tensorflow.keras.losses import kullback_leibler_divergence as kl_div
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import Nadam
@@ -26,7 +26,7 @@ m = Sequential()
 rating_width = PlayerRatings(NUM_STATS).get_pairwise_diffs(0, 0).size
 m.add(InputLayer((rating_width,)))
 m.add(Dense(NUM_NEURONS))
-m.add(Activation("relu"))
+m.add(LeakyReLU())
 m.add(LayerNormalization())
 m.add(Dropout(0.5))
 m.add(Dense(len(Outcome)))
