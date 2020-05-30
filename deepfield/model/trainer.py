@@ -19,7 +19,7 @@ from deepfield.model.models import (Batcher, PlayerRating, PlayerRatings,
 from deepfield.playgraph.graph import LevelTraversal
 
 NUM_STATS = len(Outcome)
-NUM_NEURONS = 8192
+NUM_NEURONS = 6144
 
 init_db()
 m = Sequential()
