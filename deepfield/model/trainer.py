@@ -1,12 +1,15 @@
 from abc import ABC, abstractmethod
+from math import sqrt
 from typing import Any, Dict, Iterable, List, Tuple
 
 import numpy as np
 from scipy.special import softmax
 from tensorflow.keras.layers import (Activation, Dense, Dropout, Flatten,
-                                     InputLayer)
+                                     GaussianNoise, InputLayer,
+                                     LayerNormalization)
 from tensorflow.keras.losses import kullback_leibler_divergence as kl_div
 from tensorflow.keras.models import Sequential
+from tensorflow.keras.optimizers import Nadam
 from tensorflow.keras.utils import to_categorical
 
 from deepfield.dbmodels import init_db
@@ -16,24 +19,26 @@ from deepfield.model.models import (Batcher, PlayerRating, PlayerRatings,
 from deepfield.playgraph.graph import LevelTraversal
 
 NUM_STATS = len(Outcome)
-LAYER_LENGTHS = [32]
+NUM_NEURONS = 8192
 
 init_db()
 m = Sequential()
-rating_width = PlayerRating.NUM_RATINGS * NUM_STATS
-m.add(InputLayer((2 * rating_width)))
-for num_units in LAYER_LENGTHS:
-    m.add(Dense(num_units, activation="relu"))
-    m.add(Dropout(0.5))
+rating_width = PlayerRatings(NUM_STATS).get_pairwise_diffs(0, 0).size
+m.add(InputLayer((rating_width,)))
+m.add(Dense(NUM_NEURONS))
+m.add(Activation("relu"))
+m.add(LayerNormalization())
+m.add(Dropout(0.5))
 m.add(Dense(len(Outcome)))
 m.add(Activation("softmax"))
-m.compile("adam", kl_div)
+m.compile(Nadam(1e-9), kl_div)
 model = PredictionModel(m)
 ratings = PlayerRatings(NUM_STATS)
+m.summary()
 
 tot_seen = 0
 num_seen = 0
-reset_after = 32.0
+reset_after = 1024*256
 tot_kl_div = 0
 passes = 0
 while True:
@@ -54,9 +59,8 @@ while True:
         num_seen += len(level)
         tot_seen += len(level)
         if num_seen >= reset_after:
-            reset_after = reset_after * 1.25
             print(f"{tot_kl_div / num_seen:1.3f}, {num_seen:7d}, {passes:3d}, {tot_seen}")
-            ratings.reset()
             num_seen = 0
             tot_kl_div = 0
+            model.model.save("model")
     passes += 1
