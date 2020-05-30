@@ -6,7 +6,7 @@ import numpy as np
 from scipy.special import softmax
 from tensorflow.keras.layers import (Activation, Dense, Dropout, Flatten,
                                      GaussianNoise, InputLayer,
-                                     LayerNormalization, LeakyReLU)
+                                     LayerNormalization, PReLU)
 from tensorflow.keras.losses import kullback_leibler_divergence as kl_div
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import Nadam
@@ -19,15 +19,15 @@ from deepfield.model.models import (Batcher, PlayerRating, PlayerRatings,
 from deepfield.playgraph.graph import LevelTraversal
 
 NUM_STATS = len(Outcome)
-NUM_NEURONS = 6144
+NUM_NEURONS = 1024*12
 
 init_db()
 m = Sequential()
 rating_width = PlayerRatings(NUM_STATS).get_pairwise_diffs(0, 0).size
 m.add(InputLayer((rating_width,)))
 m.add(Dense(NUM_NEURONS))
-m.add(LeakyReLU())
 m.add(LayerNormalization())
+m.add(PReLU())
 m.add(Dropout(0.5))
 m.add(Dense(len(Outcome)))
 m.add(Activation("softmax"))
@@ -50,11 +50,14 @@ while True:
         y = Batcher.pad_batch(one_hots)
         diffs = ratings.get_node_pairwise_diffs(level)
         x = Batcher.pad_batch(diffs)
-        weights = Batcher.get_padded_weights(diffs.shape[0])
+        weights = Batcher.get_padded_weights(len(level))
         kl_divs = model.backprop(x, y, weights)
         tot_kl_div += np.sum(kl_divs)
-        for i, node in enumerate(level):
-            delta = to_categorical(node["outcome"], NUM_STATS) * kl_divs[i]
+        predictions = model.predict(x)[:len(level)]
+        for i, (node, one_hot) in enumerate(zip(level, one_hots)):
+            outcome = node["outcome"]
+            delta_scale = (one_hot - predictions[i])[outcome]
+            delta = delta_scale * one_hot
             ratings.update(delta, node["batter_id"], node["pitcher_id"])
         num_seen += len(level)
         tot_seen += len(level)
