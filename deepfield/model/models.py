@@ -127,7 +127,7 @@ class PlayerRatings:
         prating = self.get_pitcher_rating(pid)
         avg_pr = self._avg_pitcher.get_agg_rating()
         avg_br = self._avg_batter.get_agg_rating()
-        return np.concatenate([brating, prating, avg_br, avg_pr], axis=None)
+        return np.concatenate([brating - avg_br, prating - avg_pr], axis=None)
 
 class PlayerRating:
     """A set of rating data for a given player."""
