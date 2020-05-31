@@ -85,7 +85,9 @@ class AbstractPlayerRating:
         return np.concatenate([s.rating for s in self._subratings], axis=None)
 
 class AvgPlayerRating(AbstractPlayerRating):
-    """Represents the rating of the average player at a given point in time."""
+    """Represents the rating of the average player at a given point in time,
+    over several timescales.
+    """
 
     def __init__(self):
         self.short_term = AvgPlayerSubrating(1000)
@@ -95,7 +97,7 @@ class AvgPlayerRating(AbstractPlayerRating):
         super().__init__(subratings)
 
 class PlayerRating(AbstractPlayerRating):
-    """A set of rating data for a given player."""
+    """A set of rating data for a given player over several timescales."""
 
     def __init__(self, avg_rating: AvgPlayerRating):
         self.short_term = PlayerSubrating(100, avg_rating.short_term)
