@@ -56,11 +56,10 @@ class Outcome(Enum):
         """Returns an array containing the percentages corresponding to the
         occurrence rate of each outcome in the database.
         """
-        query = \
-        PlayNode.select(
+        query = (PlayNode.select(
                 PlayNode.outcome,
                 fn.count(PlayNode.outcome).alias("cnt")
-                .group_by(PlayNode.outcome)
+                ).group_by(PlayNode.outcome)
                 .namedtuples()
             )
         present_outcomes_to_cnt = {r.outcome: r.cnt for r in query}
