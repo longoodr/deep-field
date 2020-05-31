@@ -1,10 +1,10 @@
 from typing import Tuple
 
+import numpy as np
 import pytest
 
 from deepfield.enums import Outcome
 from deepfield.playgraph.retrieval import PlayGraphPersistor
-
 from tests import utils
 
 STRIKEOUT = Outcome.STRIKEOUT
@@ -71,5 +71,6 @@ def test_percentages():
     utils.insert_cubs_game()
     PlayGraphPersistor().ensure_consistency()
     p = Outcome.get_percentages()
-    pass
-    
+    exp_cnts = np.asarray([21,  8, 13, 12, 12,  4,  3,  0,  1])
+    exp_p = exp_cnts / np.sum(exp_cnts)
+    assert (p == exp_p).all()
