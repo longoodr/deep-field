@@ -8,7 +8,7 @@ from tensorflow.keras.layers import (Activation, Dense, Dropout, Flatten,
                                      GaussianNoise, InputLayer,
                                      LayerNormalization, PReLU)
 from tensorflow.keras.losses import kullback_leibler_divergence as kl_div
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.optimizers import Nadam
 from tensorflow.keras.utils import to_categorical
 
@@ -22,15 +22,7 @@ NUM_STATS = len(Outcome)
 NUM_NEURONS = 1024*20
 
 init_db()
-m = Sequential()
-rating_width = PlayerRatings(NUM_STATS).get_pairwise_diffs(0, 0).size
-m.add(InputLayer((rating_width,)))
-m.add(Dense(NUM_NEURONS))
-m.add(LayerNormalization())
-m.add(PReLU())
-m.add(Dropout(0.5))
-m.add(Dense(len(Outcome)))
-m.add(Activation("softmax"))
+m = load_model("model")
 m.compile(Nadam(1e-9), kl_div)
 model = PredictionModel(m)
 ratings = PlayerRatings(NUM_STATS)
@@ -65,5 +57,5 @@ while True:
             print(f"{tot_kl_div / num_seen:1.3f}, {num_seen:7d}, {passes:3d}, {tot_seen}")
             num_seen = 0
             tot_kl_div = 0
-            model.model.save("model")
+    model.model.save("model")
     passes += 1
