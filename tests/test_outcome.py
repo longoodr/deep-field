@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from deepfield.enums import Outcome
-from deepfield.input.retrieval import PlayGraphPersistor
+from deepfield.input.writing import InputDataPersistor
 from tests import utils
 
 STRIKEOUT = Outcome.STRIKEOUT
@@ -69,7 +69,7 @@ def test_percentages():
     with pytest.raises(RuntimeError):
         Outcome.get_percentages()
     utils.insert_cubs_game()
-    PlayGraphPersistor().ensure_consistency()
+    InputDataPersistor().ensure_consistency()
     p = Outcome.get_percentages()
     exp_cnts = np.asarray([21,  8, 13, 12, 12,  4,  3,  0,  1])
     exp_p = exp_cnts / np.sum(exp_cnts)
