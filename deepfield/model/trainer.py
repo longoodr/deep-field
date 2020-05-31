@@ -18,19 +18,20 @@ from deepfield.model.models import (Batcher, PlayerRating, PlayerRatings,
                                     PredictionModel)
 from deepfield.playgraph.graph import LevelTraversal
 
-NUM_STATS = len(Outcome)
 NUM_NEURONS = 1024*20
 
 init_db()
-m = load_model("model")
-m.compile(Nadam(1e-9), kl_div)
+ratings = PlayerRatings()
+m = Sequential()
+m.add(InputLayer(ratings.get_matchup_rating(0, 0).size))
+m.add(Dense(len(Outcome), activation="softmax"))
+m.compile("nadam", kl_div)
 model = PredictionModel(m)
-ratings = PlayerRatings(NUM_STATS)
 m.summary()
 
 tot_seen = 0
 num_seen = 0
-reset_after = 1024*256
+reset_after = 1024
 tot_kl_div = 0
 passes = 0
 while True:
@@ -39,9 +40,8 @@ while True:
         level = list(level)
         outcomes = np.asarray([n["outcome"] for n in level])
         one_hots = to_categorical(outcomes, num_classes=len(Outcome))
+        x = Batcher.pad_batch(ratings.get_matchup_ratings(level))
         y = Batcher.pad_batch(one_hots)
-        ratings = ratings.get_matchup_ratings(level)
-        x = Batcher.pad_batch(ratings)
         weights = Batcher.get_padded_weights(len(level))
         kl_divs = model.backprop(x, y, weights)
         tot_kl_div += np.sum(kl_divs)

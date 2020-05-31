@@ -77,16 +77,15 @@ class PlayerRatings:
     evaluated.
     """
 
-    def __init__(self, num_stats: int):
-        self._num_stats = num_stats
+    def __init__(self):
         self.reset()
 
-    def get_batter(self, bid: int) -> PlayerRating:
+    def get_batter(self, bid: int) -> "PlayerRating":
         if bid not in self._bratings:
             self._bratings[bid] = PlayerRating(self._avg_batter)
         return self._bratings[bid]
 
-    def get_pitcher(self, pid: int) -> PlayerRating:
+    def get_pitcher(self, pid: int) -> "PlayerRating":
         if pid not in self._pratings:
             self._pratings[pid] = PlayerRating(self._avg_pitcher)
         return self._pratings[pid]
@@ -148,7 +147,7 @@ class AbstractPlayerRating:
 
     def get_rating(self) -> np.ndarray:
         """Returns the value of this rating."""
-        return np.concatenate(self._subratings, axis=None)
+        return np.concatenate([s.rating for s in self._subratings], axis=None)
 
 class AvgPlayerRating(AbstractPlayerRating):
     """Represents the rating of the average player at a given point in time."""
@@ -214,7 +213,16 @@ class AvgPlayerSubrating(AbstractSubrating):
     over all plays in the database.
     """
 
-    _init_val = Outcome.get_percentages()
+    _init_val: np.ndarray = None
+
+    def __init__(self, plays_over: int):
+        self._ensure_init_val_set()
+        super().__init__(plays_over)
+
+    @classmethod
+    def _ensure_init_val_set(cls):
+        if cls._init_val is None:
+            cls._init_val =  Outcome.get_percentages()
 
     def _initial_value(self) -> np.ndarray:
         return self._init_val
