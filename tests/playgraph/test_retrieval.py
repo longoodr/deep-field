@@ -42,7 +42,7 @@ class TestPersistence:
         PlayGraphPersistor().ensure_consistency()
         t = LevelTraversal()
         expected_layers = [
-            (1, 9),
+            (1, 9, 78),
             (3, 11),
             (4, 13),
             (5,),
@@ -55,3 +55,4 @@ class TestPersistence:
             layer_ids = set([n["play_id"] for n in layer])
             for exp in expected_layer:
                 assert exp in layer_ids
+        assert len(list(iter(LevelTraversal()))) == 38

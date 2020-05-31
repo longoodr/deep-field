@@ -1,6 +1,11 @@
 from enum import Enum, IntFlag
 from typing import Optional
 
+import numpy as np
+from peewee import fn as fn
+
+from deepfield.dbmodels import PlayNode
+
 
 class TimeOfDay(Enum):
     DAY = 0
@@ -27,13 +32,17 @@ class OnBase(IntFlag):
 
 class Outcome(Enum):
     """Field agnostic outcomes for plays. "Field agnostic" means that outcomes
-    dependent on the field configuration should be ignored: for example, bunts.
-    This also means that errors should be treated as outs, because the errors
-    are due to the fielder and would have otherwise been an out.
+    dependent on the field configuration should be ignored, like fielder's 
+    choices. This also means that errors should be treated as outs, because the
+    errors are due to the fielder and would have otherwise been an out.
     """
 
-    """XXX Should these include wild pitches / hit by pitches? Those plays are
+    """
+    XXX Should these include wild pitches / hit by pitches? Those plays are
     technically field agnostic...
+
+    XXX How should bunts be considered? Some are field-dependent but others
+    aren't...
     """
 
     STRIKEOUT = 0
@@ -45,6 +54,29 @@ class Outcome(Enum):
     DOUBLE = 6
     TRIPLE = 7
     HOMERUN = 8
+
+    @classmethod
+    def get_percentages(cls) -> np.ndarray:
+        """Returns an array containing the percentages corresponding to the
+        occurrence rate of each outcome in the database.
+        """
+        query = (PlayNode.select(
+                    PlayNode.outcome,
+                    fn.count(PlayNode.outcome).alias("cnt")
+                ).group_by(PlayNode.outcome)
+                .namedtuples()
+            )
+        present_outcomes_to_cnt = {r.outcome: r.cnt for r in query}
+        # fill outcomes that didn't occur with 0
+        cnts = np.asarray([
+                0 if outcome not in present_outcomes_to_cnt
+                else present_outcomes_to_cnt[outcome]
+                for outcome in range(len(cls))
+            ])
+        if np.sum(cnts) == 0:
+            raise RuntimeError("No plays in database")
+        percentages = cnts / np.sum(cnts)
+        return percentages
 
     @classmethod
     def from_desc(cls, desc: str) -> Optional["Outcome"]:

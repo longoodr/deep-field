@@ -1,8 +1,11 @@
 from typing import Tuple
 
+import numpy as np
 import pytest
 
 from deepfield.enums import Outcome
+from deepfield.playgraph.retrieval import PlayGraphPersistor
+from tests import utils
 
 STRIKEOUT = Outcome.STRIKEOUT
 LINEOUT = Outcome.LINEOUT
@@ -60,3 +63,14 @@ pairs = [
 def test_outcomes(pair: Tuple[str, Outcome]):
     desc, outcome = pair
     assert Outcome.from_desc(desc) == outcome
+
+def test_percentages():
+    utils.init_test_env()
+    with pytest.raises(RuntimeError):
+        Outcome.get_percentages()
+    utils.insert_cubs_game()
+    PlayGraphPersistor().ensure_consistency()
+    p = Outcome.get_percentages()
+    exp_cnts = np.asarray([21,  8, 13, 12, 12,  4,  3,  0,  1])
+    exp_p = exp_cnts / np.sum(exp_cnts)
+    assert (p == exp_p).all()

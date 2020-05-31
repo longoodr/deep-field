@@ -143,3 +143,6 @@ dmypy.json
 
 # line count files
 .VSCodeCounter/
+
+# trained models
+model
