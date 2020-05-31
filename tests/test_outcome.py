@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from deepfield.enums import Outcome
-from deepfield.playgraph.retrieval import PlayGraphPersistor
+from deepfield.input.retrieval import PlayGraphPersistor
 from tests import utils
 
 STRIKEOUT = Outcome.STRIKEOUT

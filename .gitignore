@@ -138,7 +138,7 @@ dmypy.json
 # cached pages
 /deepfield/scraping/pages
 
-# playgraph files
+# input files
 *_playgraph*
 
 # line count files

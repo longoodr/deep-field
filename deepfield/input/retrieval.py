@@ -13,7 +13,7 @@ from peewee import chunked
 from deepfield.dbmodels import (Game, Play, PlayNode, clean_graph, db,
                                 get_db_name)
 from deepfield.enums import Outcome
-from deepfield.playgraph.graph import Node
+from deepfield.input.graph import Node
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

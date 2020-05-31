@@ -3,8 +3,8 @@ from typing import Iterable, Tuple
 import pytest
 
 from deepfield.dbmodels import Play
-from deepfield.playgraph.graph import LevelTraversal
-from deepfield.playgraph.retrieval import PlayGraphPersistor
+from deepfield.input.graph import LevelTraversal
+from deepfield.input.retrieval import PlayGraphPersistor
 from deepfield.scraping.bbref_pages import BBRefLink
 from deepfield.scraping.nodes import ScrapeNode
 from deepfield.scraping.pages import Page

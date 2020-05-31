@@ -1,7 +1,7 @@
 import argparse
 
 from deepfield.dbmodels import init_db
-from deepfield.playgraph.retrieval import PlayGraphPersistor
+from deepfield.input.retrieval import PlayGraphPersistor
 from deepfield.script_utils import config_logging, logger
 
 
