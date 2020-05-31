@@ -32,13 +32,17 @@ class OnBase(IntFlag):
 
 class Outcome(Enum):
     """Field agnostic outcomes for plays. "Field agnostic" means that outcomes
-    dependent on the field configuration should be ignored: for example, bunts.
-    This also means that errors should be treated as outs, because the errors
-    are due to the fielder and would have otherwise been an out.
+    dependent on the field configuration should be ignored, like fielder's 
+    choices. This also means that errors should be treated as outs, because the
+    errors are due to the fielder and would have otherwise been an out.
     """
 
-    """XXX Should these include wild pitches / hit by pitches? Those plays are
+    """
+    XXX Should these include wild pitches / hit by pitches? Those plays are
     technically field agnostic...
+
+    XXX How should bunts be considered? Some are field-dependent but others
+    aren't...
     """
 
     STRIKEOUT = 0
@@ -57,8 +61,8 @@ class Outcome(Enum):
         occurrence rate of each outcome in the database.
         """
         query = (PlayNode.select(
-                PlayNode.outcome,
-                fn.count(PlayNode.outcome).alias("cnt")
+                    PlayNode.outcome,
+                    fn.count(PlayNode.outcome).alias("cnt")
                 ).group_by(PlayNode.outcome)
                 .namedtuples()
             )
