@@ -2,9 +2,11 @@ import os
 from hashlib import md5
 from typing import Iterator, Optional
 
+import h5py
+DbMatchupReader
 from deepfield.dbmodels import PlayNode, clean_graph, db, get_db_name
-from deepfield.input.reading import DbPlaysToGraphIterator
-
+from deepfield.input.reading import DbMatchupReader
+from deepfield.input.ratings import PlayerRatings
 
 class InputDataPersistor:
     """Maintains a consistent on-disk input dataset by check consistency and
@@ -21,7 +23,7 @@ class InputDataPersistor:
         """
         if self.is_consistent():
             return False
-        _InputDataDbWriter().write_data()
+        _InputDataWriter().write_data()
         self._write_graph_hash()
         return True
 
@@ -60,20 +62,16 @@ class InputDataPersistor:
     def _get_db_hash(self) -> str:
         return _ChecksumGenerator(get_db_name()).get_checksum()
 
-class _InputDataDbWriter:
-    """Reads plays from the database and writes the corresponding input data to
-    the database.
-    """
+class _InputDataWriter:
+    """Reads plays from the database and writes the corresponding input data."""
 
     _PER_BATCH = 300
 
     def write_data(self) -> None:
-        clean_graph()
-        with db.atomic():
-            self._write_nodes()
+        ratings = PlayerRatings()
     
     def _write_nodes(self) -> None:
-        nodes = iter(DbPlaysToGraphIterator())
+        nodes = iter(DbMatchupReader())
         try:
             while True:
                 self._write_next_batch(nodes)
