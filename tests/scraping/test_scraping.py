@@ -49,6 +49,7 @@ PARSE_URLS: List[str] = [
     "https://www.baseball-reference.com/boxes/BAL/BAL200705070.shtml",
     "https://www.baseball-reference.com/boxes/SEA/SEA199105260.shtml",
     "https://www.baseball-reference.com/boxes/SEA/SEA201903290.shtml",
+    "https://www.baseball-reference.com/boxes/WS2/WS2197109300.shtml",
     "https://www.baseball-reference.com/players/j/jimend'01.shtml",
     "https://www.baseball-reference.com/players/s/sabatc.01.shtml",
 ]
