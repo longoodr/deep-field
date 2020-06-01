@@ -1,10 +1,12 @@
+from collections import Counter
 from enum import Enum, IntFlag
+from typing import Counter as CounterType
 from typing import Optional
 
 import numpy as np
 from peewee import fn as fn
 
-from deepfield.dbmodels import PlayNode
+from deepfield.dbmodels import Play
 
 
 class TimeOfDay(Enum):
@@ -60,23 +62,7 @@ class Outcome(Enum):
         """Returns an array containing the percentages corresponding to the
         occurrence rate of each outcome in the database.
         """
-        query = (PlayNode.select(
-                    PlayNode.outcome,
-                    fn.count(PlayNode.outcome).alias("cnt")
-                ).group_by(PlayNode.outcome)
-                .namedtuples()
-            )
-        present_outcomes_to_cnt = {r.outcome: r.cnt for r in query}
-        # fill outcomes that didn't occur with 0
-        cnts = np.asarray([
-                0 if outcome not in present_outcomes_to_cnt
-                else present_outcomes_to_cnt[outcome]
-                for outcome in range(len(cls))
-            ])
-        if np.sum(cnts) == 0:
-            raise RuntimeError("No plays in database")
-        percentages = cnts / np.sum(cnts)
-        return percentages
+        return _OutcomePercentageTracker.get_percentages()
 
     @classmethod
     def from_desc(cls, desc: str) -> Optional["Outcome"]:
@@ -137,3 +123,30 @@ class Outcome(Enum):
         if "line" in desc:
             return cls.LINEOUT
         return None
+
+class _OutcomePercentageTracker:
+
+    _percs: np.ndarray = None
+
+    @classmethod
+    def get_percentages(cls) -> np.ndarray:
+        if cls._percs is not None:
+            return cls._percs
+        query = Play.select(Play.desc).tuples().iterator()
+        ctr: CounterType[int] = Counter()
+        for (desc,) in query:
+            outcome = Outcome.from_desc(desc)
+            if outcome is None:
+                continue
+            ctr[outcome.value] += 1
+        present_outcomes_to_cnt = dict(ctr)
+        # fill outcomes that didn't occur with 0
+        cnts = np.asarray([
+                0 if outcome not in present_outcomes_to_cnt
+                else present_outcomes_to_cnt[outcome]
+                for outcome in range(len(Outcome))
+            ])
+        if np.sum(cnts) == 0:
+            raise RuntimeError("No plays in database")
+        cls._percs = cnts / np.sum(cnts)
+        return cls._percs

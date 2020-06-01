@@ -3,8 +3,11 @@ from hashlib import md5
 from typing import Iterator, Optional
 
 import h5py
+from tensorflow.keras.utils import to_categorical
 
-from deepfield.dbmodels import PlayNode, clean_graph, db, get_db_name
+from deepfield.dbmodels import (PlayNode, clean_graph, db, get_data_name,
+                                get_db_name)
+from deepfield.enums import Outcome
 from deepfield.input.ratings import PlayerRatings
 from deepfield.input.reading import DbMatchupReader
 
@@ -70,14 +73,30 @@ class _InputDataWriter:
 
     def write_data(self) -> None:
         ratings = PlayerRatings()
-    
-    def _write_nodes(self) -> None:
-        nodes = iter(DbMatchupReader())
-        try:
-            while True:
-                self._write_next_batch(nodes)
-        except StopIteration:
-            return
+        rating_shape = ratings.get_matchup_rating(0, 0).shape
+        with h5py.File("data", "w") as data_file:
+            x = data_file.create_dataset("x", (1, *rating_shape), chunks=True,
+                    maxshape=(None, *rating_shape))
+            y = data_file.create_dataset("y", (1, len(Outcome)), chunks=True,
+                    maxshape=(None, len(Outcome)))
+            for i, (bid, pid, outcome) in enumerate(iter(DbMatchupReader())):
+                self._write_matchup(i, bid, pid, outcome, ratings, x, y)
+
+    def _write_matchup(self,
+                       num: int,
+                       bid: int,
+                       pid: int,
+                       outcome: int,
+                       ratings: PlayerRatings,
+                       x: h5py.Dataset,
+                       y: h5py.Dataset
+                       ) -> None:
+        outcome_oh = to_categorical(outcome, len(Outcome))
+        x.resize(num + 1, axis=0)
+        y.resize(num + 1, axis=0)
+        x[num] = ratings.get_matchup_rating(bid, pid)
+        y[num] = outcome_oh
+        ratings.update(bid, pid, outcome_oh)
 
     @classmethod
     def _write_next_batch(cls, nodes: Iterator) -> None:

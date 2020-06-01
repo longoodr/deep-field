@@ -49,22 +49,13 @@ class Play(DeepFieldModel):
     batter_id = ForeignKeyField(Player)
     pitcher_id = ForeignKeyField(Player)
 
-class PlayNode(DeepFieldModel):
-    play_id = ForeignKeyField(Play, primary_key=True)
-    outcome = SmallIntegerField()   # plays with None outcomes don't have nodes
-    level = IntegerField()  # nodes of the same level are part of same maximal antichain
-
-_MODELS = (Game, Play, Player, Team, Venue, PlayNode)
+_MODELS = (Game, Play, Player, Team, Venue)
 
 def create_tables() -> None:
     db.create_tables(_MODELS)
     
 def drop_tables() -> None:
     db.drop_tables(_MODELS)
-
-def clean_graph() -> None:
-    db.drop_tables((PlayNode,))
-    db.create_tables((PlayNode,))
 
 def init_db() -> None:
     global _DB_NAME
@@ -77,3 +68,8 @@ def get_db_name() -> str:
     if _DB_NAME is None:
         raise RuntimeError("Database not initialized")
     return _DB_NAME
+
+def get_data_name() -> str:
+    if "TESTING" in os.environ:
+        return "test_data"
+    return "data"

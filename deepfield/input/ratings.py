@@ -32,19 +32,13 @@ class PlayerRatings:
         self._avg_batter = AvgPlayerRating()
         self._avg_pitcher = AvgPlayerRating()
 
-    def update(self, event: np.ndarray, bid: int, pid: int)\
+    def update(self, bid: int, pid: int, event: np.ndarray)\
             -> None:
         """Updates the ratings for the given players."""
         self.get_batter(bid).update(event)
         self.get_pitcher(pid).update(event)
         self._avg_batter.update(event)
         self._avg_pitcher.update(event)
-
-    def get_matchup_ratings(self, nodes: Iterable[Dict[str, int]]) -> np.ndarray:
-        """Returns the matchup ratings for the given nodes."""
-        diffs = [self.get_matchup_rating(n["batter_id"], n["pitcher_id"])
-                 for n in nodes]
-        return np.stack(diffs)
 
     def get_matchup_rating(self, bid: int, pid: int) -> np.ndarray:
         """Returns the matchup rating for the given players."""
