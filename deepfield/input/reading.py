@@ -1,9 +1,14 @@
 import logging
 from collections import Counter
+from math import floor
 from typing import Counter as CounterType
 from typing import Dict, Iterable, List, Optional, Tuple
 
-from deepfield.dbmodels import Game, Play, PlayNode
+import h5py
+import numpy as np
+from tensorflow.keras.utils import Sequence
+
+from deepfield.dbmodels import Game, Play, get_data_name
 from deepfield.enums import Outcome
 
 Matchup = Tuple[int, int, int]
@@ -63,3 +68,45 @@ class DbMatchupReader:
                 .order_by(Game.date, Play.game_id, Play.play_num)
                 .namedtuples()
             )
+
+class ReadableDatafile(h5py.File):
+    
+    def __init__(self, name: str, *args, **kwargs):
+        super().__init__(name, "r", *args, **kwargs)
+        self.x = self["x"]
+        self.y = self["y"]
+
+    def get_indices(self) -> List[int]:
+        """Returns the set of indices for this data."""
+        return list(range(len(self.x)))
+
+    def get_train_test_indices(self, split: float = 0.05) -> Tuple[List[int], List[int]]:
+        indices = self.get_indices()
+        np.random.shuffle(indices)
+        train_test_partition = int((1 - split) * len(indices))
+        train = indices[:train_test_partition]
+        test = indices[train_test_partition:]
+        return train, test
+
+
+class DataGenerator(Sequence):
+    """Reads x, y data for keras model training."""
+
+    def __init__(self, ids: List[int], batch_size: int, shuffle: bool = True):
+        self._ids = ids
+        self._batch_size = batch_size
+        self._shuffle = shuffle
+        self._df = ReadableDatafile(get_data_name())
+
+    def __len__(self):
+        return int(floor(len(self._ids) / self._batch_size))
+
+    def __getitem__(self, index):
+        indices = self._ids[index*self._batch_size:(index+1)*self._batch_size]
+        x = np.asarray([self._df.x[i] for i in indices])
+        y = np.asarray([self._df.y[i] for i in indices])
+        return x, y
+
+    def on_epoch_end(self):
+        if self._shuffle == True:
+            np.random.shuffle(self._ids)

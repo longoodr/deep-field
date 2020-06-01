@@ -23,7 +23,7 @@ def setup_module(module):
     utils.init_test_env()
 
 def teardown_module(module):
-    utils.delete_db_file()
+    utils.remove_files()
 
 class TestPageFromLink:
     

@@ -73,4 +73,4 @@ def test_percentages():
     exp_cnts = np.asarray([21,  8, 13, 12, 12,  4,  3,  0,  1])
     exp_p = exp_cnts / np.sum(exp_cnts)
     assert (p == exp_p).all()
-    InputDataPersistor().remove_files()
+    utils.remove_files()

@@ -139,7 +139,7 @@ dmypy.json
 /deepfield/scraping/pages
 
 # input files
-*_playgraph*
+*_data*
 
 # line count files
 .VSCodeCounter/

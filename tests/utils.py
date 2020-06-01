@@ -7,16 +7,17 @@ from deepfield.enums import Handedness
 from deepfield.scraping.bbref_pages import BBRefLink, GamePage
 from deepfield.scraping.nodes import ScrapeNode
 from deepfield.scraping.pages import HtmlCache, Page
-
+from deepfield.input.writing import InputDataPersistor
 
 def init_test_env() -> None:
     os.environ["TESTING"] = "True"
     init_db()
     clean_db()
 
-def delete_db_file() -> None:
+def remove_files() -> None:
     db.close()
     os.remove(get_db_name())
+    InputDataPersistor().remove_files()
 
 def clean_db() -> None:
     drop_tables()
