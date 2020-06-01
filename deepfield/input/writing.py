@@ -3,10 +3,11 @@ from hashlib import md5
 from typing import Iterator, Optional
 
 import h5py
-DbMatchupReader
+
 from deepfield.dbmodels import PlayNode, clean_graph, db, get_db_name
-from deepfield.input.reading import DbMatchupReader
 from deepfield.input.ratings import PlayerRatings
+from deepfield.input.reading import DbMatchupReader
+
 
 class InputDataPersistor:
     """Maintains a consistent on-disk input dataset by check consistency and
