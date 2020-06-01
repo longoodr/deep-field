@@ -87,3 +87,14 @@ class TestParseable:
         url = "https://www.baseball-reference.com/players/r/rodrial01.shtml"
         link = BBRefLink(url)
         page = Page.from_link(link)
+
+    def test_dup_team_names(self):
+        for url in [
+            "https://www.baseball-reference.com/boxes/WS2/WS2197109300.shtml",
+            "https://www.baseball-reference.com/boxes/CLE/CLE196007171.shtml"
+        ]:
+            link = BBRefLink(url)
+            page = Page.from_link(link)
+            assert isinstance(page, GamePage)
+            utils.insert_mock_players(page)
+            ScrapeNode.from_page(page).scrape()
