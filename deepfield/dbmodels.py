@@ -19,7 +19,7 @@ class Venue(DeepFieldModel):
     name = CharField(unique=True)
     
 class Team(DeepFieldModel):
-    name = CharField(unique=True)
+    name = CharField()
     abbreviation = FixedCharField(3)
     
 class Player(DeepFieldModel):
