@@ -1,6 +1,7 @@
 import logging
 from typing import Dict, Iterable, Optional, Set, Tuple, Type
 
+from deepfield.scraping.bbref_pages import MissingPlayDataError
 from deepfield.scraping.pages import InsertablePage, Link, Page
 from lru import LRU
 
@@ -48,6 +49,8 @@ class ScrapeNode:
             try:
                 page = Page.from_link(link)
                 num_scraped += ScrapeNode.from_page(page).scrape()
+            except MissingPlayDataError:
+                logger.warning(f"{page} is missing play data, skipping.")
             except Exception:
                 logger.exception(f"Could not scrape {page}, skipping.")
         return num_scraped

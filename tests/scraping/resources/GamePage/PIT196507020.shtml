@@ -1,0 +1,1756 @@
+
+<!DOCTYPE html>
+<html data-version="klecko-" data-root="/home/br/build" itemscope itemtype="https://schema.org/WebSite" lang="en" class="no-js" >
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0" />
+    <link rel="dns-prefetch" href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181" />
+
+<!-- no:cookie fast load the css.           -->
+<script>function gup(n) {n = n.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]'); var r = new RegExp('[\\?&]'+n+'=([^&#]*)'); var re = r.exec(location.search);   return re === null?'':decodeURIComponent(re[1].replace(/\+/g,' '));}; document.srdev = gup('srdev')</script>
+<link rel="preconnect" href="https://d2p3bygnnzw9w3.cloudfront.net" crossorigin>
+<link rel="preconnect" href="https://d3k2oh6evki4b7.cloudfront.net" crossorigin>
+ <style>html,body{margin:0;padding:0;font:14px/1.25 "Helvetica Neue",helvetica,arial,sans-serif;color:#000}body{position:relative;background:#c9cbcd;z-index:0;-webkit-text-size-adjust:none;-moz-text-size-adjust:none;-ms-text-size-adjust:none}a img{border:0}ul,li,ol{margin:0;padding:0;list-style-type:none}table th,table td{border:0}iframe{max-width:100%}code{background:#eee}a,button,input,select,textarea,label,summary{touch-action:manipulation;-ms-touch-action:manipulation}::selection{background:#ff0;text-shadow:none}html.no-js .hasmore,html.no-js .js,html.js .no-js,html.no-js button,html.is_build .hide_build,html.is_dev .hide_dev,html.is_live .hide_live{display:none!important}.js-select{visibility:hidden}a[href]{color:#34d}a[href]:visited{color:#848}a[href]:hover{color:#5e44b3}a[href]:active{color:#b12}a[href^="tel:"]::before{content:"\260E";display:inline-block;margin-right:0}a[href^="mailto:"]::before{content:"\2709";display:inline-block;margin-right:0}.icon_group a[href^="tel:"]:before,.icon_group a[href^="mailto:"]:before{content:""}.screen_only{display:initial}.user_logged_in .not_logged_in,.logged_in,.sr_cpi_control,.print_only{display:none}#perflog,#modernizr,.user_logged_in .logged_in{display:block}h2{color:#000;margin-bottom:5px;font-size:1.5em}img.right{float:right;margin:0 0 5px 5px}img.left{float:left;margin:0 15px 15px 0}sup{font-size:.75em;position:relative;top:-0.4em;vertical-align:baseline}#wrap{width:100%;background:#fff;position:relative}#wrap>div,#wrap>ul{width:100%;position:relative;clear:both}.hidden-iso,.hidden,#content .hidden,.gutterad,.more,.print_only,#warnings.hide,#nag_devs{display:none}#inner_nav.hidden{visibility:hidden}.float_wrap{overflow:hidden}#header{overflow:visible;background:#efedee;border-bottom:3px solid #cf2036;min-height:50px}#header img{height:25px;float:left;padding:8px 0 8px 2%;max-width:71%;max-width:calc(95% - 80px)}#header #nav_trigger{display:block;cursor:pointer;float:right;padding:7px 2% 7px 1%;height:30px}#header #nav_trigger a{color:#cf2036;font-size:20px;font-weight:bold;text-decoration:none;display:inline-block}#header #nav_trigger a:before{color:#cf2036;content:"\2630 ";font-weight:normal}#header #nav{display:none;clear:both;width:88%;background:#fff;padding:7px 6% 0;border-bottom:3px solid #cf2036;border-top:3px solid #cf2036;overflow:hidden;font-size:12px}#header #nav .usertools{font-weight:bold;font-size:12px;margin:0 0 4px;padding:7px 6% 0;border-top:1px solid #c9cbcd}#header #nav .breadcrumbs{font-size:12px;padding:7px 6%;border-top:1px solid #c9cbcd}#header #nav_trigger.open{background:#cf2036}#header #nav_trigger.open a{color:#fff}#header #nav_trigger.open a:before{color:#fff}#header #nav.open{display:block}#header .social{margin:15px 0;display:none}#header.open_search{margin-bottom:50px}#header #subnav{display:none}#translations{background-color:#ffa;padding:4px 0;text-align:center;display:none}#translations.show{display:block}#translations .closer{top:4px}#translations .langs{display:inline-block}#translations .links{margin:0 35px 0 0}#translations .links>div{display:inline-block}#translations .links .welcome{font-weight:bold}#header .search{margin-top:10px;clear:both;padding:0 2% 6px}#header .search input,#header .search input:active,#header .search input:focus{height:32px;font-size:20px}.search input[type="search"]{padding:4px 5px;border:#747678 1px solid;width:73%;margin-right:2%}.search input[type="search"].prefilled{background-color:#ffa}.search input[type="submit"]{float:right;background:#cf2036;color:white;border:1px solid #747678;padding:0;border-radius:5px;height:24px;width:25%;width:calc(25% 0 2px)}.search input[type="submit"]:hover{text-decoration:underline}.search input[type="submit"]:active{background-color:#454041}.search .ac-outline{width:73%;margin-right:2%}.search .ac-outline input[type="search"]{width:100%;margin:0}@media screen and (-webkit-min-device-pixel-ratio:0) and (max-width:400px){#header .search input,#header .search input:active,#header .search input:focus{height:32px;font-size:20px}}#wrap>#info{width:96%;margin:0 auto;padding-bottom:10px}#info .opener,#info .opener:active,#inner_nav div .opener{color:#900;font-weight:bold;clear:both;width:100%;text-align:left;padding:10px 0;border:0;background:transparent}#info button#meta_more_button{border:1px solid #c9cbcd;background-color:#efedee;padding:.5em;margin:.5em 0;text-align:center;width:100%;max-width:400px;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;display:none}#info button#meta_more_button.show{display:inline-block}#info #meta>div>p:nth-child(n+6){display:none}#info.open #meta>div>p:nth-child(n+6){display:block}#info #meta .opener{display:none}#info #meta{margin-top:10px;overflow:hidden}#info #meta p{font-size:.93em;margin:3px 0}#info #meta>div.media-item{float:right;margin-left:10px;width:70px}#info #meta>div.media-item.country{width:100px;height:75px}#info #meta>div.media-item.country .flag{width:100%;height:100%;background-size:100%}#info .media-item img{width:100%;height:auto;border:1px solid black;box-sizing:border-box}#info .media-item img.additional{display:none}#info .media-item.logo img,.bbr #info .media-item img,.cbb #info .media-item img{border:0}#info #meta .media-item p{margin:3px 0;font-size:.785em;font-style:italic}#info #meta .media-item.loader p{visibility:hidden}#info h1{margin-top:0;margin-bottom:5px;line-height:1.1em;font-size:1.5em}#info h1+p{margin-top:5px}#info #bling{margin:6px 1% 6px 0;color:#fff;height:24px;overflow:hidden;float:left;width:88%;display:grid;grid-gap:5px 4px;grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}#info.teams #bling{width:100%}#info #bling li{padding:4px 1.25%;text-align:center;position:relative;height:15px;background:#82081b;font-size:.85em;word-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:5px;display:inline-block;width:27%;margin-bottom:5px}#info.teams #bling li{width:45%}#bling li a{color:inherit}#info #bling li.bling_hof{background-color:#ffdb1c;color:#000}#info #bling li.bling_all_star{background-color:#c9cbcd;color:#454041}#info #bling li.bling_hof,#info.teams #bling li.bling_all_star,#info.teams #bling li.bling_champ{grid-column-end:span 2}#info #bling li.important{grid-column-end:span 2}#info #bling li.special{background-color:#ffdb1c;color:#000}#info #bling li.all_star{background-color:#c9cbcd;color:#454041}#info.open #bling{height:auto;width:100%;margin-right:0;float:none;overflow:visible}@supports(display:grid){#info #bling li,#info.open #bling li,#info.teams #bling li{width:auto!important;margin-bottom:0!important}}.uni_holder{margin:3px 0;float:none;width:100%;position:relative}#info .uni_holder{float:left}#bling+.uni_holder{width:11%}#info.open #bling+.uni_holder{width:100%;overflow:visible;float:none;margin-bottom:5px}.uni_holder>a{display:inline-block;position:relative;height:auto;width:28px;margin-bottom:3px;margin-right:.3em;text-decoration:none;overflow:hidden}.uni_holder svg{height:28px;width:28px}.uni_holder svg.jersey{height:35px}.uni_holder svg text{font-size:1.8em;font-weight:bold}.uni_holder svg text.string{font-size:1.3em}.uni_holder svg.jersey text{font-size:1.5em}.uni_holder svg.jersey text.string{font-size:.7em}#info #bling+.uni_holder>a{display:none}#info .uni_holder>a.default,#info.open .uni_holder>a,#info #bling+.uni_holder>a.default{display:inline-block}#info .uni_holder .counter{display:none;position:absolute;height:14px;width:18px;border-radius:50%;color:#fff;font-weight:bold;font-size:10px;top:-4px;left:18px;background:black;text-align:center;border:0;padding:4px 0 0;cursor:pointer;text-overflow:inherit}#info .uni_holder .counter:after{content:'';padding:0;font-size:0}#info #bling+.uni_holder .counter{display:block}#info.open #bling+.uni_holder .counter{display:none}#info.open #bling+.uni_holder>a{display:inline-block}#info.open .uni_holder>a{display:inline-block;width:33px}#info.open .uni_holder svg{height:33px;width:33px}#info.open .uni_holder svg.jersey{height:41px}.stats_pullout{overflow:hidden;text-align:center;width:96%;margin:0 auto 15px 0;padding-top:6px}.stats_pullout>div{float:left}.stats_pullout>div:first-child{text-align:left}.stats_pullout>div.p2,.stats_pullout>div.p3{display:none}.stats_pullout>div>div{float:left;margin-left:15px}.stats_pullout>div>div.p2{display:none}.stats_pullout>div:first-child>div{margin-left:0}.stats_pullout h4{color:#900;margin:2px 0;font-size:.785714286em;text-align:center}.stats_pullout p{margin:2px 0;font-size:1.1em}.stats_pullout .caption{clear:both;text-align:left}@media screen and (min-width:520px){.stats_pullout>div.p2{display:block}}@media screen and (min-width:600px){.stats_pullout>div{border-left:1px solid #c9cbcd;margin-left:10px}.stats_pullout>div:first-child{border-left:none;margin-left:0}}@media screen and (min-width:736px){.stats_pullout>div.p2{display:none}}@media screen and (min-width:800px){.stats_pullout>div.p2{display:block}.stats_pullout>div>div.p2{display:block}}.opener{cursor:pointer;position:relative;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.opener:after{content:"\25BC";font-size:.75em;padding-left:5px;display:inline-block;text-decoration:none}.opener.open:after{content:"\25B2"}.note .opener{white-space:normal}.toggleable{display:none}.toggleable.open{display:block}tr.toggleable.open{display:table-row}table.toggleable.open{display:table}span.toggleable.open{display:inline}.hoverer{cursor:pointer}.hoverer:after{content:"\25BC";position:absolute;top:7px;right:0}html.no-touchevents .hoverer:hover:after{content:"\25B2"}ul.news_stories>li{margin:5px 10px 0 0;float:none}ul.news_stories.more{display:none}ul.news_stories.more.open{display:block}.bullets{padding-left:20px}.bullets>li{margin-left:0;margin-bottom:6px}ul.bullets>li{list-style-type:disc}ol.bullets>li{list-style-type:decimal}.bullets-inline>li{display:inline-block;margin-right:9px;margin-bottom:10px}.bullets-inline>li:after{content:"\00B7";margin-left:9px}.bullets-inline>li:last-child:after{content:"";margin-left:0}.bullets-inline>li.logged_in{display:none}.user_logged_in .bullets-inline>li.logged_in{display:inline-block}.desc{font-style:italic;font-size:.93em}.hilite{background-color:#ffa}.modified,.modified *{background-color:#f5f5f5}tr.hilite th,tr.hilite td{background-color:#ffa}.callout{margin:10px 0;padding:10px 15px;border:1px solid #aaa;background:#454041;color:#c9cbcd;font-size:1.1em}.callout a{color:#b3beff}.callout a:visited,.callout a:active{color:#a4adff}.callout a:hover,.callout a:visited:hover,.callout a:active:hover{color:#c4cfff}.callout.light{border-color:#404542;background:#c9cbcd;color:#404452}.callout.light a{color:#34d}.callout.light a.button,.callout.light a.button:hover{color:white}.callout.light a:hover{color:#5e44b3}.callout.light h3{background-color:transparent}.note{color:#444;font-size:.92em}.header{font-weight:bold;font-size:1.16em}.pagelog{width:90%;overflow:scroll}.preformatted-desc{width:90%;overflow:auto}.callout.stathead_player_highlight{background:#fff;border:1px solid #7e3e89;text-align:center}.stathead_player_highlight .cta{font-size:90%}.stathead_player_highlight .button.stathead_button{background-color:#7e3e89;display:none}.stathead_player_highlight img{max-width:300px}.stathead_player_highlight .stathead_player_highlight_content>div:first-child{margin-bottom:.25em}@media screen and (min-width:736px){.callout.stathead_player_highlight{display:grid;grid-template-columns:minmax(205px,1fr) 4fr minmax(175px,1fr);grid-column-gap:10px;align-items:center}.stathead_player_highlight .button.stathead_button{display:block}.stathead_player_highlight img{width:100%}}#info .adblock{display:none}.adblock{overflow:hidden}.adblock>p{font-size:.93em;margin:2px 0}.adblock img{display:block;margin:0 auto}.adblock{background-color:white;text-align:center}.adblock.ad728{display:none}body.hr #srcom .adblock.ad728{display:block}.adblock.ad300{padding:10px}.adblock.grouped{float:left;padding:0}.adblock.ad300.grouped{float:none;padding:10px}.adblock.rails{display:none}#div-gpt-ad-728x90-BTF-1{max-height:340px}@media screen and (min-width:481px){.adblock.ad300{padding:10px 0}}@media screen and (min-width:800px){.adblock.ad728{display:block;float:none;margin-bottom:10px}.adblock.ad300{display:none}.adblock.grouped.ad728{display:none}.adblock.grouped.ad300{float:left;width:320px;background:0;padding:0;display:block}}@media screen and (min-width:1810px){.adblock.rails{display:block;height:600px;width:160px;background-color:transparent;position:absolute;top:96px}.adblock.rails.left{left:0}.adblock.rails.right{right:0}}@media screen and (max-width:330px){.adblock{padding:0}.adblock.grouped{padding:0}.adblock.ad300.grouped{padding:0}}.button{background-color:#82081b;padding:10px 15px;color:white;text-decoration:none;display:inline-block;text-align:center;font-size:1.1em;margin:10px 0;border-radius:5px;cursor:pointer}.button.stathead_button{background-color:#7e3e89}.button:active,.button:visited,a.button,a.button:visited,a.button:hover{color:white}.button.alt{background:#cf2036;border:#747678 1px solid;display:block}button.tooltip,button.modal{background:transparent;border:0;text-align:left;padding:0;color:#900}.button2{display:inline-block;border:1px solid #c9cbcd;border-radius:3px;background-color:#efedee;font-size:.93em;font-weight:normal;margin:0 8px 0 0;padding:8px 12px;width:auto;text-align:center}#meta .button2{font-size:.785714286em;margin:0 6px 0 0;padding:8px 7px}.button2[href]{text-decoration:none}.button2.next{text-align:right}.button2.prev{text-align:left}.button2.index,.button2.index:hover,.button2.index:active,.button2.index:visited{background-color:#454041;color:#fff}.button2.index:hover{color:#ccc}.button2.current{text-align:left;background-color:#fff;border:0;font-weight:bold;padding-left:0;padding-right:0;margin-left:-8px;margin-right:0}.button2:last-child{margin-right:0}.button2.next:after{content:"\203A\203A";padding-left:6px;color:black}.button2.prev:before{content:"\2039\2039";padding-right:6px;color:black}#info_box div.prevnext{margin-left:1em}.prevnext{margin:10px 0 15px 0}#content .prevnext>*{margin:.25em}#header #main_nav{color:#454041;overflow:hidden}#header #main_nav>li{border-top:1px solid #c9cbcd}#header #main_nav>li:first-child{border-top:0}#header #main_nav>li>a{display:block;padding:8px 0 8px 6%;font-weight:bold;text-decoration:none;font-size:1.4em}html.no-touchevents #header #main_nav>li:active{background-color:#454041}#header #main_nav>li:active>a{color:#efedee}#header #main_nav li.current{background-color:#cf2036}#header #main_nav li.current>a{color:#efedee}#header #main_nav h4{margin:4px 0}#header #main_nav h4:first-child{margin-top:0}#header #main_nav .nm{display:none}#header #main_nav>li>div{display:none;width:98%;position:absolute;top:100%;left:0;z-index:200;border-top:1px solid #454041;padding:1%;background:#fff;font-size:14px;font-weight:normal;box-shadow:0 6px 12px -3px #454041;color:black}#header #main_nav>li.drophover>div{display:block;line-height:initial}#main_nav td{padding:3px}#main_nav .end_links{clear:both}#main_nav .list{margin:0 0 8px;padding:3px;overflow-x:hidden;text-overflow:ellipsis}#main_nav div.list span{font-weight:bold;display:inline-block}#header_leaders div.list span{min-width:70px}#main_nav .game_summary td{padding:1px}@media screen and (max-width:1019px){#header #main_nav>li>div.mobile_list{display:block;position:relative;top:auto;box-shadow:none;border:0;padding:0 0 0 12%}#header #main_nav>li>div.mobile_list strong.desc{display:none}#header #main_nav>li>div.mobile_list div.list{width:90%;line-height:2em}}.ac-outline{display:inline-block}.ac-wrapper{position:relative}.ac-prompt{position:absolute;font-size:16px;color:#454041;top:0;left:0;overflow:hidden;background:transparent}.ac-input:focus,.ac-input:active,.ac-hint:focus,.ac-input,.ac-hint{font-size:16px;background-color:#fff;width:100%;outline:0;border:0;margin:0;padding:0}.ac-input:focus,.ac-input:active,.ac-input{background-color:transparent}.ac-input{vertical-align:top;position:relative;color:#454041}.ac-hint{position:absolute;top:0;left:0;border-color:transparent;box-shadow:none;color:#747678}.ac-dropdown{position:absolute;visibility:hidden;padding:.5em 0;font-size:16px;background-color:#fff;z-index:100;cursor:default;overflow-x:hidden;overflow-y:scroll;width:calc(100% - 2px);min-width:380px;border:#aaa 1px solid;border-top:0}.ac-dropdown>div:first-of-type>.ac-results-header{padding-top:0}.ac-results-header{font-size:1em;padding:.35em .5em;font-weight:700}.ac-suggestion{cursor:pointer;padding:.35em 1em;font-size:1em;line-height:1em;border-top:1px solid #fff;border-bottom:1px solid #fff}.ac-suggestion p{margin:0}.ac-suggestion.active,.ac-suggestion.active .search-results-item{color:#b12;font-weight:bold}.search-results-item em{font-style:normal;border-bottom:1px dotted}.ac-suggestion.ac-is-under-cursor,html.no-touchevents .ac-suggestion:hover{border-top:1px solid #aaa!important;border-bottom:1px solid #aaa!important;background-color:#ffa!important}.ac-suggestion .subhead{margin-left:.5em;padding-top:.25em;display:block;font-size:.75em}.ac-suggestion-other-search{font-size:1em;line-height:1.2em;padding-left:.5em;color:#34d}.player_select_name{font-size:16px}.player_select_name button{font-size:2em;margin-left:10px;vertical-align:middle}.player_select_name strong{display:inline-block}.pi_forms .group input[type="search"]{max-width:none;height:auto;font-size:16px;padding-bottom:3px}.pi_forms .ac-outline{width:100%;max-width:520px}@media screen and (max-width:480px){.ac-dropdown{min-width:310px}#desc_container{font-size:12px}}@media screen and (min-width:400px){#info h1 span{display:inline-block}#info h1 span.header_end{display:inline}}@media screen and (min-width:481px){#header #nav_trigger a{font-size:24px}#header img{height:28px}#info #meta>div.media-item{width:92px}#info #meta>div.media-item.logo{width:118px}#info #meta>div.media-item.country{width:140px;height:105px}#info #meta>div>p:nth-child(6){display:block}#info #meta>div>p:nth-child(7){display:block}#info h1{font-size:1.7em}.button2,.button2.current{padding:8px 12px;margin:0 20px 0 0}}@media screen and (min-width:600px){#info #bling{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}#info.open #bling li{width:19.5%}#meta .button2{font-size:.93em;margin:0 20px 0 0;padding:8px 12px}}@media screen and (max-width:735px){.no_mobile{display:none}}@media screen and (min-width:736px){.mobile_only{display:none}#wrap>#header{width:100%;padding-left:0;padding-right:0;border-bottom:0}#wrap>#srcom{width:99%;margin:0 auto}#wrap>#info{width:65%;width:calc(99% - 322px);margin:0 auto;padding-right:320px;min-height:270px}#info .adblock{display:block;position:absolute;top:0;right:0;height:270px;width:300px;padding:0}h2{font-size:1.8em;line-height:1.2em}#info h1{font-size:2em;line-height:1.1em}#info #meta{min-height:auto}#info#general #meta{min-height:auto}#info.open #bling li{width:28%}}@media screen and (min-width:800px){#info #meta>div{float:left;width:100%}#info #meta>div.media-item{float:left;margin-left:0;margin-right:10px}#info #meta>div.media-item+div{width:85%;width:calc(100% - 102px)}#info #meta>div.media-item.logo+div{width:calc(100% - 128px)}#info #meta>div.media-item.country+div{width:calc(100% - 160px)}#info #meta>div>p.opener{max-width:75%}#info.open.teams #bling li{width:45%}}@media screen and (min-width:1020px){#header #nav_trigger{display:none}#wrap>#header{border-bottom:2px solid #cf2036;overflow:visible;height:126px;background:#fff}#header img{position:absolute;top:22px;height:auto;max-height:55px;max-width:35%}#header #nav{display:block;width:100%;padding:0;margin:0;clear:none;background:#efedee;border-top:1px solid #c9cbcd;border-bottom:0;overflow:visible;height:30px;position:absolute;bottom:0}#header #nav>*{display:none}#header #nav>#main_nav{display:block;color:#454041;text-align:left;margin-bottom:0;border:0;overflow:visible}#header #main_nav ul{border:0;position:relative}#header #main_nav>li{border:0;width:auto;white-space:nowrap;float:left;color:#454041;font-size:1.16666667em;font-weight:bold;height:14px;padding:8px 1.7%;line-height:12px}#header #main_nav>li>a{color:#454041;padding:0;position:relative;font-size:1em}#header #main_nav>li.current>a{color:#fff}#header #main_nav>li.nm{display:block}#header #main_nav>li.m{display:none}#header #main_nav>li.hasmore>a:after{content:"";display:none}#header #main_nav>li.hasmore.drophover>a:after{content:"";display:none}#header #main_nav li:nth-child(even){border:0}#header #main_nav>li.drophover,#header #main_nav>li:not(.hasmore):hover,#inner_nav>ul>li.drophover{background:#454041}#header #main_nav>li.drophover>a,#header #main_nav>li:not(.hasmore):hover>a,#inner_nav>ul>li.drophover>a{color:#fff}#header #main_nav>li.drophover>span,#header #main_nav>li:not(.hasmore):hover>span,#inner_nav>ul>li.drophover>span{color:#fff}#header #main_nav>li>div>ul{overflow:hidden;margin-top:10px;margin-bottom:10px}#header #main_nav>li>div>ul>li{width:18%;margin-right:2%;margin-bottom:8px;float:left}html.no-touchevents .hasmore>div{position:absolute;left:-999em}html.no-touchevents .hasmore.drophover>div{z-index:69;left:0;box-shadow:0 6px 12px -3px #454041}#header #subnav{display:block;color:#c9cbcd;background-color:#454041;width:100%;padding:0;height:22px}#header #subnav>li{font-size:.785714286em;float:left;padding:2px 10px 2px;margin-top:3px;position:relative;border-left:1px solid #747678;height:12px}#header #subnav>li.user .username{display:inline-block;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:12px;vertical-align:text-bottom;padding-left:3px;margin-top:-7px}#header #subnav>li:first-child{display:block;border-left:none}#header #subnav>li:nth-child(9){display:none}#header #subnav>li:nth-child(n+10){float:right;border-left:none;border-right:1px solid #747678}#header #subnav>li:last-child{display:none}#header #subnav>li:last-child(2){border-right:0}#header #subnav>li.current a{color:#fff}#header #subnav li a{color:#c9cbcd;text-decoration:none}#header #subnav li a:hover{color:#fff;text-decoration:underline}#header #subnav li svg{vertical-align:top;margin-top:-2px}#header .search{position:relative;float:right;padding:0;width:60%;max-width:700px;clear:none;margin-right:12px;margin-top:17px}#wrap #info{overflow:hidden;margin-bottom:8px}#info #meta{margin-top:0;margin-bottom:10px;padding-top:15px;float:left;width:70%;width:calc(100% - 265px)}#info #bling,#info.open #bling,#info.teams #bling{float:right;width:250px;height:auto;margin-top:10px;margin-right:0;grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}#info #bling li,#info.open #bling li{width:45%}#info.teams #bling li,#info.open.teams #bling li{width:92%}#info #meta>div>p.opener{display:none}#info #meta>div>p:nth-child(6){display:none}#info #meta>div>p:nth-child(7){display:none}#info.teams #meta>div>p:nth-child(n+6){display:block}#info.teams #meta>div>p:nth-child(n+11){display:none}#info.teams.open #meta>div>p:nth-child(n+11){display:block}#info.leagues #meta>div>p:nth-child(n+6){display:block}#info.leagues #meta>div>p:nth-child(n+11){display:none}#info.leagues.open #meta>div>p:nth-child(n+11){display:block}#info .adblock>div{margin-top:2px}.uni_holder{float:right;clear:right;width:250px;margin-top:10px}.uni_holder>a{border-width:5px;float:none;width:42px;margin-right:.3em}.uni_holder svg{height:42px;width:42px}.uni_holder svg.jersey{height:52px}#info .uni_holder{float:right}#info .uni_holder>a,#info #bling+.uni_holder>a{display:inline-block}#bling+.uni_holder,#info.open #bling+.uni_holder{margin-top:0;width:250px;float:right}#info #bling+.uni_holder .counter{display:none}#info.open .uni_holder>a{width:42px}#info.open .uni_holder svg{height:42px;width:42px}#info.open .uni_holder svg.jersey{height:52px}.stats_pullout>div.p3{display:block}#bling li:after{content:"";position:absolute;top:-110%;left:-210%;width:150%;height:200%;opacity:0;transform:rotate(10deg);background:rgba(255,255,255,0.13);background:linear-gradient(to right,rgba(255,255,255,0.13) 0,rgba(255,255,255,0.13) 77%,rgba(255,255,255,0.5) 92%,rgba(255,255,255,0.0) 100%)}#bling li:hover:after{opacity:1;top:-63%;left:-26%;transition-property:left,top,opacity;transition-duration:.7s,0.7s,0.15s;transition-timing-function:ease}#bling li:active:after{opacity:0}.adblock.ad728{display:block;float:left}.adblock.grouped.ad300{display:none}}@media screen and (min-width:1160px){#header #main_nav>li{padding:8px 2.2%}#info #meta>div.media-item{margin-right:20px;width:92px}#info #meta>div.media-item.logo{margin-right:10px;width:125px}#info #meta>div.media-item.country{width:160px;height:120px}#info #meta>div.media-item.logo>img{height:125px;width:125px}#info #meta>div.media-item+div{width:calc(100% - 112px)}#info #meta>div.media-item.logo+div{width:calc(100% - 135px)}#info #meta>div.media-item.country+div{width:calc(100% - 180px)}#info #meta>div.media-item.multiple:hover img.additional{display:block}#info #meta>div.media-item.multiple:hover{position:fixed;z-index:200;width:auto;background-color:rgba(200,200,200,0.8);padding:5px;border:1px solid black}#info #meta>div.media-item.multiple:hover+div{margin-left:112px}#info #meta>div.media-item.multiple:hover img{width:92px;float:left;margin-right:10px}#info #meta>div.media-item.multiple:hover img:last-child{margin-right:0}#info #meta>div.media-item.multiple:hover:after{content:'Order may not be chronological';font display:block;background:rgba(200,200,200,1);float:right;clear:left;padding:2px 5px;font-size:.83em}.stats_pullout>div>div{margin-left:21px}.stats_pullout p{font-size:1em}:lang(en) #info #meta>div.media-item.multiple:hover:after{content:"Order may not be chronological"}:lang(es) #info #meta>div.media-item.multiple:hover:after{content:"El orden no puede ser cronológico"}:lang(fr) #info #meta>div.media-item.multiple:hover:after{content:"L'ordre peut ne pas être chronologique"}:lang(pt) #info #meta>div.media-item.multiple:hover:after{content:"A ordem pode não ser cronológica"}:lang(de) #info #meta>div.media-item.multiple:hover:after{content:"Reihenfolge darf nicht chronologisch sein"}#header #subnav>li:nth-child(9){display:block}#header #subnav>li.user .username{max-width:160px}}@media screen and (min-width:1478px){#wrap{width:1450px;border-left:1px solid #747678;border-right:1px solid #747678;box-shadow:0 0 27px #454041;margin:0 auto}.sr_expanded>#wrap{width:100%;border:0;box-shadow:none}#header #subnav>li:last-child{display:block}#info #meta>div>p:nth-child(6){display:block}#info #meta>div>p:nth-child(7){display:block}}.f-i,#footer,#content,#inner_nav,#srcom{display:none}</style>
+<link rel="preload"    href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005291/css/br/sr-min.css" as="style"    crossorigin>
+<link rel="stylesheet" href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005291/css/br/sr-min.css" media="print" crossorigin
+      onload="if (document.srdev) { this.href = 'https://d2p3bygnnzw9w3.cloudfront.net/nocdn/dev/'.concat(document.srdev.substr(0,2),'/css/br/sr.css'); }; this.media='all'">
+<noscript><link href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005291/css/br/sr-min.css"  rel="stylesheet" type="text/css" /></noscript>
+<link rel="preload"    href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005291/js/br/sr-min.js" as="script" crossorigin>
+
+
+<script class="allowed">var sr_is_production = true;
+function vjs_getUrlParameter(e){e=e.replace(/[\[]/,"\\[").replace(/[\]]/,"\\]");var t=new RegExp("[\\?&]"+e+"=([^&#]*)").exec(location.search);return null===t?"":decodeURIComponent(t[1].replace(/\+/g," "))}document.lang="","/es/"===window.location.pathname.substr(0,4)?document.lang="es":"/pt/"===window.location.pathname.substr(0,4)?document.lang="pt":"/fr/"===window.location.pathname.substr(0,4)?document.lang="fr":"/it/"===window.location.pathname.substr(0,4)?document.lang="it":"/de/"===window.location.pathname.substr(0,4)?document.lang="de":(window.location.pathname.substr(0,4),document.lang="en"),vjs_getUrlParameter("lang")&&(document.lang=vjs_getUrlParameter("lang")),document.srdev=null,vjs_getUrlParameter("srdev")&&(document.srdev=vjs_getUrlParameter("srdev"));var log_performance=!0,is_new_jscss_version=!1,sr_detect_operaMini=-1<navigator.userAgent.indexOf("Opera Mini");sr_detect_operaMini&&((el=document.querySelector("html")).className=el.className.concat(" operamini"));var sr_detect_firefox=-1<navigator.userAgent.indexOf("Firefox");sr_detect_firefox&&((el=document.querySelector("html")).className=el.className.concat(" firefox"));var sr_detect_firefoxMobile=-1<navigator.userAgent.indexOf("Firefox")&&(-1<navigator.userAgent.indexOf("Mobile")||-1<navigator.userAgent.indexOf("Tablet"));sr_detect_firefoxMobile&&((el=document.querySelector("html")).className=el.className.concat(" firefox-mobile"));var el,sr_detect_ie=function(){var e=window.navigator.userAgent;if(0<e.indexOf("Trident/7.0"))return 11;if(0<e.indexOf("Trident/6.0"))return 10;if(0<e.indexOf("Trident/5.0"))return 9;for(var t=3,n=document.createElement("div"),r=n.getElementsByTagName("i");n.innerHTML="\x3c!--[if gt IE "+ ++t+"]><i></i><![endif]--\x3e",r[0];);return 4<t&&t}(),sr_detect_edge=!sr_detect_ie&&!!window.StyleMedia,sr_detect_safari=/Safari/.test(navigator.userAgent)&&/Apple Computer/.test(navigator.vendor),className="no-js";(el=document.querySelector("html")).classList?el.classList.remove(className):el.className=el.className.replace(new RegExp("(^|\\b)"+className.split(" ").join("|")+"(\\b|)","gi")," "),el.className=el.className.concat(" js"),function(a,u,m){function f(e,t){return typeof e===t}function p(e){return"function"!=typeof u.createElement?u.createElement(e):y?u.createElementNS.call(u,"http://www.w3.org/2000/svg",e):u.createElement.apply(u,arguments)}function o(e,t,n,r){var o,i,a,s,l="modernizr",c=p("div"),d=function(){var e=u.body;return e||((e=p(y?"svg":"body")).fake=!0),e}();if(parseInt(n,10))for(;n--;)(a=p("div")).id=r?r[n]:l+(n+1),c.appendChild(a);return(o=p("style")).type="text/css",o.id="s"+l,(d.fake?d:c).appendChild(o),d.appendChild(c),o.styleSheet?o.styleSheet.cssText=e:o.appendChild(u.createTextNode(e)),c.id=l,d.fake&&(d.style.background="",d.style.overflow="hidden",s=_.style.overflow,_.style.overflow="hidden",_.appendChild(d)),i=t(c,e),d.fake?(d.parentNode.removeChild(d),_.style.overflow=s,_.offsetHeight):c.parentNode.removeChild(c),!!i}function h(e){return e.replace(/([a-z])-([a-z])/g,function(e,t,n){return t+n.toUpperCase()}).replace(/^-/,"")}function s(e,t){return function(){return e.apply(t,arguments)}}function i(e){return e.replace(/([A-Z])/g,function(e,t){return"-"+t.toLowerCase()}).replace(/^ms-/,"-ms-")}function v(e,t){var n=e.length;if("CSS"in a&&"supports"in a.CSS){for(;n--;)if(a.CSS.supports(i(e[n]),t))return!0;return!1}if("CSSSupportsRule"in a){for(var r=[];n--;)r.push("("+i(e[n])+":"+t+")");return o("@supports ("+(r=r.join(" or "))+") { #modernizr { position: absolute; } }",function(e){return"absolute"==function(e,t,n){var r;if("getComputedStyle"in a){r=getComputedStyle.call(a,e,t);var o=a.console;if(null!==r)n&&(r=r.getPropertyValue(n));else if(o){o[o.error?"error":"log"].call(o,"getComputedStyle returning null, its possible modernizr test results are inaccurate")}}else r=!t&&e.currentStyle&&e.currentStyle[n];return r}(e,null,"position")})}return m}function r(e,t,n,r,o){var i=e.charAt(0).toUpperCase()+e.slice(1),a=(e+" "+z.join(i+" ")+i).split(" ");return f(t,"string")||f(t,"undefined")?function(e,t,n,r){function o(){a&&(delete T.style,delete T.modElem)}if(r=!f(r,"undefined")&&r,!f(n,"undefined")){var i=v(e,n);if(!f(i,"undefined"))return i}for(var a,s,l,c,d,u=["modernizr","tspan","samp"];!T.style&&u.length;)a=!0,T.modElem=p(u.shift()),T.style=T.modElem.style;for(l=e.length,s=0;s<l;s++)if(c=e[s],d=T.style[c],!~(""+c).indexOf("-")||(c=h(c)),T.style[c]!==m){if(r||f(n,"undefined"))return o(),"pfx"!=t||c;try{T.style[c]=n}catch(e){}if(T.style[c]!=d)return o(),"pfx"!=t||c}return o(),!1}(a,t,r,o):function(e,t,n){var r;for(var o in e)if(e[o]in t)return!1===n?e[o]:f(r=t[e[o]],"function")?s(r,n||t):r;return!1}(a=(e+" "+w.join(i+" ")+i).split(" "),t,n)}function e(e,t,n){return r(e,m,m,t,n)}var l=[],c=[],t={_version:"3.6.0",_config:{classPrefix:"",enableClasses:!0,enableJSClass:!0,usePrefixes:!0},_q:[],on:function(e,t){var n=this;setTimeout(function(){t(n[e])},0)},addTest:function(e,t,n){c.push({name:e,fn:t,options:n})},addAsyncTest:function(e){c.push({name:null,fn:e})}},d=function(){};d.prototype=t,(d=new d).addTest("cookies",function(){try{u.cookie="cookietest=1";var e=-1!=u.cookie.indexOf("cookietest=");return u.cookie="cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT",e}catch(e){return!1}}),d.addTest("cors","XMLHttpRequest"in a&&"withCredentials"in new XMLHttpRequest),d.addTest("history",function(){var e=navigator.userAgent;return(-1===e.indexOf("Android 2.")&&-1===e.indexOf("Android 4.0")||-1===e.indexOf("Mobile Safari")||-1!==e.indexOf("Chrome")||-1!==e.indexOf("Windows Phone")||"file:"===location.protocol)&&(a.history&&"pushState"in a.history)}),d.addTest("localstorage",function(){var e="modernizr";try{return localStorage.setItem(e,e),localStorage.removeItem(e),!0}catch(e){return!1}}),d.addTest("sessionstorage",function(){var e="modernizr";try{return sessionStorage.setItem(e,e),sessionStorage.removeItem(e),!0}catch(e){return!1}});var g=t._config.usePrefixes?" -webkit- -moz- -o- -ms- ".split(" "):["",""];t._prefixes=g;var _=u.documentElement,y="svg"===_.nodeName.toLowerCase();y||function(e,a){function u(e,t){var n=e.createElement("p"),r=e.getElementsByTagName("head")[0]||e.documentElement;return n.innerHTML="x<style>"+t+"</style>",r.insertBefore(n.lastChild,r.firstChild)}function m(){var e=g.elements;return"string"==typeof e?e.split(" "):e}function f(e){var t=v[e[d]];return t||(t={},h++,e[d]=h,v[h]=t),t}function r(e,t,n){return t=t||a,s?t.createElement(e):!(r=(n=n||f(t)).cache[e]?n.cache[e].cloneNode():c.test(e)?(n.cache[e]=n.createElem(e)).cloneNode():n.createElem(e)).canHaveChildren||l.test(e)||r.tagUrn?r:n.frag.appendChild(r);var r}function o(e){var t=f(e=e||a);return!g.shivCSS||n||t.hasCSS||(t.hasCSS=!!u(e,"article,aside,dialog,figcaption,figure,footer,header,hgroup,main,nav,section{display:block}mark{background:#FF0;color:#000}template{display:none}")),s||function(t,n){n.cache||(n.cache={},n.createElem=t.createElement,n.createFrag=t.createDocumentFragment,n.frag=n.createFrag()),t.createElement=function(e){return g.shivMethods?r(e,t,n):n.createElem(e)},t.createDocumentFragment=Function("h,f","return function(){var n=f.cloneNode(),c=n.createElement;h.shivMethods&&("+m().join().replace(/[\w\-:]+/g,function(e){return n.createElem(e),n.frag.createElement(e),'c("'+e+'")'})+");return n}")(g,n.frag)}(e,t),e}function p(e){for(var t,n=e.attributes,r=n.length,o=e.ownerDocument.createElement(w+":"+e.nodeName);r--;)(t=n[r]).specified&&o.setAttribute(t.nodeName,t.nodeValue);return o.style.cssText=e.style.cssText,o}function t(s){function l(){clearTimeout(e._removeSheetTimer),c&&c.removeNode(!0),c=null}var c,d,e=f(s),t=s.namespaces,n=s.parentWindow;return!M||s.printShived||(void 0===t[w]&&t.add(w),n.attachEvent("onbeforeprint",function(){l();for(var e,t,n,r=s.styleSheets,o=[],i=r.length,a=Array(i);i--;)a[i]=r[i];for(;n=a.pop();)if(!n.disabled&&y.test(n.media)){try{t=(e=n.imports).length}catch(e){t=0}for(i=0;i<t;i++)a.push(e[i]);try{o.push(n.cssText)}catch(e){}}o=function(e){for(var t,n=e.split("{"),r=n.length,o=RegExp("(^|[\\s,>+~])("+m().join("|")+")(?=[[\\s,>+~#.:]|)","gi"),i="1"+w+"\\:2";r--;)(t=n[r]=n[r].split("}"))[t.length-1]=t[t.length-1].replace(o,i),n[r]=t.join("}");return n.join("{")}(o.reverse().join("")),d=function(e){for(var t,n=e.getElementsByTagName("*"),r=n.length,o=RegExp("^(?:"+m().join("|")+")","i"),i=[];r--;)t=n[r],o.test(t.nodeName)&&i.push(t.applyElement(p(t)));return i}(s),c=u(s,o)}),n.attachEvent("onafterprint",function(){(function(e){for(var t=e.length;t--;)e[t].removeNode()})(d),clearTimeout(e._removeSheetTimer),e._removeSheetTimer=setTimeout(l,500)}),s.printShived=!0),s}var n,s,i=e.html5||{},l=/^<|^(?:button|map|select|textarea|object|iframe|option|optgroup)/i,c=/^(?:a|b|code|div|fieldset|h1|h2|h3|h4|h5|h6|i|label|li|ol|p|q|span|strong|style|table|tbody|td|th|tr|ul)/i,d="_html5shiv",h=0,v={};!function(){try{var e=a.createElement("a");e.innerHTML="<xyz></xyz>",n="hidden"in e,s=1==e.childNodes.length||function(){a.createElement("a");var e=a.createDocumentFragment();return void 0===e.cloneNode||void 0===e.createDocumentFragment||void 0===e.createElement}()}catch(e){s=n=!0}}();var g={elements:i.elements||"abbr article aside audio bdi canvas data datalist details dialog figcaption figure footer header hgroup main mark meter nav output picture progress section summary template time video",version:"3.7.3",shivCSS:!1!==i.shivCSS,supportsUnknownElements:s,shivMethods:!1!==i.shivMethods,type:"default",shivDocument:o,createElement:r,createDocumentFragment:function(e,t){if(e=e||a,s)return e.createDocumentFragment();for(var n=(t=t||f(e)).frag.cloneNode(),r=0,o=m(),i=o.length;r<i;r++)n.createElement(o[r]);return n},addElements:function(e,t){var n=g.elements;"string"!=typeof n&&(n=n.join(" ")),"string"!=typeof e&&(e=e.join(" ")),g.elements=n+" "+e,o(t)}};e.html5=g,o(a);var _,y=/^|\b(?:all|print)\b/,w="html5shiv",M=!(s||(_=a.documentElement,void 0===a.namespaces||void 0===a.parentWindow||void 0===_.applyElement||void 0===_.removeNode||void 0===e.attachEvent));g.type+=" print",(g.shivPrint=t)(a),"object"==typeof module&&module.exports&&(module.exports=g)}(void 0!==a?a:this,u),d.addTest("canvas",function(){var e=p("canvas");return!(!e.getContext||!e.getContext("2d"))}),d.addTest("csspositionsticky",function(){var e="position:",t=p("a").style;return t.cssText=e+g.join("sticky;"+e).slice(0,-e.length),-1!==t.position.indexOf("sticky")});var n="Moz O ms Webkit",w=t._config.usePrefixes?n.toLowerCase().split(" "):[];t._domPrefixes=w;var M,x=(M=!("onblur"in u.documentElement),function(e,t){var n;return!!e&&(t&&"string"!=typeof t||(t=p(t||"div")),!(n=(e="on"+e)in t)&&M&&(t.setAttribute||(t=p("div")),t.setAttribute(e,""),n="function"==typeof t[e],t[e]!==m&&(t[e]=m),t.removeAttribute(e)),n)});t.hasEvent=x,d.addTest("pointerevents",function(){var e=!1,t=w.length;for(e=d.hasEvent("pointerdown");t--&&!e;)x(w[t]+"pointerdown")&&(e=!0);return e});var b=t.testStyles=o;d.addTest("unicode",function(){var t,n=p("span"),r=p("span");return b("#modernizr{font-family:Arial,sans;font-size:300em;}",function(e){n.innerHTML=y?"妇":"&#5987;",r.innerHTML=y?"☆":"&#9734;",e.appendChild(n),e.appendChild(r),t="offsetWidth"in n&&n.offsetWidth!==r.offsetWidth}),t}),d.addTest("touchevents",function(){var t;if("ontouchstart"in a||a.DocumentTouch&&u instanceof DocumentTouch)t=!0;else{var e=["@media (",g.join("touch-enabled),("),"heartz",")","{#modernizr{top:9px;position:absolute}}"].join("");b(e,function(e){t=9===e.offsetTop})}return t});var z=t._config.usePrefixes?n.split(" "):[];t._cssomPrefixes=z;function E(e){var t,n=g.length,r=a.CSSRule;if(void 0===r)return m;if(!e)return!1;if((t=(e=e.replace(/^@/,"")).replace(/-/g,"_").toUpperCase()+"_RULE")in r)return"@"+e;for(var o=0;o<n;o++){var i=g[o];if(i.toUpperCase()+"_"+t in r)return"@-"+i.toLowerCase()+"-"+e}return!1}t.atRule=E;var S={elem:p("modernizr")};d._q.push(function(){delete S.elem});var T={style:S.elem.style};d._q.unshift(function(){delete T.style}),t.testAllProps=r;var C=t.prefixed=function(e,t,n){return 0===e.indexOf("@")?E(e):(-1!=e.indexOf("-")&&(e=h(e)),t?r(e,t,n):r(e,"pfx"))};d.addTest("vibrate",!!C("vibrate",navigator)),d.addTest("matchmedia",!!C("matchMedia",a)),t.testAllProps=e,d.addTest("flexwrap",e("flexWrap","wrap",!0)),function(){var e,t,n,r,o,i;for(var a in c)if(c.hasOwnProperty(a)){if(e=[],(t=c[a]).name&&(e.push(t.name.toLowerCase()),t.options&&t.options.aliases&&t.options.aliases.length))for(n=0;n<t.options.aliases.length;n++)e.push(t.options.aliases[n].toLowerCase());for(r=f(t.fn,"function")?t.fn():t.fn,o=0;o<e.length;o++)1===(i=e[o].split(".")).length?d[i[0]]=r:(!d[i[0]]||d[i[0]]instanceof Boolean||(d[i[0]]=new Boolean(d[i[0]])),d[i[0]][i[1]]=r),l.push((r?"":"no-")+i.join("-"))}}(),function(e){var t=_.className,n=d._config.classPrefix||"";if(y&&(t=t.baseVal),d._config.enableJSClass){var r=new RegExp("(^|\\s)"+n+"no-js(\\s|)");t=t.replace(r,"1"+n+"js2")}d._config.enableClasses&&(t+=" "+n+e.join(" "+n),y?_.className.baseVal=t:_.className=t)}(l),delete t.addTest,delete t.addAsyncTest;for(var N=0;N<d._q.length;N++)d._q[N]();a.Modernizr=d}(window,document),Modernizr.viewport_width=Math.max(document.documentElement.clientWidth,window.innerWidth||0),Modernizr.viewport_height=Math.max(document.documentElement.clientHeight,window.innerHeight||0),Modernizr.narrow=Modernizr.viewport_width<=704,Modernizr.constrained=Modernizr.viewport_width<=1200,Modernizr.site_menu=Modernizr.viewport_width<=1020?"button":"nav_bar",Modernizr.touch=Modernizr.touchevents||Modernizr.pointerevents&&(0<navigator.MaxTouchPoints||0<navigator.msMaxTouchPoints),Modernizr.phone=Modernizr.narrow&&Modernizr.touch,Modernizr.tablet=Modernizr.viewport_width<1075&&Modernizr.touch,Modernizr.desktop=!Modernizr.constrained&&!Modernizr.touch,Modernizr.laptop=!(Modernizr.desktop||Modernizr.tablet||Modernizr.phone);var patt=new RegExp("hideallads");Modernizr.adfree=patt.test(window.location.href);var sr_html=document.querySelector("html"),cn=sr_html.className;Modernizr.phone?sr_html.className=cn.concat(" phone"):Modernizr.tablet?sr_html.className=cn.concat(" tablet"):(Modernizr.desktop||Modernizr.laptop)&&(sr_html.className=cn.concat(" desktop"));var sr_host_parts=window.location.hostname.split(".");cn=sr_html.className;Modernizr.is_build=Modernizr.is_live=Modernizr.is_dev=!1,"www"===sr_host_parts[0]||"fbref"===sr_host_parts[0]?(Modernizr.is_live=!0,sr_html.className=cn.concat(" is_live")):sr_host_parts[0].startsWith("b")?(Modernizr.is_build=!0,sr_html.className=cn.concat(" is_build")):(sr_host_parts[0].startsWith("d")||sr_host_parts[0].startsWith("r"))&&(Modernizr.is_dev=!0,sr_html.className=cn.concat(" is_dev")),Modernizr.is_stathead=!1,("stathead"===sr_host_parts[1]&&"srdevel"===sr_host_parts[2]||"stathead"===sr_host_parts[0]||"www"===sr_host_parts[0]&&"stathead"===sr_host_parts[1])&&(cn=sr_html.className,sr_html.className=cn.concat(" is_stathead"),Modernizr.is_stathead=!0);var sr_logger=function(){var e=null,t={enableLogger:function(){null!=e&&(window.console.log=e)},disableLogger:function(){e=console.log,window.console.log=function(){}}};return t}();!document.srdev&&sr_is_production&&sr_logger.disableLogger(),Modernizr.is_modern=(Modernizr.canvas||Modernizr.localstorage)&&!sr_detect_operaMini,Modernizr.is_modern?(document.documentElement.className+=" is_modern",Modernizr.is_not_modern=!1):(document.documentElement.className+=" is_not_modern",Modernizr.is_not_modern=!0),Modernizr.lang=document.lang||"",Modernizr.srdev=document.srdev;var sr_utilities_js_loader=[];function vjs_readCookie(e){for(var t=e+"=",n=document.cookie.split(";"),r=0;r<n.length;r++){for(var o=n[r];" "===o.charAt(0);)o=o.substring(1,o.length);if(0===o.indexOf(t))return decodeURIComponent(o.substring(t.length,o.length))}return null}function vjs_createCookie(e,t,n){var r="";if(n){var o=new Date;o.setTime(o.getTime()+24*n*60*60*1e3),r="; expires="+o.toGMTString()}else r="";var i=encodeURIComponent(e)+"="+encodeURIComponent(t)+r+"; path=/";document.cookie=i}!function(o){function e(e,t){"use strict";var n=o.document.getElementsByTagName("script")[0],r=o.document.createElement("script");return r.src=e,r.async=!0,n.parentNode.insertBefore(r,n),t&&"function"==typeof t&&(r.onload=t),r}"undefined"!=typeof module?module.exports=e:o.loadJS=e}("undefined"!=typeof global?global:this),String.prototype.vjs_isMatch=function(e){return null!==this.match(e)};var sr_time_begin=new Date,sr_perf_startTime=new Date,sr_perf_log="<strong>Performance:</strong>",sr_perf_lastTime=new Date;function vjs_ready(e){"loading"!=document.readyState?e():document.addEventListener("DOMContentLoaded",e)}
+
+</script>
+
+<script>
+var _sr_modern_url = ''.concat(document.srdev?'https://d2p3bygnnzw9w3.cloudfront.net/nocdn/dev/'.concat(document.srdev.substring(0, 2)):"https://d2p3bygnnzw9w3.cloudfront.net/req/202005291",
+                               "/js/br", "/sr",document.srdev?"":"-min",   			       ".js");
+var _sr_basic_url = "https://d2p3bygnnzw9w3.cloudfront.net/req/202005291/js/br/sr-basic".concat("-min", ".js");
+if (Modernizr.is_modern) { loadJS( _sr_modern_url, function() { vjs_ready(sr_fire_js); }); }
+else                     { loadJS( _sr_basic_url, function() { vjs_ready(sr_fire_js); }); }
+</script>
+<link rel="preload"    href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005291/icons/sr_icons-min.svg?br" as="fetch" crossorigin>
+<link rel="preload"    href="https://d3k2oh6evki4b7.cloudfront.net/short/inc/main_nav_menu.json" as="fetch" crossorigin>
+<link rel="preload"    href="https://d2p3bygnnzw9w3.cloudfront.net/req/201604190/images/chosen-sprite.png" as="image" crossorigin>
+<link rel="preconnect" href="https://www.google-analytics.com"  crossorigin>
+<link rel="preconnect" href="https://www.googletagservices.com" crossorigin>
+    
+
+<!-- include="/inc/klecko_header_br.html_f" -->
+<script>sr_utilities_js_loader.push(function() { vjs_createCookie('srcssfull', 'yes', 0.5 )});</script>
+
+
+    <title>Milwaukee Braves at Pittsburgh Pirates Box Score, July  2, 1965 | Baseball-Reference.com</title>
+    <meta name="revised" content="07:56:08 21-May-2020" />
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="generated-by"     content="build_box_scores.pl" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-capable" content="no" />
+    <meta name="theme-color" content="4d383b" />
+    <meta name="msapplication-navbutton-color" content="4d383b" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="4d383b" />
+        
+
+<meta name="keywords" content="">
+    <link rel="canonical" href="https://www.baseball-reference.com/boxes/PIT/PIT196507020.shtml" /><meta itemprop="url"           content="https://www.baseball-reference.com">
+    <meta itemprop="name"          content="Baseball Reference">
+    <meta itemprop="alternateName" content="BBref">
+    <meta name="Description" content="Pittsburgh Pirates beat Milwaukee Braves (8-3). Jul 2, 1965, Attendance: 12352, Time of Game: 2:32.  Visit Baseball-Reference.com for the complete box score, play-by-play, and win probability">
+<meta property="fb:app_id"     content="">
+    <meta property="og:url"          content="https://www.baseball-reference.com/boxes/PIT/PIT196507020.shtml">
+    <meta property="og:title"        content="Milwaukee Braves at Pittsburgh Pirates Box Score, July  2, 1965 | Baseball-Reference.com">
+    <meta property="og:site_name"    content="Baseball-Reference.com">
+    <meta property="og:type"         content="    article" />
+    <meta property="og:description"  content="Pittsburgh Pirates beat Milwaukee Braves (8-3). Jul 2, 1965, Attendance: 12352, Time of Game: 2:32.  Visit Baseball-Reference.com for the complete box score, play-by-play, and win probability">
+    <meta property="og:image"        content="http://ssref.net/scripts/image_resize.cgi?foo=bar&flat=0&url1=https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/tlogo/br/MLN-1965.png&url2=https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/tlogo/br/PIT-1965.png">
+<meta name="twitter:card"         content="summary">
+    <meta name="twitter:site"         content="@baseball_ref">
+    <meta name="twitter:creator"      content="@baseball_ref">
+    <meta property="twitter:image"    content="http://ssref.net/scripts/image_resize.cgi?foo=bar&flat=0&url1=https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/tlogo/br/MLN-1965.png&url2=https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/tlogo/br/PIT-1965.png">
+    <meta name="twitter:domain"       content="Baseball-Reference.com">
+    <meta name="referrer" content="unsafe-url">
+
+    
+    <!-- tiles, touch, favicons -->
+    <link rel="icon"                         sizes="48x48"   href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/favicons/br/favicon-48.png">
+    <link rel="apple-touch-icon"             sizes="228x228" href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/favicons/br/apple-touch-icon-228x228-precomposed.png">
+    <link rel="apple-touch-icon"             sizes="195x195" href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/favicons/br/apple-touch-icon-195x195-precomposed.png">
+    <link rel="apple-touch-icon"             sizes="180x180" href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/favicons/br/apple-touch-icon-180x180-precomposed.png">
+    <link rel="apple-touch-icon"             sizes="152x152" href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/favicons/br/apple-touch-icon-152x152-precomposed.png">
+    <link rel="apple-touch-icon"             sizes="144x144" href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/favicons/br/apple-touch-icon-144x144-precomposed.png">
+    <link rel="apple-touch-icon"             sizes="128x128" href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/favicons/br/apple-touch-icon-128x128-precomposed.png">
+    <link rel="apple-touch-icon"             sizes="120x120" href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/favicons/br/apple-touch-icon-120x120-precomposed.png">
+    <link rel="apple-touch-icon"             sizes="114x114" href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/favicons/br/apple-touch-icon-114x114-precomposed.png">
+    <link rel="apple-touch-icon"             sizes="76x76"   href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/favicons/br/apple-touch-icon-76x76-precomposed.png">
+    <link rel="apple-touch-icon"             sizes="72x72"   href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/favicons/br/apple-touch-icon-72x72-precomposed.png">
+    <link rel="apple-touch-icon"             sizes="57x57"   href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/favicons/br/apple-touch-icon-57x57-precomposed.png">
+    <link rel="icon"                         sizes="32x32"   href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/favicons/br/favicon-32.png">
+    <!--[if IE]>
+    <link rel="shortcut icon"                                href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/favicons/br/favicon.ico"><![endif]-->
+    <meta name="msapplication-TileColor" content="#86081a" />
+    <meta name="msapplication-TileImage" content="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/favicons/br/ms-tile-144.png" />
+    <link rel=search        type="application/opensearchdescription+xml" href="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/opensearch/opensearch-br.xml" title=" Player and Team Search">    
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    var freestar = freestar || {};
+    freestar.config = freestar.config || {};
+    freestar.config.enabled_slots = [ "div-gpt-ad-728x90-GeneralHeader","div-gpt-ad-728x90-BTF-1","div-gpt-ad-728x90-BTF-2","div-gpt-ad-728x90-BTF-3","div-gpt-ad-728x90-Footer" ];
+    if (sr_detect_ie || sr_detect_edge || Modernizr.adfree || document.getElementById('sr_suppress_ads') || Modernizr.viewport_width < 1810) {
+    // do not include the rails
+    }
+    else {
+         freestar.config.enabled_slots.push('div-gpt-ad-160x600-1');
+         freestar.config.enabled_slots.push('div-gpt-ad-160x600-2');
+    } 
+
+</script>
+<script data-cfasync="false" type="text/javascript">
+    var fs_debug = window.location.search.indexOf('fsdebug') == -1 ? false : true;
+    freestar.hitTime = Date.now();
+    freestar.queue = freestar.queue || [];
+    freestar.config = freestar.config || {};
+    freestar.queue.push(function() {
+      // Include the line reflecting the area/section of the site you are on
+      googletag.pubads().setTargeting('sr_site_id', 'br');
+    });
+!function(a,b){
+    if (sr_detect_ie || sr_detect_edge || Modernizr.adfree) {
+        return;
+    }  
+    var c=b.getElementsByTagName("script")[0],
+    d=b.createElement("script"),
+    e="https://a.pub.network/baseball-reference";
+    e+=fs_debug?"/qa/pubfig.min.js":"/pubfig.min.js",
+    d.async=!0,
+    d.src=e,
+    c.parentNode.insertBefore(d,c)
+}(window,document);
+</script>
+
+
+
+</head>
+<body class="br">
+<div id="wrap">
+  
+  <div id="header" role="banner">
+  <ul id="subnav" class="notranslate">
+	<li><a href="https://www.sports-reference.com/"><svg height="15px" width="20px"><use xlink:href="#ic-sr-pennant"></use></svg> Sports Reference</a></li>
+	<li class="current"><a href="https://www.baseball-reference.com/">Baseball</a></li>
+	<li><a href="https://www.pro-football-reference.com/">Football</a> <a href="https://www.sports-reference.com/cfb/">(college)</a></li>
+	<li><a href="https://www.basketball-reference.com/">Basketball</a> <a href="https://www.sports-reference.com/cbb/">(college)</a></li>
+	<li><a href="https://www.hockey-reference.com/">Hockey</a></li>
+	<li><a href="https://fbref.com/">Soccer</a></li>
+	<li><a href="https://www.sports-reference.com/blog/">Blog</a></li>
+
+        <li><a href="https://stathead.com/">Stathead</a></li>
+        <li><a href="https://widgets.sports-reference.com/">Widgets</a></li>
+
+        	<li><a href="https://www.sports-reference.com/feedback/">Questions or Comments?</a></li>
+	
+<li class="user logged_in">Welcome <span class="username"></span>&nbsp;&#183;&nbsp;<a href="/my/">Your Account</a></li>
+<li class="user logged_in"><a class="logout" href="/my/?do=logout">Logout</a></li>
+<li class="user not_logged_in"><a class="login" href="/my/">Login</a></li>
+<li class="user not_logged_in"><a href="https://stathead.com/users/signup.cgi">Create Account</a></li>
+
+
+</ul>
+
+  <a href="/"><img src="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/logos/br-logo.svg" onerror="this.src='https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/logos/br-logo.png'; this.onerror = null;" alt="Baseball-Reference.com Logo &amp; Link to home page" /></a>
+<div id="nav_trigger" role="button"><a href="#site_menu_link">MENU</a></div>
+<div id="nav" role="navigation" aria-label="Baseball-Reference.com sections">
+	<ul id="main_nav" class="hoversmooth nohover"><li id="header_players" ><a href="/players">Players</a></li>
+<li id="header_teams" ><a href="/teams/">Teams</a></li>
+<li id="header_leagues" ><a href="/leagues/">Seasons</a></li>
+<li id="header_leaders" ><a href="/leaders/">Leaders</a></li>
+<li id="header_scores" ><a href="/boxes/">MLB Scores</a></li>
+<li id="header_playoffs" class=""><a href="/postseason/">MLB Playoffs</a></li>	
+<li id="header_playindex" class=""><a href="/play-index/">Play Index</a></li>
+<li id="header_newsletter"><a href="https://stathead.com/newsletter.cgi?site_sub=br">Newsletter</a></li>
+<li><a data-scroll href="#site_menu_link" class="opener">Full Site Menu Below</a></li>
+	</ul>
+	<div class="breadcrumbs">You are here: <div itemscope itemtype="https://schema.org/BreadcrumbList" class="crumbs"><span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a itemprop="item" href="/"><span itemprop="name">BR Home Page</span></a> <meta itemprop="position" content="1" /></span> &gt; <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a itemprop="item" href="/boxes/"><span itemprop="name">Box Scores</span></a> <meta itemprop="position" content="2" /></span> &gt; <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a itemprop="item" href="/leagues/MLB/1965-schedule.shtml"><span itemprop="name">1965</span></a> <meta itemprop="position" content="3" /></span> &gt; <strong>Milwaukee Braves at Pittsburgh Pirates Box Score, July  2, 1965</strong></div></div>
+	<ul class="usertools bullets-inline">
+<li class="user logged_in">Welcome <span class="username"></span>&nbsp;&#183;&nbsp;<a href="/my/">Your Account</a></li>
+<li class="user logged_in"><a class="logout" href="/my/?do=logout">Logout</a></li>
+<li class="user not_logged_in"><a class="login" href="/my/">Login</a></li>
+<li class="user not_logged_in"><a href="https://stathead.com/users/signup.cgi">Create Account</a></li>
+
+	</ul><!-- ul.user -->
+</div><!-- div#nav -->
+<script>
+function sr_menus_setupMainNav_button_inline () {
+    if (sr_detect_operaMini || !("classList" in document.createElement("_"))) {
+	return false;
+    }
+    var nav_trigger = document.getElementById('nav_trigger');
+    if(!nav_trigger || !Modernizr.is_modern || nav_trigger.triggered) {
+	return false;
+    }
+    nav_trigger.triggered = true;
+    var nav = document.getElementById('nav');
+    var nav_trigger_a = nav_trigger.querySelector('a');
+    if (nav_trigger_a) {
+	nav_trigger_a.setAttribute('href','javascript:void(0)');
+	nav_trigger.onclick = function (event) {
+	    nav.classList.toggle('open');
+	    var is_open = nav.classList.contains('open');
+	    if (is_open) {
+		nav_trigger.classList.add('open');
+	    }
+	    else {
+		nav_trigger.classList.remove('open');
+	    }
+	    event.preventDefault();
+	    try { sr_record_analytics_event('MainNavButtonClick_inline',sr_record_directory(),sr_record_page());}
+	    catch(err) {}
+	};
+    }
+    return true;
+}
+sr_menus_setupMainNav_button_inline();
+</script><div class="search" role="search" aria-label="Site Search for players, teams and sections">
+<form method="get" name="f_big"  action="/search/search.fcgi">
+<div class="ac-outline">
+  <div class="ac-wrapper"><input type="search" tabindex="-1" class="ac-hint" name="hint" placeholder="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" dir="auto">
+
+<input tabindex="1" type="search" class="ac-input completely" name="search" placeholder="Enter Person, Team, Section, etc" aria-label="Enter a player, team or section name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" dir="auto" />
+    <div class="ac-dropdown"></div>
+  </div>
+</div>
+
+<input type="submit" value="Search" tabindex="2" />
+<input type="hidden" name="pid" value="" data-search-id>
+<input type="hidden" name="idx" value="" data-search-idx>
+
+</form>
+</div><!-- div.search -->
+
+</div><!-- div#header -->
+
+
+
+<div id="srcom">
+
+<!-- fs_general_header -->
+<div class="adblock">
+<!-- div#fs_fs_general_header  -->
+<div align="center" id="div-gpt-ad-728x90-GeneralHeader">
+    <script data-cfasync="false" type='text/javascript'>
+    if (sr_detect_ie || sr_detect_edge || Modernizr.adfree) {
+    }
+    else {
+        console.log('push ad:div-gpt-ad-728x90-GeneralHeader');
+        freestar.queue.push(function() { googletag.display('div-gpt-ad-728x90-GeneralHeader'); });
+    }
+    </script>
+</div>
+<!-- /div.#fs_fs_general_header -->
+
+
+</div>
+
+</div>
+<div id="inner_nav" role="navigation" aria-label="Sections on this page and/or other pages related to this page" class=" inactive suppress_inpage_nav">
+	<ul class="hoversmooth">
+		<li		   class="index "><a href="/boxes/">MLB Scores &amp; Boxes</a>		</li>
+		<li		   class="full "><a href="/leagues/MLB/1965-schedule.shtml">1965 MLB Scores &amp; Schedule</a>		</li>
+		<li		   class="full "><a href="/teams/PIT/1965-schedule-scores.shtml">Pittsburgh Pirates Schedule</a>		</li>
+		<li		   class="full "><a href="/teams/MLN/1965-schedule-scores.shtml">Milwaukee Braves Schedule</a>		</li>
+		<li data-fade-selector="#inpage_nav"		   class="condensed hasmore "><span>Schedules, Scores, &amp; Boxes</span>
+			<div>
+
+					<ul class=" in_list">
+						<li><a href="/leagues/MLB/1965-schedule.shtml">1965 MLB Scores &amp; Schedule</a></li>
+						<li><a href="/teams/PIT/1965-schedule-scores.shtml">Pittsburgh Pirates Schedule</a></li>
+						<li><a href="/teams/MLN/1965-schedule-scores.shtml">Milwaukee Braves Schedule</a></li>
+					</ul>
+
+			</div>		</li>
+	</ul>
+</div><!-- div#inner_nav -->
+
+<div id="content" role="main" class="box">
+  <h1>Milwaukee Braves at Pittsburgh Pirates Box Score, July  2, 1965</h1>
+  <div class="section_wrapper setup_commented commented" id="all_1221365758">
+<div class="section_heading">
+  <span class="section_anchor" id="1221365758_link" data-label="All Games This Date"></span>	
+</div><div class="placeholder"></div>
+<!--     <div class="section_content" id="div_1221365758">
+	    <div class="game_summaries compressed">
+   <h2>MLB Scores &mdash; July 2, 1965</h2>
+   
+      <div class="game_summary nohover">
+	<table class="teams poptip" data-tip="Cleveland Indians at Baltimore Orioles">
+		<tbody>       
+		<tr class="winner">
+			<td><a href="/teams/CLE/1965.shtml">CLE</a></td>
+			<td class="right">8</td>
+			<td class="right gamelink">
+				<a href="/boxes/BAL/BAL196507020.shtml">Final</a>
+				
+			</td>
+		</tr>
+		<tr class="loser">
+			<td><a href="/teams/BAL/1965.shtml">BAL</a></td>
+			<td class="right">0</td>
+			<td class="right">
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	
+
+</div>
+
+      <div class="game_summary nohover">
+	<table class="teams poptip" data-tip="New York Yankees at Boston Red Sox">
+		<tbody>       
+		<tr class="winner">
+			<td><a href="/teams/NYY/1965.shtml">NYY</a></td>
+			<td class="right">16</td>
+			<td class="right gamelink">
+				<a href="/boxes/BOS/BOS196507020.shtml">Final</a>
+				
+			</td>
+		</tr>
+		<tr class="loser">
+			<td><a href="/teams/BOS/1965.shtml">BOS</a></td>
+			<td class="right">2</td>
+			<td class="right">
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	
+
+</div>
+
+      <div class="game_summary nohover">
+	<table class="teams poptip" data-tip="Chicago White Sox at California Angels">
+		<tbody>       
+		<tr class="loser">
+			<td><a href="/teams/CHW/1965.shtml">CHW</a></td>
+			<td class="right">4</td>
+			<td class="right gamelink">
+				<a href="/boxes/CAL/CAL196507020.shtml">Final</a>
+				
+			</td>
+		</tr>
+		<tr class="winner">
+			<td><a href="/teams/CAL/1965.shtml">CAL</a></td>
+			<td class="right">5</td>
+			<td class="right">
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	
+
+</div>
+
+      <div class="game_summary nohover">
+	<table class="teams poptip" data-tip="San Francisco Giants at Chicago Cubs">
+		<tbody>       
+		<tr class="winner">
+			<td><a href="/teams/SFG/1965.shtml">SFG</a></td>
+			<td class="right">4</td>
+			<td class="right gamelink">
+				<a href="/boxes/CHN/CHN196507020.shtml">Final</a>
+				
+			</td>
+		</tr>
+		<tr class="loser">
+			<td><a href="/teams/CHC/1965.shtml">CHC</a></td>
+			<td class="right">0</td>
+			<td class="right">
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	
+
+</div>
+
+      <div class="game_summary nohover">
+	<table class="teams poptip" data-tip="Los Angeles Dodgers at Houston Astros">
+		<tbody>       
+		<tr class="loser">
+			<td><a href="/teams/LAD/1965.shtml">LAD</a></td>
+			<td class="right">3</td>
+			<td class="right gamelink">
+				<a href="/boxes/HOU/HOU196507020.shtml">Final</a>
+				
+			</td>
+		</tr>
+		<tr class="winner">
+			<td><a href="/teams/HOU/1965.shtml">HOU</a></td>
+			<td class="right">4</td>
+			<td class="right">
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	
+
+</div>
+
+      <div class="game_summary nohover">
+	<table class="teams poptip" data-tip="Minnesota Twins at Kansas City Athletics">
+		<tbody>       
+		<tr class="winner">
+			<td><a href="/teams/MIN/1965.shtml">MIN</a></td>
+			<td class="right">3</td>
+			<td class="right gamelink">
+				<a href="/boxes/KC1/KC1196507020.shtml">Final</a>
+				
+			</td>
+		</tr>
+		<tr class="loser">
+			<td><a href="/teams/KCA/1965.shtml">KCA</a></td>
+			<td class="right">1</td>
+			<td class="right">
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	
+
+</div>
+
+      <div class="game_summary nohover">
+	<table class="teams poptip" data-tip="St. Louis Cardinals at New York Mets">
+		<tbody>       
+		<tr class="winner">
+			<td><a href="/teams/STL/1965.shtml">STL</a></td>
+			<td class="right">6</td>
+			<td class="right gamelink">
+				<a href="/boxes/NYN/NYN196507020.shtml">Final</a>
+				
+			</td>
+		</tr>
+		<tr class="loser">
+			<td><a href="/teams/NYM/1965.shtml">NYM</a></td>
+			<td class="right">3</td>
+			<td class="right">
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	
+
+</div>
+
+      <div class="game_summary nohover">
+	<table class="teams poptip" data-tip="Cincinnati Reds at Philadelphia Phillies">
+		<tbody>       
+		<tr class="loser">
+			<td><a href="/teams/CIN/1965.shtml">CIN</a></td>
+			<td class="right">3</td>
+			<td class="right gamelink">
+				<a href="/boxes/PHI/PHI196507020.shtml">Final</a>
+				
+			</td>
+		</tr>
+		<tr class="winner">
+			<td><a href="/teams/PHI/1965.shtml">PHI</a></td>
+			<td class="right">4</td>
+			<td class="right">
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	
+
+</div>
+
+      <div class="game_summary nohover current">
+	<table class="teams poptip" data-tip="Milwaukee Braves at Pittsburgh Pirates">
+		<tbody>       
+		<tr class="loser">
+			<td><a href="/teams/MLN/1965.shtml">MLN</a></td>
+			<td class="right">3</td>
+			<td class="right gamelink">
+				<a href="/boxes/PIT/PIT196507020.shtml">Final</a>
+				
+			</td>
+		</tr>
+		<tr class="winner">
+			<td><a href="/teams/PIT/1965.shtml">PIT</a></td>
+			<td class="right">8</td>
+			<td class="right">
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	
+
+</div>
+
+      <div class="game_summary nohover">
+	<table class="teams poptip" data-tip="Detroit Tigers at Washington Senators">
+		<tbody>       
+		<tr class="loser">
+			<td><a href="/teams/DET/1965.shtml">DET</a></td>
+			<td class="right">0</td>
+			<td class="right gamelink">
+				<a href="/boxes/WS2/WS2196507020.shtml">Final</a>
+				
+			</td>
+		</tr>
+		<tr class="winner">
+			<td><a href="/teams/WSA/1965.shtml">WSA</a></td>
+			<td class="right">6</td>
+			<td class="right">
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	
+
+</div>
+
+   
+   <h2>
+   
+   <a href="/boxes/?year=1965&month=07&day=02">MLB Scores &amp; Standings on this Day</a>
+   </h2>
+   
+</div>
+
+		
+    </div>
+-->
+</div>
+
+  
+
+<div class="scorebox">
+	<div>
+		<div itemscope="" itemprop="performer" itemtype="https://schema.org/Organization">
+
+
+	<div class="media-item logo loader">
+		<img class="teamlogo" itemscope="image" 			src="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/tlogo/br/MLN-1965.png"
+			alt="1965 Milwaukee Braves Logo">
+		
+			<p><a href="http://www.sportslogos.net/">via Sports Logos.net</a></p>
+			<p><a href="https://www.sports-reference.com/blog/2016/06/redesign-team-and-league-logos-courtesy-sportslogos-net/">About logos</a></p>
+		 
+	</div>
+
+
+<strong>
+				<a href="/teams/MLN/1965.shtml" itemprop="name">Milwaukee Braves</a>
+			</strong>
+		</div>
+		<div class="scores">
+			<div class="score">3</div>
+		</div><div>37-35</div>    
+			
+			
+			<div class="prevnext">
+  
+  <a href="/boxes/PHI/PHI196507010.shtml" class="button2 prev">Prev Game</a>
+  
+  
+  <a href="/boxes/PIT/PIT196507030.shtml" class="button2 next">Next Game</a>
+  
+</div>
+
+
+	</div>
+	<div>
+		<div itemscope="" itemprop="performer" itemtype="https://schema.org/Organization">
+
+
+	<div class="media-item logo loader">
+		<img class="teamlogo" itemscope="image" 			src="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/tlogo/br/PIT-1965.png"
+			alt="1965 Pittsburgh Pirates Logo">
+		
+			<p><a href="http://www.sportslogos.net/">via Sports Logos.net</a></p>
+			<p><a href="https://www.sports-reference.com/blog/2016/06/redesign-team-and-league-logos-courtesy-sportslogos-net/">About logos</a></p>
+		 
+	</div>
+
+
+<strong>
+				<a href="/teams/PIT/1965.shtml" itemprop="name">Pittsburgh Pirates</a>
+			</strong>
+		</div>
+		<div class="scores">
+			<div class="score">8</div>
+		</div><div>40-36</div>    
+			
+			
+			<div class="prevnext">
+  
+  <a href="/boxes/PIT/PIT196507010.shtml" class="button2 prev">Prev Game</a>
+  
+  
+  <a href="/boxes/PIT/PIT196507030.shtml" class="button2 next">Next Game</a>
+  
+</div>
+
+
+	</div>
+	
+	<div class="scorebox_meta">
+		<div>Friday, July 2, 1965</div><div><strong>Attendance</strong>: 12,352</div><div><strong>Venue</strong>: Forbes Field</div><div><strong>Game Duration</strong>: 2:32</div><div>Night Game, on grass</div>
+		<div><em>Logos <a href="http://www.sportslogos.net/">via Sports Logos.net</a>
+            / <a href="//www.sports-reference.com/blog/2016/06/redesign-team-and-league-logos-courtesy-sportslogos-net/">About logos</a></em></div>
+	</div>
+	
+	
+</div>
+
+
+
+
+
+<style>
+.fb .scorebox { position: relative; max-width: 640px; }
+.fb .scorebox > div:first-child .scores > div:after { position: absolute; left: 0; content: ':'; width: 100%; }
+.fb .scorebox .scorebox_meta { margin-top: 10px; }
+.fb .scorebox .score { font-size: 1.9em; font-weight: 800; }
+.fb .scorebox .score_pen, .fb .scorebox .score_aggr, .fb .scorebox .score_xg { font-size: 1.28em; font-weight: bold; margin-top: 12px; }
+.fb .scorebox > div:first-child .score_pen:before, .fb .scorebox > div:first-child .score_aggr:before, .fb .scorebox > div:first-child .score_xg:before {
+	position: absolute;
+	width: 100%;
+	left: 0;
+	margin-top: -11px;
+	color: #777;
+	font-size: 13px;
+	font-weight: bold;
+}
+.fb .scorebox > div:first-child .score_pen:before  { content: 'Penalties'; }
+.fb .scorebox > div:first-child .score_aggr:before { content: 'Aggregate'; }
+.fb .scorebox > div:first-child .score_xg:before { content: 'xG'; }
+
+@media screen and (min-width: 470px) {
+	.fb .scorebox .prevnext { min-width: 200px; }
+}
+
+@media screen and (min-width: 800px) {
+	.fb .scorebox                   .scores  { position: absolute; top: 35px; left: 0; }
+	.fb .scorebox > div:first-child .scores  { left: auto; right: 0; }
+	
+	.fb .scorebox .scores > div       { padding: 0 10px; }
+	.fb .scorebox > div:first-child .scores > div:after { width: 200%; }
+
+	.fb .scorebox .score { font-size: 2.7em; }
+
+	.fb .scorebox .score_pen, .fb .scorebox .score_aggr, .fb .scorebox .score_xg { margin-top: 17px; }
+	
+	.fb .scorebox > div:first-child .score_pen:before, .fb .scorebox > div:first-child .score_aggr:before, .fb .scorebox > div:first-child .score_xg:before { width: 200%; margin-top: -15px; }
+
+	.fb .scorebox > div { padding: 0 8%; position: relative; }
+	.fb .scorebox .event { position: absolute; padding: 0; top: 15px; right: -160px; text-align: left; }
+	.fb .scorebox .event#a { text-align: right; left: -160px; right: auto; }
+	.fb .scorebox .event > div { margin-bottom: 6px; }
+}
+
+@media screen and (max-width: 1020px) {
+	.fb .scorebox .event { display: none; }
+}
+</style>
+
+  <div class="linescore_wrap">
+  <table class="linescore nohover stats_table no_freeze">
+    <thead>
+      <tr>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        
+        <th>1</th>
+        
+        <th>2</th>
+        
+        <th>3</th>
+        
+        <th>4</th>
+        
+        <th>5</th>
+        
+        <th>6</th>
+        
+        <th>7</th>
+        
+        <th>8</th>
+        
+        <th>9</th>
+        
+        <th>R</th>
+        
+        <th>H</th>
+        
+        <th>E</th>
+        
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+		
+        <td class="center">
+
+
+	<div class="media-item logo loader">
+		<img class="teamlogo" itemscope="image" 			src="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/tlogo/br/MLN-1965.png"
+			alt="1965 Milwaukee Braves Logo">
+		
+			<p><a href="http://www.sportslogos.net/">via Sports Logos.net</a></p>
+			<p><a href="https://www.sports-reference.com/blog/2016/06/redesign-team-and-league-logos-courtesy-sportslogos-net/">About logos</a></p>
+		 
+	</div>
+
+
+</td>
+        <td><a href="/teams/MLN/1965.shtml">Milwaukee Braves</a></td>
+		
+        <td class="center">0</td>
+        <td class="center">0</td>
+        <td class="center">0</td>
+        <td class="center">0</td>
+        <td class="center">2</td>
+        <td class="center">0</td>
+        <td class="center">0</td>
+        <td class="center">1</td>
+        <td class="center">0</td>
+        <td class="center">3</td>
+        <td class="center">8</td>
+        <td class="center">1</td>
+      </tr>
+      <tr>
+		
+        <td class="center">
+
+
+	<div class="media-item logo loader">
+		<img class="teamlogo" itemscope="image" 			src="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/tlogo/br/PIT-1965.png"
+			alt="1965 Pittsburgh Pirates Logo">
+		
+			<p><a href="http://www.sportslogos.net/">via Sports Logos.net</a></p>
+			<p><a href="https://www.sports-reference.com/blog/2016/06/redesign-team-and-league-logos-courtesy-sportslogos-net/">About logos</a></p>
+		 
+	</div>
+
+
+</td>
+        <td><a href="/teams/PIT/1965.shtml">Pittsburgh Pirates</a></td>
+		
+        <td class="center">1</td>
+        <td class="center">0</td>
+        <td class="center">1</td>
+        <td class="center">1</td>
+        <td class="center">0</td>
+        <td class="center">2</td>
+        <td class="center">3</td>
+        <td class="center">0</td>
+        <td class="center">X</td>
+        <td class="center">8</td>
+        <td class="center">13</td>
+        <td class="center">1</td>
+      </tr>
+    </tbody>
+	
+	<tfoot>
+	<tr><td colspan="14">WP:&nbsp;Don&nbsp;Cardwell&nbsp;(7-2) &bull;&nbsp;LP:&nbsp;Tony&nbsp;Cloninger&nbsp;(10-7) &bull;&nbsp;SV:&nbsp;Don&nbsp;Schwall&nbsp;(1)</td></tr>
+	</tfoot>
+	
+  </table>
+  </div>
+  
+  
+
+<!-- fs_btf_3 -->
+<div class="adblock">
+<!-- div#fs_fs_btf_3  -->
+<div align="center" id="div-gpt-ad-728x90-BTF-3">
+    <script data-cfasync="false" type='text/javascript'>
+    if (sr_detect_ie || sr_detect_edge || Modernizr.adfree) {
+    }
+    else {
+        console.log('push ad:div-gpt-ad-728x90-BTF-3');
+        freestar.queue.push(function() { googletag.display('div-gpt-ad-728x90-BTF-3'); });
+    }
+    </script>
+</div>
+<!-- /div.#fs_fs_btf_3 -->
+
+
+</div>
+
+
+  
+          
+      
+      
+      
+      
+      
+         
+             <p class="note">RetroSheet has deduced an <a href="https://www.retrosheet.org/boxesetc/1965/B07020PIT1965.htm">incomplete play-by-play account of this game</a>.</p>
+            
+            
+         
+      
+         
+            
+<div id="all_MilwaukeeBravesbatting" class="table_wrapper setup_commented commented">
+
+<div class="section_heading">
+  <span class="section_anchor" id="MilwaukeeBravesbatting_link" data-label="Milwaukee Braves Batting"></span><h2>Milwaukee Braves</h2>    <div class="section_heading_text">
+      <ul>
+      </ul>
+    </div>
+    		
+</div>
+<div class="placeholder"></div>
+<!--
+   <div class="table_outer_container">
+      <div class="overthrow table_container" id="div_MilwaukeeBravesbatting">
+	  
+  <table class="sortable stats_table min_width shade_zero" id="MilwaukeeBravesbatting" data-cols-to-freeze="1"><caption>Milwaukee Braves Table</caption>
+   <colgroup><col><col><col><col><col><col><col><col><col><col><col><col><col><col><col></colgroup>
+   <thead>      
+      <tr>
+         <th aria-label=" Player Name Bold can mean player is active for this team or player has appeared in MLB * means LHP or LHB, # means switch hitter, + can mean HOFer." data-stat="player" scope="col" class=" poptip sort_default_asc show_partial_when_sorting left" data-tip="&lt;strong&gt;Player Name&lt;/strong&gt;&lt;br&gt;&lt;strong&gt;Bold&lt;/strong&gt; can mean player is active for this team&lt;br&gt;or player has appeared in MLB&lt;br&gt;* means LHP or LHB,&lt;br&gt;# means switch hitter,&lt;br&gt;+ can mean HOFer." >Batting</th>
+         <th aria-label="At Bats" data-stat="AB" scope="col" class=" poptip center" data-tip="At Bats" >AB</th>
+         <th aria-label="Runs Scored" data-stat="R" scope="col" class=" poptip center" data-tip="Runs Scored/Allowed" >R</th>
+         <th aria-label="Hits" data-stat="H" scope="col" class=" poptip center" data-tip="Hits/Hits Allowed" >H</th>
+         <th aria-label="Runs Batted In" data-stat="RBI" scope="col" class=" poptip center" data-tip="Runs Batted In" >RBI</th>
+         <th aria-label="Bases on Balls" data-stat="BB" scope="col" class=" poptip center" data-tip="Bases on Balls/Walks" >BB</th>
+         <th aria-label="Strikeouts" data-stat="SO" scope="col" class=" poptip center" data-tip="Strikeouts" >SO</th>
+         <th aria-label="Plate Appearances" data-stat="PA" scope="col" class=" poptip center" data-tip="&lt;strong&gt;Plate Appearances&lt;/strong&gt;&lt;br&gt;When available, we use actual plate appearances from play-by-play game accounts&lt;br&gt;Otherwise estimated using AB + BB + HBP + SF + SH,&lt;br&gt;which excludes catcher interferences.&lt;br&gt;When &lt;span class=tooltip&gt;this color&lt;/span&gt; click for a summary of each PA." >PA</th>
+         <th aria-label="Batting Average" data-stat="batting_avg" scope="col" class=" poptip hide_non_quals center" data-tip="&lt;strong&gt;Hits/At Bats&lt;/strong&gt;&lt;br&gt;For recent years, leaders need 3.1 PA&lt;br&gt;per team game played&lt;br&gt;Bold indicates highest BA using current stats&lt;br&gt;&lt;span class=&quot;all_time_record&quot;&gt;Gold&lt;/span&gt; means awarded title at end of year." data-filter="1" data-name="Batting Average" >BA</th>
+         <th aria-label="On-Base%" data-stat="onbase_perc" scope="col" class=" poptip hide_non_quals center" data-tip="&lt;strong&gt;(H + BB + HBP)/(At Bats + BB + HBP + SF)&lt;/strong&gt;&lt;br&gt;For recent years, leaders need 3.1 PA&lt;br&gt;per team game played" data-filter="1" data-name="On-Base%" >OBP</th>
+         <th aria-label="Slugging %" data-stat="slugging_perc" scope="col" class=" poptip hide_non_quals center" data-tip="<strong>Total Bases/At Bats or <br>(1B + 2*2B + 3*3B + 4*HR)/AB</strong><br>For recent years, leaders need 3.1 PA<br>per team game played" data-filter="1" data-name="Slugging %" >SLG</th>
+         <th aria-label="On-Base Plus Slugging" data-stat="onbase_plus_slugging" scope="col" class=" poptip hide_non_quals center" data-tip="&lt;strong&gt;On-Base + Slugging Percentages &lt;/strong&gt;&lt;br&gt;For recent years, leaders need 3.1 PA&lt;br&gt;per team game played" data-filter="1" data-name="On-Base Plus Slugging" >OPS</th>
+         <th aria-label="Putouts" data-stat="PO" scope="col" class=" poptip center" data-tip="Putouts" >PO</th>
+         <th aria-label="Assists" data-stat="A" scope="col" class=" poptip center" data-tip="Assists" >A</th>
+         <th aria-label="details" data-stat="details" scope="col" class=" poptip center" >Details</th>
+      </tr>
+      
+   </thead>
+   <tbody>
+<tr ><th scope="row" class="left " data-append-csv="clinety01" data-stat="player" csk="0" ><a href="/players/c/clinety01.shtml">Ty Cline</a> CF</th><td class="right " data-stat="AB" >3</td><td class="right iz" data-stat="R" >0</td><td class="right iz" data-stat="H" >0</td><td class="right iz" data-stat="RBI" >0</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right " data-stat="PA" >3</td><td class="right " data-stat="batting_avg" >.198</td><td class="right " data-stat="onbase_perc" >.262</td><td class="right " data-stat="slugging_perc" >.224</td><td class="right " data-stat="onbase_plus_slugging" >.486</td><td class="right iz" data-stat="PO" >0</td><td class="right iz" data-stat="A" >0</td><td class="left iz" data-stat="details" ></td></tr>
+<tr ><th scope="row" class="left " data-append-csv="cartyri01" data-stat="player" csk="1" >&nbsp;&nbsp;&nbsp;<a href="/players/c/cartyri01.shtml">Rico Carty</a> LF</th><td class="right " data-stat="AB" >1</td><td class="right iz" data-stat="R" >0</td><td class="right iz" data-stat="H" >0</td><td class="right iz" data-stat="RBI" >0</td><td class="right " data-stat="BB" >1</td><td class="right " data-stat="SO" >1</td><td class="right " data-stat="PA" >2</td><td class="right " data-stat="batting_avg" >.288</td><td class="right " data-stat="onbase_perc" >.345</td><td class="right " data-stat="slugging_perc" >.424</td><td class="right " data-stat="onbase_plus_slugging" >.769</td><td class="right iz" data-stat="PO" >0</td><td class="right iz" data-stat="A" >0</td><td class="left iz" data-stat="details" ></td></tr>
+<tr ><th scope="row" class="left " data-append-csv="bollifr01" data-stat="player" csk="2" ><a href="/players/b/bollifr01.shtml">Frank Bolling</a> 2B</th><td class="right " data-stat="AB" >5</td><td class="right iz" data-stat="R" >0</td><td class="right iz" data-stat="H" >0</td><td class="right iz" data-stat="RBI" >0</td><td class="right iz" data-stat="BB" >0</td><td class="right " data-stat="SO" >1</td><td class="right " data-stat="PA" >5</td><td class="right " data-stat="batting_avg" >.288</td><td class="right " data-stat="onbase_perc" >.327</td><td class="right " data-stat="slugging_perc" >.403</td><td class="right " data-stat="onbase_plus_slugging" >.729</td><td class="right " data-stat="PO" >4</td><td class="right " data-stat="A" >2</td><td class="left iz" data-stat="details" ></td></tr>
+<tr ><th scope="row" class="left " data-append-csv="aaronha01" data-stat="player" csk="3" ><a href="/players/a/aaronha01.shtml">Hank Aaron</a> RF</th><td class="right " data-stat="AB" >3</td><td class="right " data-stat="R" >1</td><td class="right " data-stat="H" >1</td><td class="right iz" data-stat="RBI" >0</td><td class="right " data-stat="BB" >1</td><td class="right " data-stat="SO" >1</td><td class="right " data-stat="PA" >4</td><td class="right " data-stat="batting_avg" >.332</td><td class="right " data-stat="onbase_perc" >.394</td><td class="right " data-stat="slugging_perc" >.560</td><td class="right " data-stat="onbase_plus_slugging" >.954</td><td class="right " data-stat="PO" >2</td><td class="right iz" data-stat="A" >0</td><td class="left iz" data-stat="details" ></td></tr>
+<tr ><th scope="row" class="left " data-append-csv="jonesma01" data-stat="player" csk="4" ><a href="/players/j/jonesma01.shtml">Mack Jones</a> LF-CF</th><td class="right " data-stat="AB" >4</td><td class="right iz" data-stat="R" >0</td><td class="right " data-stat="H" >1</td><td class="right iz" data-stat="RBI" >0</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right " data-stat="PA" >4</td><td class="right " data-stat="batting_avg" >.263</td><td class="right " data-stat="onbase_perc" >.317</td><td class="right " data-stat="slugging_perc" >.509</td><td class="right " data-stat="onbase_plus_slugging" >.826</td><td class="right " data-stat="PO" >2</td><td class="right iz" data-stat="A" >0</td><td class="left " data-stat="details" >2B</td></tr>
+<tr ><th scope="row" class="left " data-append-csv="torrejo01" data-stat="player" csk="5" ><a href="/players/t/torrejo01.shtml">Joe Torre</a> C</th><td class="right " data-stat="AB" >4</td><td class="right " data-stat="R" >1</td><td class="right " data-stat="H" >1</td><td class="right iz" data-stat="RBI" >0</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right " data-stat="PA" >4</td><td class="right " data-stat="batting_avg" >.331</td><td class="right " data-stat="onbase_perc" >.400</td><td class="right " data-stat="slugging_perc" >.568</td><td class="right " data-stat="onbase_plus_slugging" >.968</td><td class="right " data-stat="PO" >6</td><td class="right iz" data-stat="A" >0</td><td class="left iz" data-stat="details" ></td></tr>
+<tr ><th scope="row" class="left " data-append-csv="matheed01" data-stat="player" csk="6" ><a href="/players/m/matheed01.shtml">Eddie Mathews</a> 3B</th><td class="right " data-stat="AB" >4</td><td class="right " data-stat="R" >1</td><td class="right " data-stat="H" >2</td><td class="right " data-stat="RBI" >3</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right " data-stat="PA" >4</td><td class="right " data-stat="batting_avg" >.236</td><td class="right " data-stat="onbase_perc" >.333</td><td class="right " data-stat="slugging_perc" >.450</td><td class="right " data-stat="onbase_plus_slugging" >.783</td><td class="right " data-stat="PO" >1</td><td class="right " data-stat="A" >3</td><td class="left " data-stat="details" >HR</td></tr>
+<tr ><th scope="row" class="left " data-append-csv="olivege01" data-stat="player" csk="7" ><a href="/players/o/olivege01.shtml">Gene Oliver</a> 1B</th><td class="right " data-stat="AB" >4</td><td class="right iz" data-stat="R" >0</td><td class="right iz" data-stat="H" >0</td><td class="right iz" data-stat="RBI" >0</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right " data-stat="PA" >4</td><td class="right " data-stat="batting_avg" >.255</td><td class="right " data-stat="onbase_perc" >.339</td><td class="right " data-stat="slugging_perc" >.401</td><td class="right " data-stat="onbase_plus_slugging" >.740</td><td class="right " data-stat="PO" >6</td><td class="right " data-stat="A" >3</td><td class="left iz" data-stat="details" ></td></tr>
+<tr ><th scope="row" class="left " data-append-csv="menkede01" data-stat="player" csk="8" ><a href="/players/m/menkede01.shtml">Denis Menke</a> SS</th><td class="right " data-stat="AB" >4</td><td class="right iz" data-stat="R" >0</td><td class="right " data-stat="H" >2</td><td class="right iz" data-stat="RBI" >0</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right " data-stat="PA" >4</td><td class="right " data-stat="batting_avg" >.287</td><td class="right " data-stat="onbase_perc" >.327</td><td class="right " data-stat="slugging_perc" >.500</td><td class="right " data-stat="onbase_plus_slugging" >.827</td><td class="right " data-stat="PO" >1</td><td class="right " data-stat="A" >1</td><td class="left " data-stat="details" >2B</td></tr>
+<tr ><th scope="row" class="left " data-append-csv="clonito01" data-stat="player" csk="9" ><a href="/players/c/clonito01.shtml">Tony Cloninger</a> P</th><td class="right " data-stat="AB" >2</td><td class="right iz" data-stat="R" >0</td><td class="right iz" data-stat="H" >0</td><td class="right iz" data-stat="RBI" >0</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right " data-stat="PA" >2</td><td class="right " data-stat="batting_avg" >.184</td><td class="right " data-stat="onbase_perc" >.184</td><td class="right " data-stat="slugging_perc" >.265</td><td class="right " data-stat="onbase_plus_slugging" >.449</td><td class="right " data-stat="PO" >1</td><td class="right " data-stat="A" >1</td><td class="left iz" data-stat="details" ></td></tr>
+<tr ><th scope="row" class="left " data-append-csv="klimclo01" data-stat="player" csk="10" >&nbsp;&nbsp;&nbsp;<a href="/players/k/klimclo01.shtml">Lou Klimchock</a> </th><td class="right iz" data-stat="AB" >0</td><td class="right iz" data-stat="R" >0</td><td class="right iz" data-stat="H" >0</td><td class="right iz" data-stat="RBI" >0</td><td class="right " data-stat="BB" >1</td><td class="right iz" data-stat="SO" >0</td><td class="right " data-stat="PA" >1</td><td class="right " data-stat="batting_avg" >.081</td><td class="right " data-stat="onbase_perc" >.125</td><td class="right " data-stat="slugging_perc" >.081</td><td class="right " data-stat="onbase_plus_slugging" >.206</td><td class="right iz" data-stat="PO" ></td><td class="right iz" data-stat="A" ></td><td class="left iz" data-stat="details" ></td></tr>
+<tr ><th scope="row" class="left " data-append-csv="eilerda01" data-stat="player" csk="11" >&nbsp;&nbsp;&nbsp;<a href="/players/e/eilerda01.shtml">Dave Eilers</a> P</th><td class="right iz" data-stat="AB" >0</td><td class="right iz" data-stat="R" >0</td><td class="right iz" data-stat="H" >0</td><td class="right iz" data-stat="RBI" >0</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right iz" data-stat="PA" >0</td><td class="right iz" data-stat="batting_avg" ></td><td class="right iz" data-stat="onbase_perc" ></td><td class="right iz" data-stat="slugging_perc" ></td><td class="right iz" data-stat="onbase_plus_slugging" ></td><td class="right iz" data-stat="PO" >0</td><td class="right iz" data-stat="A" >0</td><td class="left iz" data-stat="details" ></td></tr>
+<tr ><th scope="row" class="left " data-append-csv="kelledi01" data-stat="player" csk="12" >&nbsp;&nbsp;&nbsp;<a href="/players/k/kelledi01.shtml">Dick Kelley</a> P</th><td class="right iz" data-stat="AB" >0</td><td class="right iz" data-stat="R" >0</td><td class="right iz" data-stat="H" >0</td><td class="right iz" data-stat="RBI" >0</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right iz" data-stat="PA" >0</td><td class="right " data-stat="batting_avg" >.000</td><td class="right " data-stat="onbase_perc" >.000</td><td class="right " data-stat="slugging_perc" >.000</td><td class="right " data-stat="onbase_plus_slugging" >.000</td><td class="right " data-stat="PO" >1</td><td class="right iz" data-stat="A" >0</td><td class="left iz" data-stat="details" ></td></tr>
+<tr ><th scope="row" class="left " data-append-csv="kolbga01" data-stat="player" csk="13" >&nbsp;&nbsp;&nbsp;<a href="/players/k/kolbga01.shtml">Gary Kolb</a> </th><td class="right " data-stat="AB" >1</td><td class="right iz" data-stat="R" >0</td><td class="right " data-stat="H" >1</td><td class="right iz" data-stat="RBI" >0</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right " data-stat="PA" >1</td><td class="right " data-stat="batting_avg" >.313</td><td class="right " data-stat="onbase_perc" >.313</td><td class="right " data-stat="slugging_perc" >.313</td><td class="right " data-stat="onbase_plus_slugging" >.625</td><td class="right iz" data-stat="PO" ></td><td class="right iz" data-stat="A" ></td><td class="left iz" data-stat="details" ></td></tr>
+
+   </tbody>
+   <tfoot><tr ><th scope="row" class="left " data-stat="player" >Team Totals</th><td class="right " data-stat="AB" >35</td><td class="right " data-stat="R" >3</td><td class="right " data-stat="H" >8</td><td class="right " data-stat="RBI" >3</td><td class="right " data-stat="BB" >3</td><td class="right " data-stat="SO" >3</td><td class="right " data-stat="PA" >38</td><td class="right " data-stat="batting_avg" >.229</td><td class="right " data-stat="onbase_perc" >.289</td><td class="right " data-stat="slugging_perc" >.371</td><td class="right " data-stat="onbase_plus_slugging" >.661</td><td class="right " data-stat="PO" >24</td><td class="right " data-stat="A" >10</td><td class="left iz" data-stat="details" ></td></tr>
+
+   </tfoot>
+
+</table>
+
+      </div>
+   </div>
+   <div class="footer no_hide_long" id="tfooter_MilwaukeeBravesbatting">
+   
+    <div><div id='2Bvisitor'><strong>2B:</strong> Mack Jones (9); Denis Menke (9).</div>
+<div id='HRvisitor'><strong>HR:</strong> Eddie Mathews (15).</div>
+<div id='TB'><strong>TB:</strong> Eddie&nbsp;Mathews 5; Denis&nbsp;Menke 3; Mack&nbsp;Jones 2; Gary&nbsp;Kolb; Joe&nbsp;Torre; Hank&nbsp;Aaron.</div>
+<div id='RBI'><strong>RBI:</strong> Eddie&nbsp;Mathews 3 (45).</div>
+<div id='teamlobvisitor'><strong>Team LOB:</strong> 8.</div></div>
+<div><strong>Fielding</strong>
+<div><strong>E:</strong> Eddie&nbsp;Mathews (10).</div>
+</div></div>
+-->
+</div>
+
+            
+            
+	       	
+
+<!-- fs_btf_1 -->
+<div class="adblock">
+<!-- div#fs_fs_btf_1  -->
+<div align="center" id="div-gpt-ad-728x90-BTF-1">
+    <script data-cfasync="false" type='text/javascript'>
+    if (sr_detect_ie || sr_detect_edge || Modernizr.adfree) {
+    }
+    else {
+        console.log('push ad:div-gpt-ad-728x90-BTF-1');
+        freestar.queue.push(function() { googletag.display('div-gpt-ad-728x90-BTF-1'); });
+    }
+    </script>
+</div>
+<!-- /div.#fs_fs_btf_1 -->
+
+
+</div>
+
+
+            
+         
+      
+         
+            
+<div id="all_PittsburghPiratesbatting" class="table_wrapper setup_commented commented">
+
+<div class="section_heading">
+  <span class="section_anchor" id="PittsburghPiratesbatting_link" data-label="Pittsburgh Pirates Batting"></span><h2>Pittsburgh Pirates</h2>    <div class="section_heading_text">
+      <ul>
+      </ul>
+    </div>
+    		
+</div>
+<div class="placeholder"></div>
+<!--
+   <div class="table_outer_container">
+      <div class="overthrow table_container" id="div_PittsburghPiratesbatting">
+	  
+  <table class="sortable stats_table min_width shade_zero" id="PittsburghPiratesbatting" data-cols-to-freeze="1"><caption>Pittsburgh Pirates Table</caption>
+   <colgroup><col><col><col><col><col><col><col><col><col><col><col><col><col><col><col></colgroup>
+   <thead>      
+      <tr>
+         <th aria-label=" Player Name Bold can mean player is active for this team or player has appeared in MLB * means LHP or LHB, # means switch hitter, + can mean HOFer." data-stat="player" scope="col" class=" poptip sort_default_asc show_partial_when_sorting left" data-tip="&lt;strong&gt;Player Name&lt;/strong&gt;&lt;br&gt;&lt;strong&gt;Bold&lt;/strong&gt; can mean player is active for this team&lt;br&gt;or player has appeared in MLB&lt;br&gt;* means LHP or LHB,&lt;br&gt;# means switch hitter,&lt;br&gt;+ can mean HOFer." >Batting</th>
+         <th aria-label="At Bats" data-stat="AB" scope="col" class=" poptip center" data-tip="At Bats" >AB</th>
+         <th aria-label="Runs Scored" data-stat="R" scope="col" class=" poptip center" data-tip="Runs Scored/Allowed" >R</th>
+         <th aria-label="Hits" data-stat="H" scope="col" class=" poptip center" data-tip="Hits/Hits Allowed" >H</th>
+         <th aria-label="Runs Batted In" data-stat="RBI" scope="col" class=" poptip center" data-tip="Runs Batted In" >RBI</th>
+         <th aria-label="Bases on Balls" data-stat="BB" scope="col" class=" poptip center" data-tip="Bases on Balls/Walks" >BB</th>
+         <th aria-label="Strikeouts" data-stat="SO" scope="col" class=" poptip center" data-tip="Strikeouts" >SO</th>
+         <th aria-label="Plate Appearances" data-stat="PA" scope="col" class=" poptip center" data-tip="&lt;strong&gt;Plate Appearances&lt;/strong&gt;&lt;br&gt;When available, we use actual plate appearances from play-by-play game accounts&lt;br&gt;Otherwise estimated using AB + BB + HBP + SF + SH,&lt;br&gt;which excludes catcher interferences.&lt;br&gt;When &lt;span class=tooltip&gt;this color&lt;/span&gt; click for a summary of each PA." >PA</th>
+         <th aria-label="Batting Average" data-stat="batting_avg" scope="col" class=" poptip hide_non_quals center" data-tip="&lt;strong&gt;Hits/At Bats&lt;/strong&gt;&lt;br&gt;For recent years, leaders need 3.1 PA&lt;br&gt;per team game played&lt;br&gt;Bold indicates highest BA using current stats&lt;br&gt;&lt;span class=&quot;all_time_record&quot;&gt;Gold&lt;/span&gt; means awarded title at end of year." data-filter="1" data-name="Batting Average" >BA</th>
+         <th aria-label="On-Base%" data-stat="onbase_perc" scope="col" class=" poptip hide_non_quals center" data-tip="&lt;strong&gt;(H + BB + HBP)/(At Bats + BB + HBP + SF)&lt;/strong&gt;&lt;br&gt;For recent years, leaders need 3.1 PA&lt;br&gt;per team game played" data-filter="1" data-name="On-Base%" >OBP</th>
+         <th aria-label="Slugging %" data-stat="slugging_perc" scope="col" class=" poptip hide_non_quals center" data-tip="<strong>Total Bases/At Bats or <br>(1B + 2*2B + 3*3B + 4*HR)/AB</strong><br>For recent years, leaders need 3.1 PA<br>per team game played" data-filter="1" data-name="Slugging %" >SLG</th>
+         <th aria-label="On-Base Plus Slugging" data-stat="onbase_plus_slugging" scope="col" class=" poptip hide_non_quals center" data-tip="&lt;strong&gt;On-Base + Slugging Percentages &lt;/strong&gt;&lt;br&gt;For recent years, leaders need 3.1 PA&lt;br&gt;per team game played" data-filter="1" data-name="On-Base Plus Slugging" >OPS</th>
+         <th aria-label="Putouts" data-stat="PO" scope="col" class=" poptip center" data-tip="Putouts" >PO</th>
+         <th aria-label="Assists" data-stat="A" scope="col" class=" poptip center" data-tip="Assists" >A</th>
+         <th aria-label="details" data-stat="details" scope="col" class=" poptip center" >Details</th>
+      </tr>
+      
+   </thead>
+   <tbody>
+<tr ><th scope="row" class="left " data-append-csv="bailebo01" data-stat="player" csk="0" ><a href="/players/b/bailebo01.shtml">Bob Bailey</a> 3B</th><td class="right " data-stat="AB" >5</td><td class="right iz" data-stat="R" >0</td><td class="right iz" data-stat="H" >0</td><td class="right iz" data-stat="RBI" >0</td><td class="right iz" data-stat="BB" >0</td><td class="right " data-stat="SO" >1</td><td class="right " data-stat="PA" >5</td><td class="right " data-stat="batting_avg" >.253</td><td class="right " data-stat="onbase_perc" >.340</td><td class="right " data-stat="slugging_perc" >.359</td><td class="right " data-stat="onbase_plus_slugging" >.699</td><td class="right " data-stat="PO" >1</td><td class="right " data-stat="A" >3</td><td class="left iz" data-stat="details" ></td></tr>
+<tr ><th scope="row" class="left " data-append-csv="virdobi01" data-stat="player" csk="1" ><a href="/players/v/virdobi01.shtml">Bill Virdon</a> CF</th><td class="right " data-stat="AB" >5</td><td class="right " data-stat="R" >2</td><td class="right " data-stat="H" >2</td><td class="right iz" data-stat="RBI" >0</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right " data-stat="PA" >5</td><td class="right " data-stat="batting_avg" >.306</td><td class="right " data-stat="onbase_perc" >.351</td><td class="right " data-stat="slugging_perc" >.401</td><td class="right " data-stat="onbase_plus_slugging" >.752</td><td class="right " data-stat="PO" >1</td><td class="right iz" data-stat="A" >0</td><td class="left " data-stat="details" >3B</td></tr>
+<tr ><th scope="row" class="left " data-append-csv="clemero01" data-stat="player" csk="2" ><a href="/players/c/clemero01.shtml">Roberto Clemente</a> RF</th><td class="right " data-stat="AB" >4</td><td class="right " data-stat="R" >2</td><td class="right " data-stat="H" >3</td><td class="right " data-stat="RBI" >1</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right " data-stat="PA" >4</td><td class="right " data-stat="batting_avg" >.330</td><td class="right " data-stat="onbase_perc" >.365</td><td class="right " data-stat="slugging_perc" >.446</td><td class="right " data-stat="onbase_plus_slugging" >.811</td><td class="right " data-stat="PO" >4</td><td class="right iz" data-stat="A" >0</td><td class="left " data-stat="details" >3B,2B</td></tr>
+<tr ><th scope="row" class="left " data-append-csv="stargwi01" data-stat="player" csk="3" ><a href="/players/s/stargwi01.shtml">Willie Stargell</a> LF</th><td class="right " data-stat="AB" >4</td><td class="right iz" data-stat="R" >0</td><td class="right " data-stat="H" >2</td><td class="right " data-stat="RBI" >2</td><td class="right iz" data-stat="BB" >0</td><td class="right " data-stat="SO" >1</td><td class="right " data-stat="PA" >4</td><td class="right " data-stat="batting_avg" >.286</td><td class="right " data-stat="onbase_perc" >.342</td><td class="right " data-stat="slugging_perc" >.604</td><td class="right " data-stat="onbase_plus_slugging" >.946</td><td class="right iz" data-stat="PO" >0</td><td class="right iz" data-stat="A" >0</td><td class="left " data-stat="details" >2B</td></tr>
+<tr ><th scope="row" class="left " data-append-csv="motama01" data-stat="player" csk="4" >&nbsp;&nbsp;&nbsp;<a href="/players/m/motama01.shtml">Manny Mota</a> LF</th><td class="right iz" data-stat="AB" >0</td><td class="right " data-stat="R" >1</td><td class="right iz" data-stat="H" >0</td><td class="right iz" data-stat="RBI" >0</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right iz" data-stat="PA" >0</td><td class="right " data-stat="batting_avg" >.250</td><td class="right " data-stat="onbase_perc" >.286</td><td class="right " data-stat="slugging_perc" >.288</td><td class="right " data-stat="onbase_plus_slugging" >.574</td><td class="right " data-stat="PO" >1</td><td class="right iz" data-stat="A" >0</td><td class="left iz" data-stat="details" ></td></tr>
+<tr ><th scope="row" class="left " data-append-csv="clenddo01" data-stat="player" csk="5" ><a href="/players/c/clenddo01.shtml">Donn Clendenon</a> 1B</th><td class="right " data-stat="AB" >4</td><td class="right iz" data-stat="R" >0</td><td class="right " data-stat="H" >2</td><td class="right " data-stat="RBI" >1</td><td class="right iz" data-stat="BB" >0</td><td class="right " data-stat="SO" >2</td><td class="right " data-stat="PA" >4</td><td class="right " data-stat="batting_avg" >.321</td><td class="right " data-stat="onbase_perc" >.370</td><td class="right " data-stat="slugging_perc" >.468</td><td class="right " data-stat="onbase_plus_slugging" >.838</td><td class="right " data-stat="PO" >12</td><td class="right iz" data-stat="A" >0</td><td class="left iz" data-stat="details" ></td></tr>
+<tr ><th scope="row" class="left " data-append-csv="mazerbi01" data-stat="player" csk="6" ><a href="/players/m/mazerbi01.shtml">Bill Mazeroski</a> 2B</th><td class="right " data-stat="AB" >4</td><td class="right " data-stat="R" >1</td><td class="right " data-stat="H" >1</td><td class="right iz" data-stat="RBI" >0</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right " data-stat="PA" >4</td><td class="right " data-stat="batting_avg" >.280</td><td class="right " data-stat="onbase_perc" >.322</td><td class="right " data-stat="slugging_perc" >.395</td><td class="right " data-stat="onbase_plus_slugging" >.717</td><td class="right " data-stat="PO" >4</td><td class="right " data-stat="A" >2</td><td class="left " data-stat="details" >GDP</td></tr>
+<tr ><th scope="row" class="left " data-append-csv="alleyge01" data-stat="player" csk="7" ><a href="/players/a/alleyge01.shtml">Gene Alley</a> SS</th><td class="right " data-stat="AB" >4</td><td class="right " data-stat="R" >1</td><td class="right " data-stat="H" >1</td><td class="right " data-stat="RBI" >1</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right " data-stat="PA" >4</td><td class="right " data-stat="batting_avg" >.260</td><td class="right " data-stat="onbase_perc" >.300</td><td class="right " data-stat="slugging_perc" >.357</td><td class="right " data-stat="onbase_plus_slugging" >.657</td><td class="right iz" data-stat="PO" >0</td><td class="right " data-stat="A" >2</td><td class="left " data-stat="details" >3B</td></tr>
+<tr ><th scope="row" class="left " data-append-csv="pagliji01" data-stat="player" csk="8" ><a href="/players/p/pagliji01.shtml">Jim Pagliaroni</a> C</th><td class="right " data-stat="AB" >3</td><td class="right iz" data-stat="R" >0</td><td class="right " data-stat="H" >2</td><td class="right iz" data-stat="RBI" >0</td><td class="right " data-stat="BB" >1</td><td class="right " data-stat="SO" >1</td><td class="right " data-stat="PA" >4</td><td class="right " data-stat="batting_avg" >.277</td><td class="right " data-stat="onbase_perc" >.345</td><td class="right " data-stat="slugging_perc" >.445</td><td class="right " data-stat="onbase_plus_slugging" >.790</td><td class="right " data-stat="PO" >3</td><td class="right iz" data-stat="A" >0</td><td class="left iz" data-stat="details" ></td></tr>
+<tr ><th scope="row" class="left " data-append-csv="cardwdo01" data-stat="player" csk="9" ><a href="/players/c/cardwdo01.shtml">Don Cardwell</a> P</th><td class="right " data-stat="AB" >1</td><td class="right " data-stat="R" >1</td><td class="right iz" data-stat="H" >0</td><td class="right " data-stat="RBI" >1</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right " data-stat="PA" >3</td><td class="right " data-stat="batting_avg" >.129</td><td class="right " data-stat="onbase_perc" >.156</td><td class="right " data-stat="slugging_perc" >.258</td><td class="right " data-stat="onbase_plus_slugging" >.414</td><td class="right iz" data-stat="PO" >0</td><td class="right " data-stat="A" >2</td><td class="left " data-stat="details" >SB,2&#183;SH</td></tr>
+<tr ><th scope="row" class="left " data-append-csv="schwado01" data-stat="player" csk="10" >&nbsp;&nbsp;&nbsp;<a href="/players/s/schwado01.shtml">Don Schwall</a> P</th><td class="right " data-stat="AB" >1</td><td class="right iz" data-stat="R" >0</td><td class="right iz" data-stat="H" >0</td><td class="right iz" data-stat="RBI" >0</td><td class="right iz" data-stat="BB" >0</td><td class="right " data-stat="SO" >1</td><td class="right " data-stat="PA" >1</td><td class="right " data-stat="batting_avg" >.000</td><td class="right " data-stat="onbase_perc" >.000</td><td class="right " data-stat="slugging_perc" >.000</td><td class="right " data-stat="onbase_plus_slugging" >.000</td><td class="right " data-stat="PO" >1</td><td class="right " data-stat="A" >1</td><td class="left iz" data-stat="details" ></td></tr>
+
+   </tbody>
+   <tfoot><tr ><th scope="row" class="left " data-stat="player" >Team Totals</th><td class="right " data-stat="AB" >35</td><td class="right " data-stat="R" >8</td><td class="right " data-stat="H" >13</td><td class="right " data-stat="RBI" >6</td><td class="right " data-stat="BB" >1</td><td class="right " data-stat="SO" >6</td><td class="right " data-stat="PA" >38</td><td class="right " data-stat="batting_avg" >.371</td><td class="right " data-stat="onbase_perc" >.389</td><td class="right " data-stat="slugging_perc" >.600</td><td class="right " data-stat="onbase_plus_slugging" >.989</td><td class="right " data-stat="PO" >27</td><td class="right " data-stat="A" >10</td><td class="left iz" data-stat="details" ></td></tr>
+
+   </tfoot>
+
+</table>
+
+      </div>
+   </div>
+   <div class="footer no_hide_long" id="tfooter_PittsburghPiratesbatting">
+   
+    <div><div id='2Bhome'><strong>2B:</strong> Roberto Clemente (10); Willie Stargell (10).</div>
+<div id='3Bhome'><strong>3B:</strong> Bill Virdon (4); Roberto Clemente (9); Gene Alley (3).</div>
+<div id='SHhome'><strong>SH:</strong> Don Cardwell 2 (8).</div>
+<div id='TB'><strong>TB:</strong> Roberto&nbsp;Clemente 6; Bill&nbsp;Virdon 4; Gene&nbsp;Alley 3; Willie&nbsp;Stargell 3; Donn&nbsp;Clendenon 2; Jim&nbsp;Pagliaroni 2; Bill&nbsp;Mazeroski.</div>
+<div id='GIDP'><strong>GIDP:</strong> Bill&nbsp;Mazeroski (10).</div>
+<div id='RBI'><strong>RBI:</strong> Willie&nbsp;Stargell 2 (60); Roberto&nbsp;Clemente (33); Gene&nbsp;Alley (23); Donn&nbsp;Clendenon (44); Don&nbsp;Cardwell (3).</div>
+<div id='teamlobhome'><strong>Team LOB:</strong> 6.</div></div>
+<div><strong>Fielding</strong>
+<div><strong>E:</strong> Donn&nbsp;Clendenon (17).</div>
+</div><div><strong>Baserunning</strong>
+<div id='SBhome'><strong>SB:</strong> Don Cardwell (1).</div>
+</div></div>
+-->
+</div>
+
+            
+            
+         
+      
+         
+            <div class="section_wrapper setup_commented commented" id="all_6799509569">
+<div class="section_heading">
+  <span class="section_anchor" id="6799509569_link" data-label="Pitching Lines and Info"></span>	
+</div><div class="placeholder"></div>
+<!--     <div class="section_content" id="div_6799509569">
+	    
+<div id="all_MilwaukeeBravespitching" class="table_wrapper">
+
+<div class="section_heading">
+  <span class="section_anchor" id="MilwaukeeBravespitching_link" data-label="Milwaukee Braves"></span><h2>Milwaukee Braves</h2>    <div class="section_heading_text">
+      <ul>
+      </ul>
+    </div>
+    		
+</div>   <div class="table_outer_container">
+      <div class="overthrow table_container" id="div_MilwaukeeBravespitching">
+	  
+  <table class="sortable stats_table min_width shade_zero" id="MilwaukeeBravespitching" data-cols-to-freeze="1"><caption>Milwaukee Braves Table</caption>
+   <colgroup><col><col><col><col><col><col><col><col><col><col><col></colgroup>
+   <thead>      
+      <tr>
+         <th aria-label=" Player Name Bold can mean player is active for this team or player has appeared in MLB * means LHP or LHB, # means switch hitter, + can mean HOFer." data-stat="player" scope="col" class=" poptip sort_default_asc show_partial_when_sorting left" data-tip="&lt;strong&gt;Player Name&lt;/strong&gt;&lt;br&gt;&lt;strong&gt;Bold&lt;/strong&gt; can mean player is active for this team&lt;br&gt;or player has appeared in MLB&lt;br&gt;* means LHP or LHB,&lt;br&gt;# means switch hitter,&lt;br&gt;+ can mean HOFer." >Pitching</th>
+         <th aria-label="Innings Pitched" data-stat="IP" scope="col" class=" poptip center" data-tip="Innings Pitched" data-filter="1" data-name="Innings Pitched" >IP</th>
+         <th aria-label="Hits" data-stat="H" scope="col" class=" poptip center" data-tip="Hits/Hits Allowed" >H</th>
+         <th aria-label="Runs Scored" data-stat="R" scope="col" class=" poptip center" data-tip="Runs Scored/Allowed" >R</th>
+         <th aria-label="Earned Runs" data-stat="ER" scope="col" class=" poptip center" data-tip="Earned Runs Allowed" >ER</th>
+         <th aria-label="Bases on Balls" data-stat="BB" scope="col" class=" poptip center" data-tip="Bases on Balls/Walks" >BB</th>
+         <th aria-label="Strikeouts" data-stat="SO" scope="col" class=" poptip center" data-tip="Strikeouts" >SO</th>
+         <th aria-label="Home Runs" data-stat="HR" scope="col" class=" poptip center" data-tip="Home Runs Hit/Allowed" >HR</th>
+         <th aria-label="Earned Run Average" data-stat="earned_run_avg" scope="col" class=" poptip sort_default_asc hide_non_quals center" data-tip="&lt;strong&gt;9 * ER / IP&lt;/strong&gt;&lt;br&gt;For recent years, leaders need 1 IP&lt;br&gt;per team game played.&lt;br&gt;Bold indicates lowest ERA using current stats&lt;br&gt;&lt;span class=glimmer&gt;Gold&lt;/span&gt; means awarded ERA title at end of year." data-filter="1" data-name="Earned Run Average" >ERA</th>
+         <th aria-label="Batters Faced" data-stat="batters_faced" scope="col" class=" poptip center" data-tip="Batters Faced" >BF</th>
+         <th aria-label=" Game Score Developed by Bill James 1. Start with 50 points. 2. Add 1 point for each out recorded, so 3 points for every complete inning pitched. 3. Add 2 points for each inning completed after the 4th. 4. Add 1 point for each strikeout. 5. Subtract 2 points for each hit allowed. 6. Subtract 4 points for each earned run allowed. 7. Subtract 2 points for each unearned run allowed. 8. Subtract 1 point for each walk. " data-stat="game_score" scope="col" class=" poptip center" data-tip="&lt;strong&gt;Game Score&lt;/strong&gt;&lt;br&gt;Developed by Bill James&lt;br&gt;1. Start with 50 points.&lt;br&gt; 2. Add 1 point for each out recorded, so 3 points for every complete inning pitched.&lt;br&gt; 3. Add 2 points for each inning completed after the 4th.&lt;br&gt; 4. Add 1 point for each strikeout.&lt;br&gt; 5. Subtract 2 points for each hit allowed.&lt;br&gt; 6. Subtract 4 points for each earned run allowed.&lt;br&gt; 7. Subtract 2 points for each unearned run allowed.&lt;br&gt; 8. Subtract 1 point for each walk.&lt;br&gt;" >GSc</th>
+      </tr>
+      
+   </thead>
+   <tbody>
+<tr ><th scope="row" class="left " data-append-csv="clonito01" data-stat="player" csk="0" ><a href="/players/c/clonito01.shtml">Tony Cloninger</a>, L (10-7)</th><td class="right " data-stat="IP" > 6 </td><td class="right " data-stat="H" >9</td><td class="right " data-stat="R" >5</td><td class="right " data-stat="ER" >4</td><td class="right iz" data-stat="BB" >0</td><td class="right " data-stat="SO" >5</td><td class="right iz" data-stat="HR" >0</td><td class="right " data-stat="earned_run_avg" >3.92</td><td class="right " data-stat="batters_faced" >28</td><td class="right " data-stat="game_score" >41</td></tr>
+<tr ><th scope="row" class="left " data-append-csv="eilerda01" data-stat="player" csk="1" ><a href="/players/e/eilerda01.shtml">Dave Eilers</a></th><td class="right " data-stat="IP" > 0 </td><td class="right " data-stat="H" >3</td><td class="right " data-stat="R" >3</td><td class="right " data-stat="ER" >3</td><td class="right iz" data-stat="BB" >0</td><td class="right iz" data-stat="SO" >0</td><td class="right iz" data-stat="HR" >0</td><td class="right " data-stat="earned_run_avg" >15.00</td><td class="right " data-stat="batters_faced" >3</td><td class="right iz" data-stat="game_score" ></td></tr>
+<tr ><th scope="row" class="left " data-append-csv="kelledi01" data-stat="player" csk="2" ><a href="/players/k/kelledi01.shtml">Dick Kelley</a></th><td class="right " data-stat="IP" > 2 </td><td class="right " data-stat="H" >1</td><td class="right iz" data-stat="R" >0</td><td class="right iz" data-stat="ER" >0</td><td class="right " data-stat="BB" >1</td><td class="right " data-stat="SO" >1</td><td class="right iz" data-stat="HR" >0</td><td class="right " data-stat="earned_run_avg" >3.68</td><td class="right " data-stat="batters_faced" >7</td><td class="right iz" data-stat="game_score" ></td></tr>
+
+   </tbody>
+   <tfoot><tr ><th scope="row" class="left " data-stat="player" >Team Totals</th><td class="right " data-stat="IP" > 8 </td><td class="right " data-stat="H" >13</td><td class="right " data-stat="R" >8</td><td class="right " data-stat="ER" >7</td><td class="right " data-stat="BB" >1</td><td class="right " data-stat="SO" >6</td><td class="right iz" data-stat="HR" >0</td><td class="right " data-stat="earned_run_avg" > 7.88</td><td class="right " data-stat="batters_faced" >38</td><td class="right " data-stat="game_score" >41</td></tr>
+
+   </tfoot>
+
+</table>
+
+      </div>
+   </div>
+</div>
+<p class="note"></p>
+<div id="all_PittsburghPiratespitching" class="table_wrapper">
+
+<div class="section_heading">
+  <span class="section_anchor" id="PittsburghPiratespitching_link" data-label="Pittsburgh Pirates"></span><h2>Pittsburgh Pirates</h2>    <div class="section_heading_text">
+      <ul>
+      </ul>
+    </div>
+    		
+</div>   <div class="table_outer_container">
+      <div class="overthrow table_container" id="div_PittsburghPiratespitching">
+	  
+  <table class="sortable stats_table min_width shade_zero" id="PittsburghPiratespitching" data-cols-to-freeze="1"><caption>Pittsburgh Pirates Table</caption>
+   <colgroup><col><col><col><col><col><col><col><col><col><col><col></colgroup>
+   <thead>      
+      <tr>
+         <th aria-label=" Player Name Bold can mean player is active for this team or player has appeared in MLB * means LHP or LHB, # means switch hitter, + can mean HOFer." data-stat="player" scope="col" class=" poptip sort_default_asc show_partial_when_sorting left" data-tip="&lt;strong&gt;Player Name&lt;/strong&gt;&lt;br&gt;&lt;strong&gt;Bold&lt;/strong&gt; can mean player is active for this team&lt;br&gt;or player has appeared in MLB&lt;br&gt;* means LHP or LHB,&lt;br&gt;# means switch hitter,&lt;br&gt;+ can mean HOFer." >Pitching</th>
+         <th aria-label="Innings Pitched" data-stat="IP" scope="col" class=" poptip center" data-tip="Innings Pitched" data-filter="1" data-name="Innings Pitched" >IP</th>
+         <th aria-label="Hits" data-stat="H" scope="col" class=" poptip center" data-tip="Hits/Hits Allowed" >H</th>
+         <th aria-label="Runs Scored" data-stat="R" scope="col" class=" poptip center" data-tip="Runs Scored/Allowed" >R</th>
+         <th aria-label="Earned Runs" data-stat="ER" scope="col" class=" poptip center" data-tip="Earned Runs Allowed" >ER</th>
+         <th aria-label="Bases on Balls" data-stat="BB" scope="col" class=" poptip center" data-tip="Bases on Balls/Walks" >BB</th>
+         <th aria-label="Strikeouts" data-stat="SO" scope="col" class=" poptip center" data-tip="Strikeouts" >SO</th>
+         <th aria-label="Home Runs" data-stat="HR" scope="col" class=" poptip center" data-tip="Home Runs Hit/Allowed" >HR</th>
+         <th aria-label="Earned Run Average" data-stat="earned_run_avg" scope="col" class=" poptip sort_default_asc hide_non_quals center" data-tip="&lt;strong&gt;9 * ER / IP&lt;/strong&gt;&lt;br&gt;For recent years, leaders need 1 IP&lt;br&gt;per team game played.&lt;br&gt;Bold indicates lowest ERA using current stats&lt;br&gt;&lt;span class=glimmer&gt;Gold&lt;/span&gt; means awarded ERA title at end of year." data-filter="1" data-name="Earned Run Average" >ERA</th>
+         <th aria-label="Batters Faced" data-stat="batters_faced" scope="col" class=" poptip center" data-tip="Batters Faced" >BF</th>
+         <th aria-label=" Game Score Developed by Bill James 1. Start with 50 points. 2. Add 1 point for each out recorded, so 3 points for every complete inning pitched. 3. Add 2 points for each inning completed after the 4th. 4. Add 1 point for each strikeout. 5. Subtract 2 points for each hit allowed. 6. Subtract 4 points for each earned run allowed. 7. Subtract 2 points for each unearned run allowed. 8. Subtract 1 point for each walk. " data-stat="game_score" scope="col" class=" poptip center" data-tip="&lt;strong&gt;Game Score&lt;/strong&gt;&lt;br&gt;Developed by Bill James&lt;br&gt;1. Start with 50 points.&lt;br&gt; 2. Add 1 point for each out recorded, so 3 points for every complete inning pitched.&lt;br&gt; 3. Add 2 points for each inning completed after the 4th.&lt;br&gt; 4. Add 1 point for each strikeout.&lt;br&gt; 5. Subtract 2 points for each hit allowed.&lt;br&gt; 6. Subtract 4 points for each earned run allowed.&lt;br&gt; 7. Subtract 2 points for each unearned run allowed.&lt;br&gt; 8. Subtract 1 point for each walk.&lt;br&gt;" >GSc</th>
+      </tr>
+      
+   </thead>
+   <tbody>
+<tr ><th scope="row" class="left " data-append-csv="cardwdo01" data-stat="player" csk="0" ><a href="/players/c/cardwdo01.shtml">Don Cardwell</a>, W (7-2)</th><td class="right " data-stat="IP" > 6.2</td><td class="right " data-stat="H" >5</td><td class="right " data-stat="R" >2</td><td class="right " data-stat="ER" >2</td><td class="right " data-stat="BB" >2</td><td class="right " data-stat="SO" >2</td><td class="right " data-stat="HR" >1</td><td class="right " data-stat="earned_run_avg" >3.83</td><td class="right " data-stat="batters_faced" >27</td><td class="right " data-stat="game_score" >56</td></tr>
+<tr ><th scope="row" class="left " data-append-csv="schwado01" data-stat="player" csk="1" ><a href="/players/s/schwado01.shtml">Don Schwall</a>, S (1)</th><td class="right " data-stat="IP" > 2.1</td><td class="right " data-stat="H" >3</td><td class="right " data-stat="R" >1</td><td class="right iz" data-stat="ER" >0</td><td class="right " data-stat="BB" >1</td><td class="right " data-stat="SO" >1</td><td class="right iz" data-stat="HR" >0</td><td class="right " data-stat="earned_run_avg" >3.52</td><td class="right " data-stat="batters_faced" >11</td><td class="right iz" data-stat="game_score" ></td></tr>
+
+   </tbody>
+   <tfoot><tr ><th scope="row" class="left " data-stat="player" >Team Totals</th><td class="right " data-stat="IP" > 9 </td><td class="right " data-stat="H" >8</td><td class="right " data-stat="R" >3</td><td class="right " data-stat="ER" >2</td><td class="right " data-stat="BB" >3</td><td class="right " data-stat="SO" >3</td><td class="right " data-stat="HR" >1</td><td class="right " data-stat="earned_run_avg" > 2.00</td><td class="right " data-stat="batters_faced" >38</td><td class="right " data-stat="game_score" >56</td></tr>
+
+   </tfoot>
+
+</table>
+
+      </div>
+   </div>
+</div>
+<p class="note"></p><div class="indiv_events"><div>
+<div><strong>Balks:</strong> None.</div>
+<div><strong>WP:</strong> None.</div>
+<div><strong>HBP:</strong> None.</div>
+<div><strong>IBB:</strong> None.</div>
+<div><strong>Pickoffs:</strong> None.</div>
+</div>
+</div>
+		
+    </div>
+-->
+</div>
+
+            
+            
+	       	
+
+<!-- fs_btf_2 -->
+<div class="adblock">
+<!-- div#fs_fs_btf_2  -->
+<div align="center" id="div-gpt-ad-728x90-BTF-2">
+    <script data-cfasync="false" type='text/javascript'>
+    if (sr_detect_ie || sr_detect_edge || Modernizr.adfree) {
+    }
+    else {
+        console.log('push ad:div-gpt-ad-728x90-BTF-2');
+        freestar.queue.push(function() { googletag.display('div-gpt-ad-728x90-BTF-2'); });
+    }
+    </script>
+</div>
+<!-- /div.#fs_fs_btf_2 -->
+
+<div><a href="https://stathead.com/?&amp;utm_medium=web&amp;utm_source=br&amp;utm_campaign=adfree_callouts">Become a Stathead &amp; surf this site ad-free.</a></div>
+</div>
+
+
+            
+         
+      
+         
+            <div class="section_wrapper setup_commented commented" id="all_6181505373">
+<div class="section_heading">
+  <span class="section_anchor" id="6181505373_link" data-label="Other Info"></span><h2>Other Info</h2>    <div class="section_heading_text">
+      <ul>
+      </ul>
+    </div>
+    		
+</div><div class="placeholder"></div>
+<!--     <div class="section_content" id="div_6181505373">
+	    <div><strong>Umpires:</strong> HP - Lee Weyer, 1B - John Kibler, 2B - Frank Secory, 3B - Ken Burkhart.</div><div><strong>Time of Game:</strong> 2:32.</div>
+<div><strong>Attendance:</strong> 12,352.</div>
+<div><strong>Field Condition:</strong> Unknown.</div>
+<div><strong>Start Time Weather:</strong> Unknown.</div>
+
+		
+    </div>
+-->
+</div>
+
+            
+            
+         
+      
+         
+            <div class="grid_wrapper commented" id="all_lineups">
+
+<div class="section_heading">
+  <span class="section_anchor" id="lineups_link" data-label="Starting Lineups"></span><h2>Starting Lineups</h2>    <div class="section_heading_text">
+      <ul>
+      </ul>
+    </div>
+    		
+</div><!-- 	<div data-no-overall-control class="data_grid " id="div_lineups">
+		
+		<div class="data_grid_group solo">
+		
+		<div id="lineups_1" class="data_grid_box">
+	
+	<table>
+		<caption>Braves</caption>				<tr class="">
+						<td>1</td>
+						<td><a href="/players/c/clinety01.shtml">Ty Cline</a></td>
+						<td>CF</td>
+			
+		</tr>
+				<tr class="">
+						<td>2</td>
+						<td><a href="/players/b/bollifr01.shtml">Frank Bolling</a></td>
+						<td>2B</td>
+			
+		</tr>
+				<tr class="">
+						<td>3</td>
+						<td><a href="/players/a/aaronha01.shtml">Hank Aaron</a></td>
+						<td>RF</td>
+			
+		</tr>
+				<tr class="">
+						<td>4</td>
+						<td><a href="/players/j/jonesma01.shtml">Mack Jones</a></td>
+						<td>LF</td>
+			
+		</tr>
+				<tr class="">
+						<td>5</td>
+						<td><a href="/players/t/torrejo01.shtml">Joe Torre</a></td>
+						<td>C</td>
+			
+		</tr>
+				<tr class="">
+						<td>6</td>
+						<td><a href="/players/m/matheed01.shtml">Eddie Mathews</a></td>
+						<td>3B</td>
+			
+		</tr>
+				<tr class="">
+						<td>7</td>
+						<td><a href="/players/o/olivege01.shtml">Gene Oliver</a></td>
+						<td>1B</td>
+			
+		</tr>
+				<tr class="">
+						<td>8</td>
+						<td><a href="/players/m/menkede01.shtml">Denis Menke</a></td>
+						<td>SS</td>
+			
+		</tr>
+				<tr class="">
+						<td>9</td>
+						<td><a href="/players/c/clonito01.shtml">Tony Cloninger</a></td>
+						<td>P</td>
+			
+		</tr>
+			</table>	
+</div><div id="lineups_2" class="data_grid_box">
+	
+	<table>
+		<caption>Pirates</caption>				<tr class="">
+						<td>1</td>
+						<td><a href="/players/b/bailebo01.shtml">Bob Bailey</a></td>
+						<td>3B</td>
+			
+		</tr>
+				<tr class="">
+						<td>2</td>
+						<td><a href="/players/v/virdobi01.shtml">Bill Virdon</a></td>
+						<td>CF</td>
+			
+		</tr>
+				<tr class="">
+						<td>3</td>
+						<td><a href="/players/c/clemero01.shtml">Roberto Clemente</a></td>
+						<td>RF</td>
+			
+		</tr>
+				<tr class="">
+						<td>4</td>
+						<td><a href="/players/s/stargwi01.shtml">Willie Stargell</a></td>
+						<td>LF</td>
+			
+		</tr>
+				<tr class="">
+						<td>5</td>
+						<td><a href="/players/c/clenddo01.shtml">Donn Clendenon</a></td>
+						<td>1B</td>
+			
+		</tr>
+				<tr class="">
+						<td>6</td>
+						<td><a href="/players/m/mazerbi01.shtml">Bill Mazeroski</a></td>
+						<td>2B</td>
+			
+		</tr>
+				<tr class="">
+						<td>7</td>
+						<td><a href="/players/a/alleyge01.shtml">Gene Alley</a></td>
+						<td>SS</td>
+			
+		</tr>
+				<tr class="">
+						<td>8</td>
+						<td><a href="/players/p/pagliji01.shtml">Jim Pagliaroni</a></td>
+						<td>C</td>
+			
+		</tr>
+				<tr class="">
+						<td>9</td>
+						<td><a href="/players/c/cardwdo01.shtml">Don Cardwell</a></td>
+						<td>P</td>
+			
+		</tr>
+			</table>	
+</div>
+
+		</div>
+		</div>-->
+</div>
+
+            
+            
+         
+      
+         
+            <div class="section_wrapper setup_commented commented" id="all_7302867945">
+<div class="section_heading">
+  <span class="section_anchor" id="7302867945_link" data-label="Links &amp; PBP Explanation"></span>	
+</div><div class="placeholder"></div>
+<!--     <div class="section_content" id="div_7302867945">
+	    <p>
+	
+	<a rel="nofollow" href="https://www.retrosheet.org/boxesetc/1965/B07020PIT1965.htm">Retrosheet.org Boxscore:PIT196507020</a><br />
+	
+
+    
+	<a rel="nofollow" href="http://backtobaseball.com/playballregularseason.php?page=0&IDindex=PIT196507020">BackToBaseball.com Game Playback</a>
+	
+</p>
+
+
+
+<p></p>
+
+<p class="note">In some cases, the results from play-by-play data will contradict
+results in the official record.  The official record has many, many
+errors, but we have not undertaken to reconcile those errors.
+Pitch-by-pitch data should not be taken as completely accurate, though
+we believe it to be as accurate as is currently possible.</p>
+
+<p class="note">Box scores and play-by-play outputs produced by Sports Reference LLC.  All Rights Reserved.</p>
+
+		
+    </div>
+-->
+</div>
+
+            
+            
+         
+      
+
+<!-- global.nonempty_tables_num: 7, table_count: 7 -->
+   <!-- no Local/Partials/NoteBottom.tt2 -->
+<div id="bottom_nav" class="section_wrapper">
+<div class="section_heading"><span data-no-inpage="1" class="section_anchor" id="inner_nav_bottom_link" data-label="Schedules, Scores, &amp; Boxes"></span><h2>Schedules, Scores, &amp; Boxes</h2></div>
+<div class="section_content" id="bottom_nav_container">
+
+  <p><a href="/boxes/">MLB Scores &amp; Boxes</a></p>
+  
+        <ul class="">
+          <li><a href="/leagues/MLB/1965-schedule.shtml">1965 MLB Scores &amp; Schedule</a></li>
+          <li><a href="/teams/PIT/1965-schedule-scores.shtml">Pittsburgh Pirates Schedule</a></li>
+          <li><a href="/teams/MLN/1965-schedule-scores.shtml">Milwaukee Braves Schedule</a></li>
+        </ul></div></div>
+
+   
+
+
+<!-- fs_footer -->
+<div class="adblock">
+<!-- div#fs_fs_footer  -->
+<div align="center" id="div-gpt-ad-728x90-Footer">
+    <script data-cfasync="false" type='text/javascript'>
+    if (sr_detect_ie || sr_detect_edge || Modernizr.adfree) {
+    }
+    else {
+        console.log('push ad:div-gpt-ad-728x90-Footer');
+        freestar.queue.push(function() { googletag.display('div-gpt-ad-728x90-Footer'); });
+    }
+    </script>
+</div>
+<!-- /div.#fs_fs_footer -->
+
+</div>
+
+
+
+
+</div><!-- div#content -->
+
+
+<div id="footer" role="contentinfo">
+	<div id="footer_header">
+		 <ul class="bullets-inline">
+<li class="user logged_in">Welcome <span class="username"></span>&nbsp;&#183;&nbsp;<a href="/my/">Your Account</a></li>
+<li class="user logged_in"><a class="logout" href="/my/?do=logout">Logout</a></li>
+<li class="user not_logged_in"><a class="login" href="/my/">Login</a></li>
+<li class="user not_logged_in"><a href="https://stathead.com/users/signup.cgi">Create Account</a></li>
+
+</ul>
+		 <div class="breadcrumbs" itemscope itemtype="https://schema.org/Other">You are here: <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a itemprop="item" href="/"><span itemprop="name">BR Home Page</span></a> <meta itemprop="position" content="1" /></span> &gt; <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a itemprop="item" href="/boxes/"><span itemprop="name">Box Scores</span></a> <meta itemprop="position" content="2" /></span> &gt; <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a itemprop="item" href="/leagues/MLB/1965-schedule.shtml"><span itemprop="name">1965</span></a> <meta itemprop="position" content="3" /></span> &gt; <strong>Milwaukee Braves at Pittsburgh Pirates Box Score, July  2, 1965</strong></div>
+	</div><!-- div#footer_header -->
+
+	<div id="footer_general">
+		<div id="site_menu" role="navigation" aria-label="complete site index">
+			
+			
+<div class="section_heading">
+  <span class="section_anchor" id="site_menu_link" data-label="Full Site Menu" data-no-inpage="1"></span><h2>Full Site Menu</h2>    <div class="section_heading_text">
+      <ul> <li><a data-scroll href="#header">Return to Top</a></li>
+      </ul>
+    </div>
+    		
+</div>
+			
+				<ul>
+	<li><a href="/players/">MLB Players</a>
+	<div>Current Greats: <a href="/players/k/kershcl01.shtml">Clayton Kershaw</a>, 
+<a href="/players/t/troutmi01.shtml">Mike Trout</a>, 
+<a href="/players/b/bettsmo01.shtml">Mookie Betts</a>, 
+<a href="/players/d/degroja01.shtml">Jacob deGrom</a>, 
+<a href="/players/c/cabremi01.shtml">Miguel Cabrera</a>, 
+<a href="/players/g/greinza01.shtml">Zack Greinke</a>, 
+<a href="/players/a/altuvjo01.shtml">Jose Altuve</a>,
+...   </div>
+
+	<div>All-Time Greats:  
+<a href="/players/m/musiast01.shtml">Stan Musial</a>, 
+<a href="/players/b/bondsba01.shtml">Barry Bonds</a>, 
+<a href="/players/r/ruthba01.shtml">Babe Ruth</a>, 
+<a href="/players/j/jeterde01.shtml">Derek Jeter</a>, 
+<a href="/players/g/griffke02.shtml">Ken Griffey Jr</a>, 
+<a href="/players/r/robinja02.shtml">Jackie Robinson</a>, 
+<a href="/players/a/aaronha01.shtml">Hank Aaron</a>, ...</div>
+</li>
+
+
+	 <li><a href="/teams/">MLB Teams</a>
+	 	<div class="division"><strong>NL East</strong>:
+<a href="/teams/ATL/">Atlanta Braves</a>, 
+<a href="/teams/FLA/">Miami Marlins</a>, 
+<a href="/teams/NYM/">New York Mets</a>, 
+<a href="/teams/PHI/">Philadelphia Phillies</a>, 
+<a href="/teams/WSN/">Washington Nationals</a>
+		</div>	
+	 	<div class="division"><strong>NL Central</strong>:
+<a href="/teams/CHC/">Chicago Cubs</a>, 
+<a href="/teams/CIN/">Cincinnati Reds</a>, 
+<a href="/teams/MIL/">Milwaukee Brewers</a>, 
+<a href="/teams/PIT/">Pittsburgh Pirates</a>, 
+<a href="/teams/STL/">St. Louis Cardinals</a>
+		</div>	
+	 	<div class="division"><strong>NL West</strong>:
+<a href="/teams/ARI/">Arizona Diamondbacks</a>, 
+<a href="/teams/COL/">Colorado Rockies</a>, 
+<a href="/teams/LAD/">Los Angeles Dodgers </a>, 
+<a href="/teams/SDP/">San Diego Padres</a>, 
+<a href="/teams/SFG/">San Francisco Giants</a>
+		</div>	
+	 	<div class="division"><strong>AL East</strong>:
+<a href="/teams/BAL/">Baltimore Orioles</a>, 
+<a href="/teams/BOS/">Boston Red Sox</a>, 
+<a href="/teams/NYY/">New York Yankees</a>, 
+<a href="/teams/TBR/">Tampa Bay Rays</a>, 
+<a href="/teams/TOR/">Toronto Blue Jays</a>
+		</div>	
+	 	<div class="division"><strong>AL Central</strong>:
+<a href="/teams/CHW/">Chicago White Sox</a>, 
+<a href="/teams/CLE/">Cleveland Indians</a>, 
+<a href="/teams/DET/">Detroit Tigers</a>, 
+<a href="/teams/KCR/">Kansas City Royals</a>, 
+<a href="/teams/MIN/">Minnesota Twins</a>
+		</div>	
+	 	<div class="division"><strong>AL West</strong>:
+<a href="/teams/HOU/">Houston Astros</a>, 
+<a href="/teams/LAA/">Los Angeles Angels</a>, 
+<a href="/teams/OAK/">Oakland Athletics</a>, 
+<a href="/teams/SEA/">Seattle Mariners</a>, 
+<a href="/teams/TEX/">Texas Rangers</a>
+		</div>	
+	 </li>
+
+<li><a href="/leagues/">Seasons</a>
+	     <div><a href="/leagues/MLB/2019.shtml">2019</a>,
+	     <a href="/leagues/MLB/2018.shtml">2018</a>,
+	     <a href="/leagues/MLB/2019-standard-pitching.shtml">2019 MLB Pitching</a>,
+	     <a href="/leagues/MLB/2019-standard-batting.shtml">2019 MLB Batting</a>,
+	     <a href="/leagues/MLB/2019-standings.shtml">2019 MLB Standings</a>,
+	     <a href="/leagues/MLB/2019-misc.shtml">2019 MLB Attendance</a>,
+	     <a href="/leagues/MLB/2019-rookies.shtml">2019 MLB Rookies</a>,
+	     ...</div>
+</li>
+
+         <li><a href="/leagues/MLB-leaders.shtml">MLB Leaders</a>
+	     <div>
+	     <a href="/leagues/MLB/2019-batting-leaders.shtml">2019 MLB Batting</a>,
+	     <a href="/leagues/MLB/2019-pitching-leaders.shtml">2019 MLB Pitching</a>,
+	     <a href="/leaders/WAR_career.shtml">Career WAR Leaders</a>,
+	     <a href="/leaders/HR_season.shtml">Single-Season Home Run Leaders</a>,
+	     <a href="/leaders/SO_p_active.shtml">Active Strikeout Leaders</a>,
+	     <a href="/friv/milestones.cgi">Upcoming Player Milestones</a>,
+	     ...</div>
+	 </li>
+
+         <li><a href="/boxes/">MLB Scores</a>
+	     <div><a href="/boxes/">Yesterday's MLB Games</a>,
+	     <a href="/boxes/">Scores from any date in MLB history</a>,
+	     <a href="/previews/">MLB Probable Pitchers</a>,
+	     ...</div>
+	 </li>
+	 <li><a href="/leagues/MLB-schedule.shtml">MLB Schedule</a></li>
+
+         <li><a href="/leagues/MLB-standings.shtml">MLB Standings</a>
+	     <div>
+	     <a href="/leagues/AL/2019-standings.shtml">AL Standings</a>,
+	     <a href="/leagues/NL/2019-standings.shtml">NL Standings</a>,
+	     <a href="/boxes/">Standings for any date in history</a>,
+	     ...</div>
+	 </li>
+
+         <li><a href="/postseason/">MLB Playoffs</a>
+	     <div>
+	     <a href="/postseason/world-series.shtml">World Series Winners</a>,
+	     <a href="/postseason/2019_WS.shtml">2019 World Series: Astros vs Nationals</a>,
+	     <a href="/postseason/2018_WS.shtml">2018 World Series: Red Sox vs Dodgers</a>,
+	     <a href="/postseason/2017_WS.shtml">2017 World Series: Astros vs Dodgers</a>,
+	     <a href="/postseason/WS_batting.shtml">World Series Batting Leaders</a>,
+	     <a href="/postseason/WS_pitching.shtml">World Series Pitching Leaders</a>,
+	     ...</div>
+	 </li>
+
+         <li><a href="/play-index/">Play Index</a>
+	     <div>Player Finders:
+	     <a href="/play-index/season_finder.cgi">Season &amp; Career Finder</a>,
+	     <a href="/play-index/game_finder.cgi">Game Finder</a>,
+	     <a href="/play-index/streak_finder.cgi">Streak Finder</a>,
+	     <a href="/play-index/event_finder.cgi">Event Finder</a>,
+	     <a href="/play-index/player-comparison.cgi">Player Comparison Finder</a>,
+	     <a href="/play-index/neutralized-stats.cgi">Neutralized Stats</a>,
+	     ...</div>
+	     <div>Team Finders:
+	     <a href="/play-index/team-season-finder.cgi">Season Finder</a>,
+	     <a href="/play-index/split_finder.cgi?class=team">Split Finder</a>,
+	     <a href="/play-index/game_finder.cgi?class=team">Game Finder</a>,
+	     <a href="/play-index/streak_finder.cgi?class=team">Streak Finder</a>,
+	     <a href="/play-index/event_finder.cgi?class=team">Event Finder</a>,
+	     ...</div>
+	     <div>Other Finders:
+	     <a href="/draft/">Draft Finder</a>,
+	     <a href="/play-index/">Game Score &amp; Result Searches</a>,
+	     <a href="/friv/trade-partners.cgi">Team Trade Histories</a>,
+	     ...</div>
+	 </li>
+
+         <li><a href="/managers/">Managers</a>
+	     <div>Active:
+	     <a href="/managers/francte01.shtml">Terry Francona</a>,
+	     <a href="/managers/baldero01.shtml">Rocco Baldelli</a>,
+	     <a href="/managers/shildmi99.shtml">Mike Shildt</a>,
+	     ...</div>
+	     <div>Retired:
+	     <a href="/managers/mcgrajo01.shtml">John McGraw</a>,
+	     <a href="/managers/coxbo01.shtml">Bobby Cox</a>,
+	     <a href="/managers/weaveea99.shtml">Earl Weaver</a>,
+	     ...</div>
+	 </li>
+
+         <li><a href="/awards/">MLB Awards</a>
+	     <div>
+	     <a href="/awards/hof.shtml">Baseball Hall of Fame</a>,
+	     <a href="/awards/mvp.shtml">MLB MVP's</a>,
+	     <a href="/awards/cya.shtml">MLB Cy Young Award</a>,
+	     <a href="/awards/roy_rol.shtml">MLB Rookie of the Year</a>,
+	     <a href="/awards/gold_glove_nl.shtml">Rawlings Gold Gloves</a>,
+	     <a href="/awards/hof_2020.shtml">2020 HOF results</a>,
+	     <a href="/awards/hof_2021.shtml">2021 Hall of Fame ballot</a>,
+	     ...</div>
+	 </li>
+
+         <li><a href="/allstar/">MLB All-Star Games</a>
+	     <div>
+	     <a href="/allstar/2020-allstar-game.shtml">2020 All-Star Game</a>,
+	     <a href="/allstar/2019-allstar-game.shtml">2019 All-Star Game</a>,
+	     <a href="/allstar/bat-register.shtml">All-Time All-Star Batters</a>,
+	     <a href="/allstar/pitch-register.shtml">All-Time All-Star Pitchers</a>,
+	     ...</div>
+	 </li>
+
+         <li><a href="/friv/">Frivolities</a> and More
+	     <div>
+	     <a href="/oracle/">Oracle of Baseball</a>,
+	     <a href="/friv/numbers.cgi">Uniform Number Tracker</a>,
+	     <a href="/friv/coffee.shtml">Cups of Coffee</a>,
+	     <a href="/friv/baseball-player-name-pronunciation-guide.shtml">Pronunciation Guide</a>,
+	     <a href="/bio/">Birthplaces</a>,
+	     <a href="/schools/">Players by School Attended</a>,
+	     ....</div>
+	 </li>
+
+         <li><a href="/draft/">MLB Draft</a>
+	     <div>
+	     <a href="/draft/?query_type=year_round&amp;year_ID=2019&amp;draft_round=1&amp;draft_type=junreg&amp;">2019 Draft</a>,
+	     <a href="/draft/?query_type=year_round&amp;year_ID=2018&amp;draft_round=1&amp;draft_type=junreg&amp;">2018 Draft</a>,
+	     <a href="/draft/?query_type=year_round&amp;year_ID=2017&amp;draft_round=1&amp;draft_type=junreg&amp;">2017 Draft</a>,
+	     <a href="/draft/?overall_pick=1&amp;draft_type=junreg&amp;">MLB Number One Picks</a>,
+	     ...</div>
+	 </li>
+
+         <li><a href="/register/">Minor, Foreign, College, &amp; Negro Leagues</a>
+	     <div>
+	     <a href="/register/minor-league-stats.shtml">Minor League Stats</a>,
+	     <a href="/register/negro-league-stats.shtml">Negro League Stats</a>,
+	     <a href="/register/npb-stats.shtml">Nippon Pro Baseball Stats</a>,
+	     <a href="/register/cuban-league-stats.shtml">Cuban National Series Stats</a>,
+	     <a href="/register/kbo-stats.shtml">Korean Baseball Stats</a>,
+	     <a href="/register/league.cgi?year=2019">2019 Minor Leagues</a>,
+	     <a href="/register/affiliate.cgi?year=2019">2019 Affiliates</a>,
+	     ...</div>
+	 </li>
+
+         <li><a href="/bullpen/">Baseball-Reference Bullpen</a>
+	     <div>
+	     <a href="/bullpen/">85,000+ pages of baseball information</a>,
+	     <a href="/bullpen/How_to_contribute">How to Contribute</a>,
+	     ...</div>
+	 </li>
+
+         <li><a href="/about/">About Baseball Reference</a>
+	     <div>
+	     <a href="/about/bat_glossary.shtml">Batting Glossary</a>,
+	     <a href="/about/pitch_glossary.shtml">Pitching Glossary</a>,
+	     <a href="/about/war_explained.shtml">Wins Above Replacement Explainer</a>,
+	     <a href="/data/">WAR data archive</a>,
+	     <a href="/about/coverage.shtml">BR Data Coverage</a>,
+	     ...</div>
+	 </li>
+
+
+</ul>   
+
+			
+		</div><!-- div#site_menu -->
+		<div>
+			<div id="social" class="icon_group noload">
+	
+<div class="section_heading">
+  <span class="section_anchor" id="_link" data-label="We're Social...for Statheads" data-no-inpage="1"></span><h2>We're Social...for Statheads</h2>		
+</div>
+	<a href="tel://888-512-8907" data-tip="Call us on Telephone" data-label="Telephone" class="poptip"><svg class="icon phone"><use xlink:href="#ic-phone"></use></svg></a>
+	<a href="//www.sports-reference.com/blog/" data-tip="The Sports Reference Blog" data-label="Our Blog" class="poptip"><svg class="icon wordpress"><use xlink:href="#ic-wordpress"></use></svg></a>
+	<a href="https://www.sports-reference.com/blog/feed/" data-tip="Our Blog's RSS Feed" data-label="RSS Feed" class="poptip"><svg class="icon rss"><use xlink:href="#ic-rss"></use></svg></a>
+	
+		<a href="https://twitter.com/baseball_ref" data-tip="Baseball-Reference.com at Twitter" data-label="Twitter" class="poptip"><svg class="icon twitter"><use xlink:href="#ic-twitter"></use></svg></a>
+	
+	<a href="https://reddit.com/r/SportsReference" data-tip="Reddit/r/SportsReference" data-label="Reddit/r/SR" class="poptip"><svg class="icon reddit"><use xlink:href="#ic-reddit"></use></svg></a>
+	<a href="https://www.youtube.com/user/sportsreference" data-tip="YouTube/SportsReference" data-label="YouTube" class="poptip"><svg class="icon youtube"><use xlink:href="#ic-youtube"></use></svg></a>
+	<a href="https://www.linkedin.com/company/sports-reference-llc" data-tip="Follow SR on LinkedIn" data-label="LinkedIn" class="poptip"><svg class="icon linkedin"><use xlink:href="#ic-linkedin"></use></svg></a>
+	<a href="https://www.paypal.me/sportsref" data-tip="Send us money via PayPal" data-label="PayPal" class="poptip"><svg class="icon paypal"><use xlink:href="#ic-paypal"></use></svg></a>
+
+<p>Every <a href="https://www.sports-reference.com/blog/sports-reference-social-media/">Sports Reference Social Media Account</a></p>
+<p><strong>Site Last Updated:</strong> Sunday, May 31,  4:34PM
+</p>
+<p><a href="https://www.sports-reference.com/feedback/" class="button alt">Question, Comment, Feedback, or Correction?</a></p>
+
+<p><a style="background-color:#8e4496; color: #fff;" href="https://stathead.com/?&utm_medium=sr&utm_source=br&utm_campaign=site-footer" class="button alt">Are you a Stathead, too? Subscribe to our Newsletter</a></p>
+
+<p><a style="background-color:#155ca9; color: #fff;" href="https://www.sports-reference.com/this-week.html?&utm_medium=sr&utm_source=br&utm_campaign=site-footer-twisr" class="button alt">This Week in Sports Reference<br><em>Find out when we add a feature or make a change</em></a></p>
+
+<p><a href="https://www.sports-reference.com/blog/ways-sports-reference-can-help-your-website/?utm_medium=sr&utm_source=br&utm_campaign=site-footer-ways-help">Do you have a sports website? Or write about sports? We have tools and resources that can help you use sports data.  Find out more.</a></p>
+
+
+</div><!-- div#social -->
+
+			<div id="tips_tricks">
+   
+<div class="section_heading">
+  <span class="section_anchor" id="tips_link" data-label="FAQs, Tip &amp; Tricks" data-no-inpage="1"></span><h2>FAQs, Tip &amp; Tricks</h2>		
+</div>
+   <ul>
+<li>Learn about the <a href="//www.baseball-reference.com/about/war_explained.shtml">Wins Above Replacement Formula</a></li>
+
+           <li><a href="//www.sports-reference.com/blog/category/tips-and-tricks/">Tips and Tricks from our Blog.</a></li>
+           <li><a href="/linker/">Do you have a blog? Join our linker program.</a></li>
+	   <li><a href="//www.sports-reference.com/blog/category/how-to-videos/">Watch our How-To Videos to Become a Stathead</a></li>
+	   <li><a href="//www.baseball-reference.com/play-index/">Subscribe to the Play Index and get access to more data than you can imagine</a></li>
+   </ul>
+</div><!-- div#tips_tricks -->
+
+			<div id="credits">
+				<p>All logos are the trademark &amp; property of their owners and not Sports Reference LLC.  We present them here for purely educational purposes.
+				<a href="https://www.sports-reference.com/blog/2016/06/redesign-team-and-league-logos-courtesy-sportslogos-net/">Our reasoning for presenting offensive logos.</a></p>
+				<p>
+					
+					Logos were compiled by the amazing <a href="http://sportslogos.net/">SportsLogos.net.</a>
+				</p>
+				
+     
+     <div class="notice">Primary NCAA Data Provided By
+	<a href="http://www.gracenote.com/sports/sports-data/" rel="nofollow"><img alt="Gracenote Sports" border=0 width=275 src="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/images/klecko/gracenote-2.png"></a>
+</div>
+
+          <p>Copyright &copy; 2000-2020 <a href="//www.sports-reference.com/">Sports Reference LLC</a>. All rights reserved.</p>
+
+     <p >Much of the play-by-play, game results, and transaction information both shown and used to create certain data sets was obtained free of charge from and is copyrighted by <a rel="nofollow" href="https://www.retrosheet.org/">RetroSheet</a>.</p>
+     <p>Win Expectancy, Run Expectancy, and Leverage Index calculations provided by Tom Tango of <a rel="nofollow" href="http://www.tangotiger.com/index.php">InsideTheBook.com</a>, and co-author of <a class="italic_text" rel="nofollow" href="">The Book: Playing the Percentages in Baseball</a>.</p>
+     <p>Total Zone Rating and initial framework for Wins above Replacement calculations provided by Sean Smith.</p>
+     <p>Full-year historical Major League statistics provided by Pete Palmer and Gary Gillette of <a rel="nofollow" href="http://www.hiddengamesports.com/">Hidden Game Sports</a>.</p>
+     <p><a href="http://www.baseballinfosolutions.com/"><img alt="BaseballInfoSolutions.com logo"  src="https://d2p3bygnnzw9w3.cloudfront.net/req/202005181/images/klecko/bis_logo.png"></a></p>
+     <p>Some defensive statistics Copyright &copy; <a href="http://www.baseballinfosolutions.com/">Baseball Info Solutions</a>, 2010-2020.</p>
+     <p>Some high school data is courtesy David McWater.</p>
+     <p>Many historical player head shots courtesy of David Davis. Many thanks to him. All images are property the copyright holder and are displayed here for informational purposes only.</p>
+
+			</div><!-- div#credits -->
+		</div>
+	</div>
+
+	<ul id="site_dirs" class="notranslate bullets-inline">
+	<li><a href="https://www.sports-reference.com/"><svg height="15px" width="20px"><use xlink:href="#ic-sr-pennant"></use></svg> Sports Reference</a></li>
+	<li class="current"><a href="https://www.baseball-reference.com/">Baseball</a></li>
+	<li><a href="https://www.pro-football-reference.com/">Football</a> <a href="https://www.sports-reference.com/cfb/">(college)</a></li>
+	<li><a href="https://www.basketball-reference.com/">Basketball</a> <a href="https://www.sports-reference.com/cbb/">(college)</a></li>
+	<li><a href="https://www.hockey-reference.com/">Hockey</a></li>
+	<li><a href="https://fbref.com/">Soccer</a></li>
+	<li><a href="https://www.sports-reference.com/blog/">Blog</a></li>
+
+        <li><a href="https://stathead.com/">Stathead</a></li>
+        <li><a href="https://widgets.sports-reference.com/">Widgets</a></li>
+
+        
+</ul>
+
+	<div id="about"><a href="//www.sports-reference.com/about.html">About</a> &bull; <a href="//www.sports-reference.com/privacy.html">Privacy Statement</a> &bull; <a href="//www.sports-reference.com/termsofuse.html">Conditions &amp; Terms of Service</a> &bull; <a href="//www.sports-reference.com/advertise.html">Advertise With Us</a> &bull; <a href="//www.sports-reference.com/data_use.html">Use of Data</a></div><!-- div#about -->
+</div><!-- div#footer -->
+
+</div><!-- div#wrap -->
+<!-- yes sticky url:  https://www.baseball-reference.com/boxes/PIT/PIT196507020.shtml -->
+<div id="fs-select-footer"></div>
+      
+
+
+
+<!-- rails -->
+
+<div class="adblock rails  left"><!-- div#fs_fs_rails_left  -->
+<div align="center" id="div-gpt-ad-160x600-1">
+    <script data-cfasync="false" type='text/javascript'>
+    if (sr_detect_ie || sr_detect_edge || Modernizr.adfree) {
+    }
+    else {
+        console.log('push ad:div-gpt-ad-160x600-1');
+        freestar.queue.push(function() { googletag.display('div-gpt-ad-160x600-1'); });
+    }
+    </script>
+</div>
+<!-- /div.#fs_fs_rails_left -->
+</div>
+<div class="adblock rails right"><!-- div#fs_fs_rails_right  -->
+<div align="center" id="div-gpt-ad-160x600-2">
+    <script data-cfasync="false" type='text/javascript'>
+    if (sr_detect_ie || sr_detect_edge || Modernizr.adfree) {
+    }
+    else {
+        console.log('push ad:div-gpt-ad-160x600-2');
+        freestar.queue.push(function() { googletag.display('div-gpt-ad-160x600-2'); });
+    }
+    </script>
+</div>
+<!-- /div.#fs_fs_rails_right -->
+</div>
+
+
+<!-- Google Analytics --><script> var sr_cookie = vjs_readCookie('stathead_user') || ''; var sr_cookie_split = sr_cookie.split("::"); var sr_session_key = (sr_cookie_split.length > 1)?sr_cookie_split[2]:''; var sr_ad_free_key = "2"; var sr_is_subscriber = (sr_ad_free_key && sr_session_key.vjs_isMatch(new RegExp("/" + sr_ad_free_key + "$/"))) || sr_session_key.vjs_isMatch(/1$/); var sr_is_user = sr_cookie !== null && sr_cookie !== ''; var sr_seen_modal = vjs_readCookie('modal_ad') !== null; (function(i,s,o,g,r,a,m){ i['GoogleAnalyticsObject']=r; i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date(); a=s.createElement(o),m=s.getElementsByTagName(o)[0]; a.async=1; a.src=g; m.parentNode.insertBefore(a,m) })(window,document,'script','https://www.google-analytics.com/analytics.js','ga'); ga('create', 'UA-1890630-1', 'auto'); ga('require', 'linkid', 'linkid.js'); ga('require', 'ecommerce', 'ecommerce.js'); ga('send', 'pageview'); ga('create', 'UA-1890630-19', 'auto', {'name': 'combined_tracker', 'allowLinker': true }); ga('combined_tracker.send', 'pageview'); var sr_device = 'unk'; if (Modernizr.phone) { sr_device = 'phone'; } else if (Modernizr.tablet) { sr_device = 'tablet'; } else if (Modernizr.laptop) { sr_device = 'laptop'; } else if (Modernizr.desktop) { sr_device = 'desktop'; } ga('create', 'UA-1890630-9', 'auto', {'name': 'sr_tracker', 'allowLinker': true }); ga('sr_tracker.require', 'displayfeatures'); ga('sr_tracker.set', 'dimension1','br'); ga('sr_tracker.set', 'dimension2',sr_is_subscriber); ga('sr_tracker.set', 'dimension3',sr_is_user); ga('sr_tracker.set', 'dimension4',sr_seen_modal); ga('sr_tracker.set', 'dimension5',sr_device); ga('sr_tracker.set', 'dimension6',Modernizr.is_modern?'yes':'no'); ga('sr_tracker.set', 'dimension7',Modernizr.viewport_width); /* note that this requires the Assets/AdBlockTest.tt2 to be included above. */ ga('sr_tracker.set', 'dimension8',(typeof sr_test == 'undefined')?'no-test':( sr_test ? 'non-blocking':'blocking')); ga('sr_tracker.send', 'pageview'); /* cribbed from: http://www.axllent.org/docs/view/track-outbound-links-with-analytics-js/ */ function _gaLt(event) { if (!ga.hasOwnProperty("loaded") || ga.loaded != true) { return; } var el = event.srcElement || event.target; /* if a link has been clicked */ if (el && el.href) { var link = el.href; /* Only if it is an external link */ if (link.indexOf(location.host) == -1 && !link.match(/^javascript\:/i)) { /* Is target set and not _(self|parent|top)? */ var target = (el.target && !el.target.match(/^_(self|parent|top)/i)) ? el.target : false; /* If target opens a new window then just track */ if (el.target && !el.target.match(/^_(self|parent|top)/i)) { ga("send", "event", "Outgoing Links", link, document.location.pathname + document.location.search); } }; } } window.addEventListener ? window.addEventListener("load", function() { document.body.addEventListener("click", _gaLt, !1)}, !1) : window.attachEvent && window.attachEvent("onload", function() { document.body.attachEvent("onclick", _gaLt) }); </script><!-- End Google Analytics -->
+
+
+</body><!-- SR -->
+</html>
+
+

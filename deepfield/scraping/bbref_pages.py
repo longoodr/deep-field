@@ -18,6 +18,9 @@ from deepfield.scraping.pages import InsertablePage, Link, Page
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+class MissingPlayDataError(ValueError):
+    pass
+
 class BBRefPage(Page):
     """A page from baseball-reference.com."""
     
@@ -182,7 +185,10 @@ class _PlaceholderTable(BeautifulSoup):
     def __init__(self, ph_div):
         # Note the SECOND sibling is the comment of interest because there is
         # an intermediate \n.
-        table_contents = ph_div.next_sibling.next_sibling
+        try:
+            table_contents = ph_div.next_sibling.next_sibling
+        except AttributeError:
+            raise MissingPlayDataError
         super().__init__(table_contents, "lxml")
     
 class _PlaceholderDivFilter:

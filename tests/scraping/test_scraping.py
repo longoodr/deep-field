@@ -4,7 +4,8 @@ from typing import List
 
 import pytest
 
-from deepfield.scraping.bbref_pages import (BBRefLink, GamePage, PlayerPage,
+from deepfield.scraping.bbref_pages import (BBRefLink, GamePage,
+                                            MissingPlayDataError, PlayerPage,
                                             SchedulePage)
 from deepfield.scraping.nodes import InsertableScrapeNode, ScrapeNode
 from deepfield.scraping.pages import HtmlCache, Page
@@ -64,6 +65,16 @@ class TestParseable:
         if isinstance(page, GamePage):
             utils.insert_mock_players(page)
         ScrapeNode.from_page(page).scrape()
+
+    def test_cannot_parse(self):
+        url = "https://www.baseball-reference.com/boxes/PIT/PIT196507020.shtml"
+        utils.clean_db()
+        link = BBRefLink(url)
+        page = Page.from_link(link)
+        assert isinstance(page, GamePage)
+        utils.insert_mock_players(page)
+        with pytest.raises(MissingPlayDataError):
+            ScrapeNode.from_page(page).scrape()
 
     def test_malformed_html(self):
         # the web handler will download the correct html, so need to copy
