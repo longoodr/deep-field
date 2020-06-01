@@ -139,13 +139,7 @@ class _OutcomePercentageTracker:
             if outcome is None:
                 continue
             ctr[outcome.value] += 1
-        present_outcomes_to_cnt = dict(ctr)
-        # fill outcomes that didn't occur with 0
-        cnts = np.asarray([
-                0 if outcome not in present_outcomes_to_cnt
-                else present_outcomes_to_cnt[outcome]
-                for outcome in range(len(Outcome))
-            ])
+        cnts = np.asarray([ctr[i] for i in range(len(Outcome))])
         if np.sum(cnts) == 0:
             raise RuntimeError("No plays in database")
         cls._percs = cnts / np.sum(cnts)
