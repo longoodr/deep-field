@@ -44,10 +44,10 @@ def insert_mock_players(page: GamePage) -> None:
 
 def _insert_mock_player(name: str, name_id: str) -> None:
     fields = {
-        "name": name,
-        "name_id": name_id,
-        "bats": Handedness.RIGHT.value,
-        "throws": Handedness.RIGHT.value,
-    }
+            "name": name,
+            "name_id": name_id,
+            "bats": Handedness.RIGHT.value,
+            "throws": Handedness.RIGHT.value,
+        }
     if Player.get_or_none(Player.name_id == name_id) is None:
         Player.create(**fields)
