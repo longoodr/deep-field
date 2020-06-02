@@ -107,15 +107,17 @@ class HandednessTracker:
         phand = self.get_pitcher_handedness(pid)
         if bhand != self._BOTH and phand != self._BOTH:
             return phand, bhand
-        # based on https://tinyurl.com/y89epnls, assume switch pitcher vs switch
-        # hitter implies pitcher pitches left and batter bats right
+        # based on https://tinyurl.com/y89epnls, assume switch pitcher vs
+        # switch hitter implies pitcher pitches left and batter bats right. 
+        # (This almost never happens)
         if bhand == self._BOTH and phand == self._BOTH:
             return (self._LEFT, self._RGHT)
-        # the switch player chooses opposite of the other
+        # switch batters prefer to bat opposite of pitcher
         if bhand == self._BOTH:
             bhand = self._CHOOSE_OPPOSITE[phand]
+        # switch pitchers (i.e. Pat Venditte) prefer to pitch same as batter
         elif phand == self._BOTH:
-            phand = self._CHOOSE_OPPOSITE[bhand]
+            phand = bhand
         return phand, bhand
 
 class AbstractPlayerRating:
