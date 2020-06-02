@@ -14,6 +14,7 @@ class PlayerRatings:
     """
 
     def __init__(self):
+        self.hands = HandednessTracker()
         self.reset()
 
     def get_batter(self, bid: int) -> "PlayerRating":
@@ -36,13 +37,22 @@ class PlayerRatings:
     def update(self, bid: int, pid: int, event: np.ndarray)\
             -> None:
         """Updates the ratings for the given players."""
-        self.get_batter(bid).update(event)
-        self.get_pitcher(pid).update(event)
-        self._avg_batter.update(event)
-        self._avg_pitcher.update(event)
+        bat_against_hand, pit_against_hand = \
+                self.hands.get_bat_pit_against_handednesses(bid, pid)
+        self.get_batter(bid).update(event, bat_against_hand)
+        self.get_pitcher(pid).update(event, pit_against_hand)
+        self._avg_batter.update(event, bat_against_hand)
+        self._avg_pitcher.update(event, pit_against_hand)
 
-    def get_matchup_rating(self, bid: int, pid: int) -> np.ndarray:
-        """Returns the matchup rating for the given players."""
+    def get_matchup_rating(self,
+                           bid: int,
+                           pid: int,
+                           pit_appearances: int = 0
+                           ) -> np.ndarray:
+        """Returns the matchup rating for the given players. `pit_appearances`
+        specifies the number of appearances the pitcher has accumulated for the
+        current game.
+        """
         brating = self.get_batter(bid)
         prating = self.get_pitcher(pid)
         b_avg = self._avg_batter.get_rating()
