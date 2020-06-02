@@ -70,6 +70,7 @@ class InputDataPersistor:
         with WritableDatafile(get_data_name()) as df:
             for i, (bid, pid, outcome) in enumerate(iter(DbMatchupReader())):
                 df.write_matchup(i, bid, pid, outcome)
+            df.trim_size()
 
 class ChecksumGenerator:
 
@@ -96,11 +97,20 @@ class WritableDatafile(h5py.File):
                     maxshape=(None, *rating_shape))
         self.__y = self.create_dataset("y", (1, len(Outcome)), chunks=True,
                     maxshape=(None, len(Outcome)))
+        self.__size = 1
+        self.__last_num = 0
 
     def write_matchup(self, num: int, bid: int, pid: int, outcome: int) -> None:
         outcome_oh = to_categorical(outcome, len(Outcome))
-        self.__x.resize(num + 1, axis=0)
-        self.__y.resize(num + 1, axis=0)
+        if num >= self.__size:
+            self.__size *= 2
+            self.__x.resize(self.__size, axis=0)
+            self.__y.resize(self.__size, axis=0)
         self.__x[num] = self.__ratings.get_matchup_rating(bid, pid)
         self.__y[num] = outcome_oh
+        self.__last_num = num
         self.__ratings.update(bid, pid, outcome_oh)
+
+    def trim_size(self) -> None:
+        self.__x.resize(self.__last_num + 1, axis=0)
+        self.__y.resize(self.__last_num + 1, axis=0)
