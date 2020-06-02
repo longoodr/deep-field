@@ -1,5 +1,7 @@
 import os
+from collections import Counter
 from hashlib import md5
+from typing import Counter as CounterType
 from typing import Iterator, Optional
 
 import h5py
@@ -68,8 +70,9 @@ class InputDataPersistor:
 
     def _write_data(self) -> None:
         with WritableDatafile(get_data_name()) as df:
-            for i, (bid, pid, outcome) in enumerate(iter(DbMatchupReader())):
-                df.write_matchup(i, bid, pid, outcome)
+            for i, (bid, pid, outcome, game_id)\
+                    in enumerate(iter(DbMatchupReader())):
+                df.write_matchup(i, bid, pid, outcome, game_id)
             df.trim_size()
 
 class ChecksumGenerator:
@@ -99,17 +102,32 @@ class WritableDatafile(h5py.File):
                     maxshape=(None, len(Outcome)))
         self.__size = 1
         self.__last_num = 0
+        self.__last_game_id: Optional[str] = None
 
-    def write_matchup(self, num: int, bid: int, pid: int, outcome: int) -> None:
+    def __reset_pitcher_appearances(self) -> None:
+        self.__pit_appearances: CounterType[int] = Counter()
+
+    def write_matchup(self,
+                      num: int,
+                      bid: int,
+                      pid: int,
+                      outcome: int,
+                      game_id: str
+                      ) -> None:
         outcome_oh = to_categorical(outcome, len(Outcome))
+        if self.__last_game_id != game_id:
+            self.__reset_pitcher_appearances()
+            self.__last_game_id = game_id
         if num >= self.__size:
             self.__size *= 2
             self.__x.resize(self.__size, axis=0)
             self.__y.resize(self.__size, axis=0)
-        self.__x[num] = self.__ratings.get_matchup_rating(bid, pid)
+        self.__x[num] = self.__ratings.get_matchup_rating(
+                bid, pid, self.__pit_appearances[pid])
         self.__y[num] = outcome_oh
         self.__last_num = num
         self.__ratings.update(bid, pid, outcome_oh)
+        self.__pit_appearances[pid] += 1
 
     def trim_size(self) -> None:
         self.__x.resize(self.__last_num + 1, axis=0)

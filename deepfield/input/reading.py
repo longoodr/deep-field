@@ -11,7 +11,7 @@ from tensorflow.keras.utils import Sequence
 from deepfield.dbmodels import Game, Play, get_data_name
 from deepfield.enums import Outcome
 
-Matchup = Tuple[int, int, int]
+Matchup = Tuple[int, int, int, str]
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -58,12 +58,12 @@ class DbMatchupReader:
         if outcome is None:
             self._num_none += 1
             return None
-        return (play.batter_id, play.pitcher_id, outcome.value)
+        return (play.batter_id, play.pitcher_id, outcome.value, play.game_id)
 
     @staticmethod
     def __get_plays():
         return (Play
-                .select(Play.id, Play.batter_id, Play.pitcher_id, Play.desc)
+                .select(Play.batter_id, Play.pitcher_id, Play.desc, Play.game_id)
                 .join(Game, on=(Play.game_id == Game.id))
                 .order_by(Game.date, Play.game_id, Play.play_num)
                 .namedtuples()
