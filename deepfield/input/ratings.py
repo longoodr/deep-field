@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
 from math import exp, log
-from typing import Dict, Iterable
+from typing import Dict, Iterable, Tuple
 
 import numpy as np
 
-from deepfield.enums import Outcome
+from deepfield.dbmodels import Player
+from deepfield.enums import Handedness, Outcome
 
 
 class PlayerRatings:
@@ -44,34 +45,93 @@ class PlayerRatings:
         """Returns the matchup rating for the given players."""
         brating = self.get_batter(bid)
         prating = self.get_pitcher(pid)
-        b_vs_avg = brating.get_rating() - self._avg_batter.get_rating()
-        p_vs_avg = prating.get_rating() - self._avg_pitcher.get_rating()
+        b_avg = self._avg_batter.get_rating()
+        p_avg = self._avg_pitcher.get_rating()
         return np.concatenate(
                 [
-                    b_vs_avg,
-                    p_vs_avg,
+                    brating.get_rating(),
+                    prating.get_rating(),
+                    b_avg,
+                    p_avg,
                     brating.appearances,
                     prating.appearances,
                 ],
                 axis=None
             )
 
+class HandednessTracker:
+    """Returns handedness info for requested players."""
+
+    _LEFT = Handedness.LEFT.value
+    _RGHT = Handedness.RIGHT.value
+    _BOTH = Handedness.BOTH.value
+        
+    _CHOOSE_OPPOSITE = {
+            _LEFT: _RGHT,
+            _RGHT: _LEFT
+        }
+
+    def __init__(self):
+        self._pit_hand: Dict[int, int] = {}
+        self._bat_hand: Dict[int, int] = {}
+
+    def get_pitcher_handedness(self, pid: int) -> int:
+        if pid not in self._pit_hand:
+            hand = Player.get(Player.id == pid).throws
+            self._pit_hand[pid] = hand
+        return self._pit_hand[pid]
+
+    def get_batter_handedness(self, bid: int) -> int:
+        if bid not in self._bat_hand:
+            hand = Player.get(Player.id == bid).bats
+            self._bat_hand[bid] = hand
+        return self._bat_hand[bid]
+
+    def get_bat_pit_against_handednesses(self, bid: int, pid: int)\
+            -> Tuple[int, int]:
+        """Returns a tuple of the handednesses that the batter and pitcher are
+        facing for the given matchup, respectively.
+        """
+        bhand = self.get_batter_handedness(bid)
+        phand = self.get_pitcher_handedness(pid)
+        if bhand != self._BOTH and phand != self._BOTH:
+            return phand, bhand
+        # based on https://tinyurl.com/y89epnls, assume switch pitcher vs switch
+        # hitter implies pitcher pitches left and batter bats right
+        if bhand == self._BOTH and phand == self._BOTH:
+            return (self._LEFT, self._RGHT)
+        # the switch player chooses opposite of the other
+        if bhand == self._BOTH:
+            bhand = self._CHOOSE_OPPOSITE[phand]
+        elif phand == self._BOTH:
+            phand = self._CHOOSE_OPPOSITE[bhand]
+        return phand, bhand
+
 class AbstractPlayerRating:
     """Tracks rating data for matchups."""
 
-    def __init__(self, subratings: Iterable["AbstractSubrating"]):
-        self._subratings = list(subratings)
+    def __init__(self,
+                 against_left: Iterable["AbstractSubrating"],
+                 against_right: Iterable["AbstractSubrating"]
+                 ):
+        against_left = list(against_left)
+        against_right = list(against_right)
+        self._against_hand_subratings = {
+                Handedness.LEFT.value: against_left,
+                Handedness.RIGHT.value: against_right
+            }
+        self._subratings = against_left + against_right
 
     def reset(self) -> None:
         """Resets the rating to its initial value."""
         for subrating in self._subratings:
             subrating.reset()
 
-    def update(self, event: np.ndarray) -> None:
+    def update(self, event: np.ndarray, against_hand: int) -> None:
         """Updates the ratings with the given event. This should be a one-hot
         vector.
         """
-        for subrating in self._subratings:
+        for subrating in self._against_hand_subratings[against_hand]:
             subrating.update(event)
 
     def get_rating(self) -> np.ndarray:
@@ -83,26 +143,58 @@ class AvgPlayerRating(AbstractPlayerRating):
     over several timescales.
     """
 
+    SHORT = 1000
+    MID = 10000
+    LONG = 100000
+
     def __init__(self):
-        self.short_term = AvgPlayerSubrating(1000)
-        self.mid_term = AvgPlayerSubrating(10000)
-        self.long_term = AvgPlayerSubrating(100000)
-        subratings = [self.short_term, self.mid_term, self.long_term]
-        super().__init__(subratings)
+        self.short_against_left = AvgPlayerSubrating(self.SHORT)
+        self.mid_against_left = AvgPlayerSubrating(self.MID)
+        self.long_against_left = AvgPlayerSubrating(self.LONG)
+        against_left = [
+                self.short_against_left,
+                self.mid_against_left,
+                self.long_against_left
+            ]
+        self.short_against_right = AvgPlayerSubrating(self.SHORT)
+        self.mid_against_right = AvgPlayerSubrating(self.MID)
+        self.long_against_right = AvgPlayerSubrating(self.LONG)
+        against_right = [
+                self.short_against_right,
+                self.mid_against_right,
+                self.long_against_right
+            ]
+        super().__init__(against_left, against_right)
 
 class PlayerRating(AbstractPlayerRating):
     """A set of rating data for a given player over several timescales."""
 
+    SHORT = 100
+    MID = 1000
+    LONG = 10000
+
     def __init__(self, avg_rating: AvgPlayerRating):
-        self.short_term = PlayerSubrating(100, avg_rating.short_term)
-        self.mid_term = PlayerSubrating(1000, avg_rating.mid_term)
-        self.long_term = PlayerSubrating(10000, avg_rating.long_term)
-        subratings = [self.short_term, self.mid_term, self.long_term]
-        super().__init__(subratings)
+        self.short_against_left = PlayerSubrating(self.SHORT, avg_rating.short_against_left)
+        self.mid_against_left = PlayerSubrating(self.MID, avg_rating.mid_against_left)
+        self.long_against_left = PlayerSubrating(self.LONG, avg_rating.long_against_left)
+        against_left = [
+                self.short_against_left,
+                self.mid_against_left,
+                self.long_against_left
+            ]
+        self.short_against_right = PlayerSubrating(self.SHORT, avg_rating.short_against_right)
+        self.mid_against_right = PlayerSubrating(self.MID, avg_rating.mid_against_right)
+        self.long_against_right = PlayerSubrating(self.LONG, avg_rating.long_against_right)
+        against_right = [
+                self.short_against_right,
+                self.mid_against_right,
+                self.long_against_right
+            ]
+        super().__init__(against_left, against_right)
         self.appearances = 0
 
-    def update(self, event: np.ndarray) -> None:
-        super().update(event)
+    def update(self, event: np.ndarray, against_hand: int) -> None:
+        super().update(event, against_hand)
         self.appearances += 1
 
 class AbstractSubrating(ABC):
