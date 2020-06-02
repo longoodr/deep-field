@@ -128,11 +128,18 @@ class _OutcomePercentageTracker:
 
     _percs: np.ndarray = None
 
+    _SAMPLE_OVER = 50000
+
     @classmethod
     def get_percentages(cls) -> np.ndarray:
         if cls._percs is not None:
             return cls._percs
-        query = Play.select(Play.desc).tuples().iterator()
+        query = (Play.select(Play.desc)
+                .order_by(fn.Random())
+                .limit(cls._SAMPLE_OVER)
+                .tuples()
+                .iterator()
+            )
         ctr: CounterType[int] = Counter()
         for (desc,) in query:
             outcome = Outcome.from_desc(desc)
