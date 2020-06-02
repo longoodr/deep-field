@@ -227,7 +227,7 @@ class AbstractSubrating(ABC):
                 update(x) for update, x in zip(update_funcs, self.rating)
             ])
 
-    # see https://www.desmos.com/calculator/lffptb95tq for a visual explanation
+    # see https://www.desmos.com/calculator/eqilnfnshh for a visual explanation
     # of these updates
     def _pos_update(self, x):
         if x == 1:
