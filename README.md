@@ -23,7 +23,9 @@ Each rating is initialized to an estimate of the average outcome distribution ov
 * The outcome's corresponding one-hot vector *v* is generated. This can be considered the "actual" outcome distribution for this matchup, as opposed to the "expected" distribution of the players' ratings.
 * For each event *e*, with corresponding entry *v<sub>e</sub>* in *v*, and current estimated probability *p<sub>e</sub>(t)* in the rating which is averaged over the last *k* plays,
 
-<p style="text-align: center;"><img src="https://latex.codecogs.com/svg.latex?p_e(t%2B1)%3D\left\{\begin{array}{ll}1-e^{\ln(1-p_e(t))-\frac{1}{k}}%20%26\quad%20v_e%3D1%20\\e^{\ln(p_e(t))-\frac{1}{k}}%26\quad%20v_e%3D0\end{array}\right." /></p>
+<p align="center">
+    <img src="https://latex.codecogs.com/svg.latex?p_e(t%2B1)%3D\left\{\begin{array}{ll}1-e^{\ln(1-p_e(t))-\frac{1}{k}}%20%26\quad%20v_e%3D1%20\\e^{\ln(p_e(t))-\frac{1}{k}}%26\quad%20v_e%3D0\end{array}\right." />
+</p>
 
 * This is a form of exponential smoothing, which increases the observed outcome's probability and decreases all other probabilities according to an exponential curve.
 
