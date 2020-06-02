@@ -65,6 +65,7 @@ class PlayerRatings:
                     p_avg,
                     brating.appearances,
                     prating.appearances,
+                    pit_appearances
                 ],
                 axis=None
             )
