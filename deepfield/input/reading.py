@@ -88,7 +88,6 @@ class ReadableDatafile(h5py.File):
         test = indices[train_test_partition:]
         return train, test
 
-
 class DataGenerator(Sequence):
     """Reads x, y data for keras model training."""
 
