@@ -72,7 +72,7 @@ class DbMatchupReader:
 class ReadableDatafile(h5py.File):
     
     def __init__(self, name: str, *args, **kwargs):
-        super().__init__(name, "r", *args, **kwargs)
+        super().__init__(f"{name}.hdf5", "r", *args, **kwargs)
         self.x = self["x"]
         self.y = self["y"]
 

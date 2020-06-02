@@ -90,7 +90,7 @@ class WritableDatafile(h5py.File):
     """Writes matchups to an hdf5 file."""
 
     def __init__(self, name: str, *args, **kwargs):
-        super().__init__(name, "w", *args, **kwargs)
+        super().__init__(f"{name}.hdf5", "w", *args, **kwargs)
         self.__ratings = PlayerRatings()
         rating_shape = self.__ratings.get_matchup_rating(0, 0).shape
         self.__x = self.create_dataset("x", (1, *rating_shape), chunks=True,
