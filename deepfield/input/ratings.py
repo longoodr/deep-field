@@ -219,7 +219,7 @@ class AbstractSubrating(ABC):
 
     def update(self, event: np.ndarray) -> None:
         update_funcs = [
-                self._pos_update if event[i] >= self.rating[i]
+                self._pos_update if event[i] == 1
                 else self._neg_update
                 for i in range(event.size)
             ]
@@ -230,9 +230,13 @@ class AbstractSubrating(ABC):
     # see https://www.desmos.com/calculator/lffptb95tq for a visual explanation
     # of these updates
     def _pos_update(self, x):
+        if x == 1:
+            return 1
         return 1 - exp(log(1-x) - self._weight)
 
     def _neg_update(self, x):
+        if x == 0:
+            return 0
         return exp(log(x) - self._weight)
 
     def reset(self) -> None:
