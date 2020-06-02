@@ -27,6 +27,6 @@ Each rating is initialized to an estimate of the average outcome distribution ov
     <img src="https://latex.codecogs.com/svg.latex?p_e(t%2B1)%3D\left\{\begin{array}{ll}1-e^{\ln(1-p_e(t))-\frac{1}{k}}%20%26\quad%20v_e%3D1%20\\e^{\ln(p_e(t))-\frac{1}{k}}%26\quad%20v_e%3D0\end{array}\right." />
 </p>
 
-* This is a form of exponential smoothing, which increases the observed outcome's probability and decreases all other probabilities according to an exponential curve.
+* This is a form of exponential smoothing, which increases the observed outcome's probability and decreases all other probabilities according to an exponential curve. See [here](https://www.desmos.com/calculator/eqilnfnshh) for a visualization.
 
 ___
