@@ -4,12 +4,19 @@ from typing import List
 
 import pytest
 
-import tests.data.test_env as test_env
-from deepfield.data.bbref_pages import (BBRefLink, GamePage, PlayerPage,
-                                        SchedulePage)
-from deepfield.data.nodes import InsertableScrapeNode, ScrapeNode
-from deepfield.data.pages import HtmlCache, Page
+from deepfield.scraping.bbref_pages import (BBRefLink, GamePage,
+                                            MissingPlayDataError, PlayerPage,
+                                            SchedulePage)
+from deepfield.scraping.nodes import InsertableScrapeNode, ScrapeNode
+from deepfield.scraping.pages import HtmlCache, Page
+from tests import utils
 
+
+def setup_module(module):
+    utils.init_test_env()
+
+def teardown_module(module):
+    utils.remove_files()
 
 class TestScrapeNode:
     
@@ -23,7 +30,7 @@ class TestScrapeNode:
         
     def test_no_visit_twice(self):
         # these games share the same lineups
-        test_env.clean_db()
+        utils.clean_db()
         games = [
             "WAS201710120.shtml",
             "CHN201710110.shtml"
@@ -42,6 +49,8 @@ PARSE_URLS: List[str] = [
     "https://www.baseball-reference.com/boxes/OAK/OAK201203280.shtml",
     "https://www.baseball-reference.com/boxes/BAL/BAL200705070.shtml",
     "https://www.baseball-reference.com/boxes/SEA/SEA199105260.shtml",
+    "https://www.baseball-reference.com/boxes/SEA/SEA201903290.shtml",
+    "https://www.baseball-reference.com/boxes/WS2/WS2197109300.shtml",
     "https://www.baseball-reference.com/players/j/jimend'01.shtml",
     "https://www.baseball-reference.com/players/s/sabatc.01.shtml",
 ]
@@ -50,17 +59,27 @@ class TestParseable:
     
     @pytest.mark.parametrize("url", PARSE_URLS)
     def test_can_parse(self, url: str):
-        test_env.clean_db()
+        utils.clean_db()
         link = BBRefLink(url)
         page = Page.from_link(link)
         if isinstance(page, GamePage):
-            test_env.insert_mock_players(page)
+            utils.insert_mock_players(page)
         ScrapeNode.from_page(page).scrape()
+
+    def test_cannot_parse(self):
+        url = "https://www.baseball-reference.com/boxes/PIT/PIT196507020.shtml"
+        utils.clean_db()
+        link = BBRefLink(url)
+        page = Page.from_link(link)
+        assert isinstance(page, GamePage)
+        utils.insert_mock_players(page)
+        with pytest.raises(MissingPlayDataError):
+            ScrapeNode.from_page(page).scrape()
 
     def test_malformed_html(self):
         # the web handler will download the correct html, so need to copy
         # malformed html to cached file beforehand to test properly
-        player_pages = os.path.join("tests", "data", "resources", "PlayerPage")
+        player_pages = os.path.join("tests", "scraping", "resources", "PlayerPage")
         copyfile(
                 src = os.path.join(player_pages, "malformed_arod.shtml"),
                 dst = os.path.join(player_pages, "rodrial01.shtml")
@@ -68,3 +87,14 @@ class TestParseable:
         url = "https://www.baseball-reference.com/players/r/rodrial01.shtml"
         link = BBRefLink(url)
         page = Page.from_link(link)
+
+    def test_dup_team_names(self):
+        for url in [
+            "https://www.baseball-reference.com/boxes/WS2/WS2197109300.shtml",
+            "https://www.baseball-reference.com/boxes/CLE/CLE196007171.shtml"
+        ]:
+            link = BBRefLink(url)
+            page = Page.from_link(link)
+            assert isinstance(page, GamePage)
+            utils.insert_mock_players(page)
+            ScrapeNode.from_page(page).scrape()

@@ -1,3 +1,4 @@
+import os
 from datetime import date, time
 from pathlib import Path
 from typing import Iterable, Tuple, Type
@@ -5,19 +6,24 @@ from typing import Iterable, Tuple, Type
 import pytest
 from pytest import raises
 
-import tests.data.test_env as test_env
-from deepfield.data.bbref_pages import (BBRefLink, BBRefPage, GamePage,
-                                        PlayerPage, SchedulePage)
-from deepfield.data.dbmodels import (Game, Play, Player, Team,
-                                     Venue, db)
-from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
-from deepfield.data.pages import HtmlCache, Page
+from deepfield.dbmodels import Game, Play, Player, Team, Venue, db
+from deepfield.enums import FieldType, Handedness, OnBase, TimeOfDay
+from deepfield.scraping.bbref_pages import (BBRefLink, BBRefPage, GamePage,
+                                            PlayerPage, SchedulePage)
+from deepfield.scraping.pages import HtmlCache, Page
+from tests import utils
 
 RES_URLS = [
     "https://www.baseball-reference.com/boxes/WAS/WAS201710120.shtml",
     "https://www.baseball-reference.com/leagues/MLB/2016-schedule.shtml",
     "https://www.baseball-reference.com/players/v/vendipa01.shtml"
 ]
+
+def setup_module(module):
+    utils.init_test_env()
+
+def teardown_module(module):
+    utils.remove_files()
 
 class TestPageFromLink:
     
@@ -55,9 +61,9 @@ class TestPage:
     
     @classmethod
     def setup_method(cls):
-        test_env.clean_db()
-        html = test_env.resources.find_html(BBRefLink(cls.name))
-        cls.page = cls.page_type(html)
+        utils.clean_db()
+        html = HtmlCache.get().find_html(BBRefLink(cls.name))
+        cls.page = cls.page_type(html)  # type: ignore
 
     @classmethod
     def test_urls(cls, on_list_suffixes: Iterable[str], not_on_list_suffixes: Iterable[str]):
@@ -112,7 +118,8 @@ class TestPlayerPage(TestPage):
     
     name = "vendipa01.shtml"
     page_type = PlayerPage
-    
+    page: PlayerPage
+
     def test_hash_eq(self):
         self._test_hash_eq(TestGamePage.name)
     
@@ -128,6 +135,7 @@ class TestPlayerPage(TestPage):
 class AbstractTestGamePage(TestPage):
     
     page_type = GamePage
+    page: GamePage
     
     @staticmethod
     def _id_of_name_id(name_id: str) -> int:
@@ -156,7 +164,7 @@ class TestGamePage(AbstractTestGamePage):
     def test_queries(self):
         with raises(ValueError):
             self.page.update_db()
-        test_env.insert_mock_players(self.page)
+        utils.insert_mock_players(self.page)
         assert not self.page._exists_in_db()
         self.page.update_db()
         assert self.page._exists_in_db()
@@ -203,7 +211,7 @@ class TestGamePageNames(AbstractTestGamePage):
     plays: Iterable[Tuple[int, str]] # play_num, name_id
     
     def _test_queries(self):
-        test_env.insert_mock_players(self.page)
+        utils.insert_mock_players(self.page)
         self.page.update_db()
         assert self.page._exists_in_db()
         for play_num, name_id in self.plays:
@@ -248,6 +256,7 @@ class TestPlayerTables(TestPage):
     
     name = "OAK201903200.shtml"
     page_type = GamePage
+    page: GamePage
     
     def test_players(self):
         away = [

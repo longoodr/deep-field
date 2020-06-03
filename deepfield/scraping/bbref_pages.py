@@ -10,13 +10,16 @@ import requests
 from bs4 import BeautifulSoup, Comment
 from peewee import Query, chunked
 
-from deepfield.data.dbmodels import (DeepFieldModel, Game, Play, Player, Team,
-                                     Venue, db)
-from deepfield.data.enums import FieldType, Handedness, OnBase, TimeOfDay
-from deepfield.data.pages import InsertablePage, Link, Page
+from deepfield.dbmodels import (DeepFieldModel, Game, Play, Player, Team,
+                                Venue, db)
+from deepfield.enums import FieldType, Handedness, OnBase, TimeOfDay
+from deepfield.scraping.pages import InsertablePage, Link, Page
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+class MissingPlayDataError(ValueError):
+    pass
 
 class BBRefPage(Page):
     """A page from baseball-reference.com."""
@@ -58,7 +61,7 @@ class BBRefLink(Link):
         return record is not None
     
     __PLAYER_NAME_ID_MATCHER = re.compile(r"^[\w\.']+\d\d$")
-    __GAME_NAME_ID_MATCHER   = re.compile(r"[A-Z]{3}\d{9}")
+    __GAME_NAME_ID_MATCHER   = re.compile(r"[A-Z0-9]{3}\d{9}")
     
     def _get_page_type(self) -> Type[BBRefPage]:
         if re.fullmatch(self.__GAME_NAME_ID_MATCHER, self.name_id):
@@ -183,7 +186,10 @@ class _PlaceholderTable(BeautifulSoup):
     def __init__(self, ph_div):
         # Note the SECOND sibling is the comment of interest because there is
         # an intermediate \n.
-        table_contents = ph_div.next_sibling.next_sibling
+        try:
+            table_contents = ph_div.next_sibling.next_sibling
+        except AttributeError:
+            raise MissingPlayDataError
         super().__init__(table_contents, "lxml")
     
 class _PlaceholderDivFilter:
@@ -422,7 +428,7 @@ class _GameQueryRunner:
         self.__scorebox_meta = scorebox_meta
         self.__game_name = game_name
 
-    def add_game(self, teams: List[Team], venue: Venue) -> Game:
+    def add_game(self, teams: List[Team], venue: Optional[Venue]) -> Game:
         fields = {
             "name_id"         : self.__game_name,
             "local_start_time": self.__get_local_start_time(),
@@ -789,4 +795,8 @@ class _PlayerAppearances:
         inning_char = inning[0]
         inning_player = (inning_char, player_type)
         side = _PlayQueryRunner.INNING_AND_PLAYER_TO_SIDE[inning_player]
-        self.__map[side][name][player_type] += 1
+        try:
+            self.__map[side][name][player_type] += 1
+        except KeyError:
+            stripped_name = _NameStripper.get_stripped_name(name)
+            self.__map[side][stripped_name][player_type] += 1

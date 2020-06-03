@@ -237,17 +237,17 @@ class HtmlCache(_AbstractHtmlCache):
     @classmethod
     def get(cls) -> "HtmlCache":
         if not hasattr(cls, "_instance"):
-            # ensure in right spot: data -> deepfield -> deep-field
+            # ensure in right spot: scraping -> deepfield -> deep-field
             parents = Path(__file__).parents
-            for actual, expected in zip(parents, ["data", "deepfield", "deep-field"]):
+            for actual, expected in zip(parents, ["scraping", "deepfield", "deep-field"]):
                 if actual.name != expected:
                     raise RuntimeError(
                         "HtmlCache def not found with right parent folder structure")
             project_root = parents[2]
             if "TESTING" in os.environ:
-                root = (project_root / os.path.join("tests", "data", "resources")).resolve()
+                root = (project_root / os.path.join("tests", "scraping", "resources")).resolve()
             else:
-                root = (project_root / os.path.join("deepfield", "data", "pages")).resolve()
+                root = (project_root / os.path.join("deepfield", "scraping", "pages")).resolve()
             cls._instance = HtmlCache(str(root))
         return cls._instance
     
@@ -291,6 +291,7 @@ class _HtmlFolder(_AbstractHtmlCache):
     def insert_html(self, html: str, link: Link) -> None:
         if not os.path.isdir(self._root):
             os.mkdir(self._root)
+            self.__init_contained_files()
         filename = self._get_filename(link)
         filepath = self._full_path(filename)
         with open(filepath, 'w', encoding="utf-8") as html_file:

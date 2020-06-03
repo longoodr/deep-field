@@ -1,5 +1,13 @@
+import os
+from typing import Optional
+
 from peewee import (CharField, DateField, FixedCharField, ForeignKeyField,
-                    Model, SmallIntegerField, SqliteDatabase, TimeField)
+                    IntegerField, Model, SmallIntegerField, SqliteDatabase,
+                    TimeField)
+
+_DB_NAME: Optional[str] = None
+_PROD_DB_NAME = "stats.db"
+_TEST_DB_NAME = "tmp.db"
 
 db = SqliteDatabase(None)
 
@@ -11,7 +19,7 @@ class Venue(DeepFieldModel):
     name = CharField(unique=True)
     
 class Team(DeepFieldModel):
-    name = CharField(unique=True)
+    name = CharField()
     abbreviation = FixedCharField(3)
     
 class Player(DeepFieldModel):
@@ -43,8 +51,25 @@ class Play(DeepFieldModel):
 
 _MODELS = (Game, Play, Player, Team, Venue)
 
-def create_tables():
+def create_tables() -> None:
     db.create_tables(_MODELS)
     
-def drop_tables():
+def drop_tables() -> None:
     db.drop_tables(_MODELS)
+
+def init_db() -> None:
+    global _DB_NAME
+    _DB_NAME = _TEST_DB_NAME if "TESTING" in os.environ else _PROD_DB_NAME
+    db.init(_DB_NAME)
+    create_tables()
+
+def get_db_name() -> str:
+    global _DB_NAME
+    if _DB_NAME is None:
+        raise RuntimeError("Database not initialized")
+    return _DB_NAME
+
+def get_data_name() -> str:
+    if "TESTING" in os.environ:
+        return "test_data"
+    return "data"
