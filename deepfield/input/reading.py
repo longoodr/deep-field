@@ -76,12 +76,10 @@ class ReadableDatafile(h5py.File):
         self.x = self["x"]
         self.y = self["y"]
 
-    def get_indices(self) -> List[int]:
-        """Returns the set of indices for this data."""
-        return list(range(len(self.x)))
-
-    def get_train_test_indices(self, split: float = 0.05) -> Tuple[List[int], List[int]]:
-        indices = self.get_indices()
+    def get_train_test_ids(self, batch_size: int, split: float = 0.05)\
+            -> Tuple[np.ndarray, np.ndarray]:
+        """Returns a random set of train and test batch IDs for this data."""
+        indices = np.arange(int(len(self.x) / batch_size))
         np.random.shuffle(indices)
         train_test_partition = int((1 - split) * len(indices))
         train = indices[:train_test_partition]
@@ -91,21 +89,26 @@ class ReadableDatafile(h5py.File):
 class DataGenerator(Sequence):
     """Reads x, y data for keras model training."""
 
-    def __init__(self, ids: List[int], batch_size: int, shuffle: bool = True):
+    def __init__(self, ids: np.ndarray, batch_size: int, shuffle: bool = True):
         self._ids = ids
-        self._batch_size = batch_size
         self._shuffle = shuffle
-        self._df = ReadableDatafile(get_data_name())
+        self._batch_size = batch_size
+        df = ReadableDatafile(get_data_name())
+        self.x = df.x
+        self.y = df.y
+        self.on_epoch_end()
 
     def __len__(self):
-        return int(floor(len(self._ids) / self._batch_size))
+        return len(self._ids)
 
-    def __getitem__(self, index):
-        indices = self._ids[index*self._batch_size:(index+1)*self._batch_size]
-        x = np.asarray([self._df.x[i] for i in indices])
-        y = np.asarray([self._df.y[i] for i in indices])
+    def __getitem__(self, i):
+        index = self._ids[i]
+        lo = index * self._batch_size
+        hi = (index + 1) * self._batch_size
+        x = self.x[lo:hi]
+        y = self.y[lo:hi]
         return x, y
 
     def on_epoch_end(self):
-        if self._shuffle == True:
+        if self._shuffle:
             np.random.shuffle(self._ids)

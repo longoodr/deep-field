@@ -28,6 +28,10 @@ class TestDatafile:
         InputDataPersistor().ensure_consistency()
         cls.df = ReadableDatafile(get_data_name())
 
+    @classmethod
+    def teardown_class(cls):
+        cls.df.close()
+
     def test_access(self):
         assert self.df.x.shape[0] == self.LEN
         assert self.df.y.shape[0] == self.LEN
@@ -35,10 +39,7 @@ class TestDatafile:
         assert (self.df.y[1] == to_categorical(Outcome.STRIKEOUT.value, len(Outcome))).all()
 
     def test_indices(self):
-        indices = self.df.get_indices()
-        for i in range(self.LEN):
-            assert i in indices
-        train, test = self.df.get_train_test_indices()
+        train, test = self.df.get_train_test_ids(1)
         for i in range(self.LEN):
             assert (
                     (i in train and i not in test) or
