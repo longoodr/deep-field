@@ -3,6 +3,7 @@ from math import exp, log
 from typing import Dict, Iterable, Tuple
 
 import numpy as np
+from tensorflow.keras.utils import to_categorical
 
 from deepfield.dbmodels import Player
 from deepfield.enums import Handedness, Outcome
@@ -57,12 +58,18 @@ class PlayerRatings:
         prating = self.get_pitcher(pid)
         b_avg = self._avg_batter.get_rating()
         p_avg = self._avg_pitcher.get_rating()
+        b_hand = to_categorical(
+                self.hands.get_batter_handedness(bid), len(Handedness))
+        p_hand = to_categorical(
+                self.hands.get_pitcher_handedness(pid), len(Handedness))
         return np.concatenate(
                 [
                     brating.get_rating(),
                     prating.get_rating(),
                     b_avg,
                     p_avg,
+                    b_hand,
+                    p_hand,
                     brating.appearances,
                     prating.appearances,
                     pit_appearances
@@ -103,22 +110,22 @@ class HandednessTracker:
         """Returns a tuple of the handednesses that the batter and pitcher are
         facing for the given matchup, respectively.
         """
-        bhand = self.get_batter_handedness(bid)
-        phand = self.get_pitcher_handedness(pid)
-        if bhand != self._BOTH and phand != self._BOTH:
-            return phand, bhand
+        b_hand = self.get_batter_handedness(bid)
+        p_hand = self.get_pitcher_handedness(pid)
+        if b_hand != self._BOTH and p_hand != self._BOTH:
+            return p_hand, b_hand
         # based on https://tinyurl.com/y89epnls, assume switch pitcher vs
         # switch hitter implies pitcher pitches left and batter bats right. 
         # (This almost never happens)
-        if bhand == self._BOTH and phand == self._BOTH:
+        if b_hand == self._BOTH and p_hand == self._BOTH:
             return (self._LEFT, self._RGHT)
         # switch batters prefer to bat opposite of pitcher
-        if bhand == self._BOTH:
-            bhand = self._CHOOSE_OPPOSITE[phand]
+        if b_hand == self._BOTH:
+            b_hand = self._CHOOSE_OPPOSITE[p_hand]
         # switch pitchers (i.e. Pat Venditte) prefer to pitch same as batter
-        elif phand == self._BOTH:
-            phand = bhand
-        return phand, bhand
+        elif p_hand == self._BOTH:
+            p_hand = b_hand
+        return p_hand, b_hand
 
 class AbstractPlayerRating:
     """Tracks rating data for matchups."""
