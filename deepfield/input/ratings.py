@@ -125,15 +125,17 @@ class AbstractPlayerRating:
 
     def __init__(self,
                  against_left: Iterable["AbstractSubrating"],
-                 against_right: Iterable["AbstractSubrating"]
+                 against_right: Iterable["AbstractSubrating"],
+                 against_everyone: Iterable["AbstractSubrating"],
                  ):
         against_left = list(against_left)
         against_right = list(against_right)
+        self._against_everyone = list(against_everyone)
         self._against_hand_subratings = {
                 Handedness.LEFT.value: against_left,
                 Handedness.RIGHT.value: against_right
             }
-        self._subratings = against_left + against_right
+        self._subratings = against_left + against_right + self._against_everyone
 
     def reset(self) -> None:
         """Resets the rating to its initial value."""
@@ -145,6 +147,8 @@ class AbstractPlayerRating:
         vector.
         """
         for subrating in self._against_hand_subratings[against_hand]:
+            subrating.update(event)
+        for subrating in self._against_everyone:
             subrating.update(event)
 
     def get_rating(self) -> np.ndarray:
@@ -177,7 +181,15 @@ class AvgPlayerRating(AbstractPlayerRating):
                 self.mid_against_right,
                 self.long_against_right
             ]
-        super().__init__(against_left, against_right)
+        self.short_against_everyone = AvgPlayerSubrating(self.SHORT)
+        self.mid_against_everyone = AvgPlayerSubrating(self.MID)
+        self.long_against_everyone = AvgPlayerSubrating(self.LONG)
+        against_everyone = [
+            self.short_against_everyone,
+            self.mid_against_everyone,
+            self.long_against_everyone
+        ]
+        super().__init__(against_left, against_right, against_everyone)
 
 class PlayerRating(AbstractPlayerRating):
     """A set of rating data for a given player over several timescales."""
@@ -203,7 +215,15 @@ class PlayerRating(AbstractPlayerRating):
                 self.mid_against_right,
                 self.long_against_right
             ]
-        super().__init__(against_left, against_right)
+        self.short_against_everyone = PlayerSubrating(self.SHORT, avg_rating.short_against_everyone)
+        self.mid_against_everyone = PlayerSubrating(self.MID, avg_rating.mid_against_everyone)
+        self.long_against_everyone = PlayerSubrating(self.LONG, avg_rating.long_against_everyone)
+        against_everyone = [
+            self.short_against_everyone,
+            self.mid_against_everyone,
+            self.long_against_everyone
+        ]
+        super().__init__(against_left, against_right, against_everyone)
         self.appearances = 0
 
     def update(self, event: np.ndarray, against_hand: int) -> None:
