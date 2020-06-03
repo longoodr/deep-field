@@ -37,7 +37,7 @@ class InputDataPersistor:
         for filename in [self._data_filename, self._hash_filename]:
             try:
                 os.remove(filename)
-            except FileNotFoundError:
+            except (FileNotFoundError, PermissionError):
                 pass
 
     def is_consistent(self) -> bool:
@@ -95,7 +95,7 @@ class WritableDatafile(h5py.File):
     def __init__(self, name: str, *args, **kwargs):
         super().__init__(f"{name}.hdf5", "w", *args, **kwargs)
         self.__ratings = PlayerRatings()
-        rating_shape = self.__ratings.get_matchup_rating(0, 0).shape
+        rating_shape = self.__ratings.get_matchup_rating(1, 1).shape
         self.__x = self.create_dataset("x", (1, *rating_shape), chunks=True,
                     maxshape=(None, *rating_shape))
         self.__y = self.create_dataset("y", (1, len(Outcome)), chunks=True,
