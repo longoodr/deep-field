@@ -1,4 +1,19 @@
 # Deep Field
+Deep Field is my attempt to answer the question: "given an arbitrary batter and pitcher matchup in Major League Baseball, is it possible to predict the probabilities of what will happen when they face each other at the plate?"
+
+I attempt to answer this question by compiling a database of every play in modern Major League Baseball and training a neural network on computed performance statistics for every seen matchup. It sees the outcome of every matchup, and its goal is to predict a probability distribution over the nine possible outcomes.
+
+The nine considered outcomes are:
+* Strikeouts
+* Lineouts
+* Groundouts
+* Walks
+* Singles
+* Doubles
+* Triples
+* Home Runs
+
+These outcomes were chosen because they are "field agnostic", i.e. these outcomes don't depend on who is on base or who is fielding. This means things like double plays are counted as their corresponding outs, because if there hadn't been someone on the field, the result would have been its corresponding out. This also means that errors are treated as outs. Any other play that does not fall under one of these outcomes is ignored.
 
 ### Scraping
 `deepfield/scraping/scraper.py` is a script that will scrape games from www.baseball-reference.com into a database named `stats.db`.
@@ -18,7 +33,7 @@ Each data point corresponds to a play in the database; the goal is to predict th
 * Similar estimations for the average pitcher's performance.
 * Batting handedness of the batter.
 * Pitching handedness of the pitcher.
-* Total number of appearances for this batter. This is intended to estimate the accuracy of the estimated distribution for the batter.
+* Total number of appearances for this batter. This is intended to estimate the uncertainty the estimated distribution for the batter.
 * Total number of appearances for this pitcher, for similar reasons.
 * Total number of appearances for this pitcher in the game. This is intended to estimate pitcher fatigue.
 
