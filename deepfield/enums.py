@@ -134,20 +134,24 @@ class _OutcomePercentageTracker:
     def get_percentages(cls) -> np.ndarray:
         if cls._percs is not None:
             return cls._percs
-        query = (Play.select(Play.desc)
-                .order_by(fn.Random())
-                .limit(cls._SAMPLE_OVER)
-                .tuples()
-                .iterator()
-            )
+        query = cls._random_sample()
+        if query.count() == 0:
+            raise RuntimeError("No plays in database")
         ctr: CounterType[int] = Counter()
-        for (desc,) in query:
+        for (desc,) in query.iterator():
             outcome = Outcome.from_desc(desc)
             if outcome is None:
                 continue
             ctr[outcome.value] += 1
         cnts = np.asarray([ctr[i] for i in range(len(Outcome))])
-        if np.sum(cnts) == 0:
-            raise RuntimeError("No plays in database")
         cls._percs = cnts / np.sum(cnts)
         return cls._percs
+
+    @classmethod
+    def _random_sample(cls):
+        return (Play.select(Play.desc)
+                .order_by(fn.Random())
+                .limit(cls._SAMPLE_OVER)
+                .tuples()
+            )
+        
