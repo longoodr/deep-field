@@ -7,6 +7,7 @@ The nine considered outcomes are:
 * Strikeouts
 * Lineouts
 * Groundouts
+* Flyouts
 * Walks
 * Singles
 * Doubles
