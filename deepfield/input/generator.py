@@ -1,5 +1,4 @@
 import argparse
-import logging
 
 from deepfield.script_utils import config_logging, logger
 from deepfield.dbmodels import init_db
@@ -7,7 +6,7 @@ from deepfield.input.writing import InputDataPersistor
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Generates input data from plays in the database.")
+    _ = argparse.ArgumentParser(description="Generates input data from plays in the database.")
     config_logging()
     init_db()
     p = InputDataPersistor()

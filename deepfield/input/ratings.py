@@ -3,7 +3,7 @@ from math import exp, log
 from typing import Dict, Iterable, Tuple
 
 import numpy as np
-from tensorflow.keras.utils import to_categorical
+from keras.utils import to_categorical
 
 from deepfield.dbmodels import Player
 from deepfield.enums import Handedness, Outcome

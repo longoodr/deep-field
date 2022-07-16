@@ -2,7 +2,7 @@ import os
 from typing import Optional
 
 from peewee import (CharField, DateField, FixedCharField, ForeignKeyField,
-                    IntegerField, Model, SmallIntegerField, SqliteDatabase,
+                    Model, SmallIntegerField, SqliteDatabase,
                     TimeField)
 
 _DB_NAME: Optional[str] = None

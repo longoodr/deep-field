@@ -2,8 +2,8 @@ import argparse
 from datetime import datetime
 from typing import Iterable
 
-from deepfield.dbmodels import create_tables, init_db
-from deepfield.scraping.bbref_pages import BBRefLink, SchedulePage
+from deepfield.dbmodels import init_db
+from deepfield.scraping.bbref_pages import BBRefLink
 from deepfield.scraping.nodes import ScrapeNode
 from deepfield.scraping.pages import Page
 from deepfield.script_utils import config_logging, logger

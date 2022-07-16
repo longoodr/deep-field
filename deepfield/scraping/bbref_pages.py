@@ -1,14 +1,11 @@
 import logging
-import math
 import re
-from collections import Counter
 from datetime import date, datetime, time
 from typing import (Any, Callable, Dict, Iterable, List, Optional, Set, Tuple,
                     Type)
 
-import requests
-from bs4 import BeautifulSoup, Comment, Tag
-from peewee import Query, chunked
+from bs4 import BeautifulSoup, Tag
+from peewee import chunked
 
 from deepfield.dbmodels import (DeepFieldModel, Game, Play, Player, Team,
                                 Venue, db)
@@ -109,8 +106,8 @@ class PlayerPage(BBRefInsertablePage):
     def __init__(self, html: str):
         super().__init__(html)
         self._player_info = self._soup.find("div",
-            {"itemtype": "https://schema.org/Person"})
-    
+            {"id": "info", "class": "players"})
+
     def get_links(self) -> Iterable[Link]:
         """PlayerPages don't depend on anything else."""
         return []

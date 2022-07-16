@@ -5,10 +5,9 @@ from typing import List
 import pytest
 
 from deepfield.scraping.bbref_pages import (BBRefLink, GamePage,
-                                            MissingPlayDataError, PlayerPage,
-                                            SchedulePage)
+                                            MissingPlayDataError)
 from deepfield.scraping.nodes import InsertableScrapeNode, ScrapeNode
-from deepfield.scraping.pages import HtmlCache, Page
+from deepfield.scraping.pages import Page
 from tests import utils
 
 
@@ -23,10 +22,7 @@ class TestScrapeNode:
     def test_from_page(self):
         link = BBRefLink("WAS201710120.shtml")
         page = Page.from_link(link)
-        new_node1 = ScrapeNode.from_page(page)
-        new_node2 = ScrapeNode.from_page(page)
-        assert new_node1 is new_node2
-        assert new_node1.__class__ == InsertableScrapeNode
+        assert ScrapeNode.from_page(page).__class__ == InsertableScrapeNode
         
     def test_no_visit_twice(self):
         # these games share the same lineups
