@@ -1,13 +1,14 @@
 import os
 from collections import Counter
 from hashlib import md5
-from typing import Counter as CounterType
+from typing import Counter as CounterType, Tuple
 from typing import Optional
 
 import h5py
+import numpy as np
 from keras.utils import to_categorical
 
-from deepfield.dbmodels import db, get_data_name, get_db_name
+from deepfield.dbmodels import get_data_name, get_db_name
 from deepfield.enums import Outcome
 from deepfield.input.ratings import PlayerRatings
 from deepfield.input.reading import DbMatchupReader
@@ -90,12 +91,12 @@ class ChecksumGenerator:
         return md5sum.hexdigest()
 
 class WritableDatafile(h5py.File):
-    """Writes matchups to an hdf5 file."""
+    """Handles writing matchups to an hdf5 file."""
 
     def __init__(self, name: str, *args, **kwargs):
         super().__init__(f"{name}.hdf5", "w", *args, **kwargs)
         self.__ratings = PlayerRatings()
-        rating_shape = self.__ratings.get_matchup_rating(1, 1).shape
+        rating_shape = self.__get_x_shape()
         self.__x = self.create_dataset("x", (1, *rating_shape), chunks=True,
                     maxshape=(None, *rating_shape))
         self.__y = self.create_dataset("y", (1, len(Outcome)), chunks=True,
@@ -104,16 +105,8 @@ class WritableDatafile(h5py.File):
         self.__last_num = 0
         self.__last_game_id: Optional[str] = None
 
-    def __reset_pitcher_appearances(self) -> None:
-        self.__pit_appearances: CounterType[int] = Counter()
-
     def write_matchup(self,
-                      num: int,
-                      bid: int,
-                      pid: int,
-                      outcome: int,
-                      game_id: str
-                      ) -> None:
+            num: int, bid: int, pid: int, outcome: int, game_id: str) -> None:
         outcome_oh = to_categorical(outcome, len(Outcome))
         if self.__last_game_id != game_id:
             self.__reset_pitcher_appearances()
@@ -122,8 +115,7 @@ class WritableDatafile(h5py.File):
             self.__size *= 2
             self.__x.resize(self.__size, axis=0)
             self.__y.resize(self.__size, axis=0)
-        self.__x[num] = self.__ratings.get_matchup_rating(
-                bid, pid, self.__pit_appearances[pid])
+        self.__x[num] = self._get_x(bid, pid, self.__pit_appearances[pid])
         self.__y[num] = outcome_oh
         self.__last_num = num
         self.__ratings.update(bid, pid, outcome_oh)
@@ -132,3 +124,22 @@ class WritableDatafile(h5py.File):
     def trim_size(self) -> None:
         self.__x.resize(self.__last_num + 1, axis=0)
         self.__y.resize(self.__last_num + 1, axis=0)
+    
+    # Swap the following two implementations out as needed.    
+    def __get_x_shape(self) -> Tuple[int]:
+        return self.__get_rating_x_shape()
+    
+    def _get_x(self, bid, pid, pit_appearances) -> np.ndarray:
+        return self.__get_rating_x(bid, pid, pit_appearances)
+    
+    # Legacy rating dataset.
+    def __get_rating_x_shape(self) -> Tuple[int]:
+        return self.__ratings.get_matchup_rating(1, 1).shape
+    
+    def __get_rating_x(self, bid, pid, pit_appearances) -> np.ndarray:
+        return self.__ratings.get_matchup_rating(bid, pid, pit_appearances)
+
+    # Dependency graph dataset.
+
+    def __reset_pitcher_appearances(self) -> None:
+        self.__pit_appearances: CounterType[int] = Counter()

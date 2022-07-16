@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 from keras.utils import to_categorical
 
 from deepfield.dbmodels import get_data_name
@@ -43,5 +42,4 @@ class TestDatafile:
         for i in range(self.LEN):
             assert (
                     (i in train and i not in test) or
-                    (i in test and i not in train)
-                )
+                    (i in test and i not in train))
