@@ -1,9 +1,7 @@
 import logging
-from typing import Dict, Iterable, Optional, Set, Tuple, Type
 
 from deepfield.scraping.bbref_pages import MissingPlayDataError
-from deepfield.scraping.pages import InsertablePage, Link, Page
-from lru import LRU
+from deepfield.scraping.pages import InsertablePage, Page
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -11,22 +9,16 @@ logger.setLevel(logging.INFO)
 class ScrapeNode:
     """A node in the page dependency graph. The nodes are traversed via DFS."""
     
-    _CACHE_SIZE = 100
-    _cached_nodes = LRU(_CACHE_SIZE)
-    
     @classmethod
     def from_page(cls, page: Page):
         """Factory method to create proper ScrapeNode subclass from page. Use
         this over the constructor.
         """
-        if page in cls._cached_nodes:
-            return cls._cached_nodes[page]
         new_node: ScrapeNode
         if isinstance(page, InsertablePage):
             new_node = InsertableScrapeNode(page)
         else:
             new_node = ScrapeNode(page)
-        cls._cached_nodes[page] = new_node
         return new_node
     
     def __init__(self, page: Page):

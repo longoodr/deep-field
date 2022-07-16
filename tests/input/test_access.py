@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from tensorflow.keras.utils import to_categorical
+from keras.utils import to_categorical
 
 from deepfield.dbmodels import get_data_name
 from deepfield.enums import Outcome

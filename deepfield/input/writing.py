@@ -2,10 +2,10 @@ import os
 from collections import Counter
 from hashlib import md5
 from typing import Counter as CounterType
-from typing import Iterator, Optional
+from typing import Optional
 
 import h5py
-from tensorflow.keras.utils import to_categorical
+from keras.utils import to_categorical
 
 from deepfield.dbmodels import db, get_data_name, get_db_name
 from deepfield.enums import Outcome

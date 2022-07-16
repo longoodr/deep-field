@@ -58,7 +58,7 @@ class Page(ABC):
         return _PageRetriever(link, cachable).get_page()
      
     def __init__(self, html: str):
-        self._soup = BeautifulSoup(html, "lxml")
+        self._soup = BeautifulSoup(html, "html.parser")
     
     @abstractmethod
     def get_links(self) -> Iterable[Link]:

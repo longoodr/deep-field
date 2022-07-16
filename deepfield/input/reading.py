@@ -1,12 +1,9 @@
 import logging
-from collections import Counter
-from math import floor
-from typing import Counter as CounterType
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Optional, Tuple
 
 import h5py
 import numpy as np
-from tensorflow.keras.utils import Sequence
+from keras.utils import Sequence
 
 from deepfield.dbmodels import Game, Play, get_data_name
 from deepfield.enums import Outcome

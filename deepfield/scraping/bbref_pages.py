@@ -7,7 +7,7 @@ from typing import (Any, Callable, Dict, Iterable, List, Optional, Set, Tuple,
                     Type)
 
 import requests
-from bs4 import BeautifulSoup, Comment
+from bs4 import BeautifulSoup, Comment, Tag
 from peewee import Query, chunked
 
 from deepfield.dbmodels import (DeepFieldModel, Game, Play, Player, Team,
@@ -122,9 +122,6 @@ class PlayerPage(BBRefInsertablePage):
         with db.atomic():
             Player.create(**fields)
     
-    def __get_player_name(self) -> str:
-        return self._player_info.h1.text
-    
     __HANDEDNESS_MATCHER = re.compile(r"(?:Bats:|Throws:) (\w+)")
     
     def __get_handedness(self) -> Dict[str, Any]: # Bats, Throws
@@ -190,7 +187,7 @@ class _PlaceholderTable(BeautifulSoup):
             table_contents = ph_div.next_sibling.next_sibling
         except AttributeError:
             raise MissingPlayDataError
-        super().__init__(table_contents, "lxml")
+        super().__init__(table_contents, "html.parser")
     
 class _PlaceholderDivFilter:
     """Matches placeholder divs whose comment of interest contains the
@@ -341,8 +338,8 @@ class _PlayerTable(_PlaceholderTable):
         return row.a["href"] # /players/s/smithjo01.shtml
                 
     @staticmethod 
-    def __player_tag_filter(tag) -> bool:
-        return tag.name == "th" and len(tag.attrs) == 5
+    def __player_tag_filter(tag: Tag) -> bool:
+        return tag.name == "th" and tag.has_attr("data-append-csv") and (len(tag.attrs) == 4 or len(tag.attrs) == 5)
 
 class _GamePageQueryRunner:
     """Handles execution of queries for data contained on a GamePage."""
