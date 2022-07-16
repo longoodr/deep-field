@@ -147,10 +147,9 @@ class GamePage(BBRefInsertablePage):
     def _run_queries(self) -> None:
         if not hasattr(self, "_query_runner"):
             self.__query_runner = _GamePageQueryRunner(
-                    self._soup,
-                    self._player_tables,
-                    self._link.name_id
-                )
+                self._soup,
+                self._player_tables,
+                self._link.name_id)
         self.__query_runner.run_queries()
     
 class _NameStripper:
@@ -343,19 +342,11 @@ class _GamePageQueryRunner:
     
     def __init__(self, soup, player_tables: _PlayerTables, game_name: str):
         self.__soup = soup
-        self.__scorebox = self.__soup.find(
-                "div", {"class": "scorebox"}
-            )
-        self.__scorebox_meta = self.__scorebox.find(
-                "div", {"class": "scorebox_meta"}
-            )
+        self.__scorebox = self.__soup.find("div", {"class": "scorebox"})
+        self.__scorebox_meta = self.__scorebox.find("div", {"class": "scorebox_meta"})
         self.__team_adder = _TeamQueryRunner(self.__scorebox)
         self.__venue_adder = _VenueQueryRunner(self.__scorebox_meta)
-        self.__game_adder = _GameQueryRunner(
-                self.__soup,
-                self.__scorebox_meta,
-                game_name
-            )
+        self.__game_adder = _GameQueryRunner(self.__soup, self.__scorebox_meta, game_name)
         self.__pbp_adder = _PlayQueryRunner(self.__soup, player_tables)
         
     def run_queries(self) -> None:
@@ -544,9 +535,8 @@ class _PlayQueryRunner:
     
     def __get_play_rows(self):
         return self.__pbp_table.find_all(
-                "tr",
-                id=lambda id: id and id.startswith("event_")
-            )
+            "tr",
+            id=lambda id: id and id.startswith("event_"))
         
 class _PlayDataTransformer:
     """Transforms data contained in play rows to data that is ready for
@@ -554,9 +544,9 @@ class _PlayDataTransformer:
     """
     
     __INNING_CHAR_OFFSET = {
-            "t": 0,
-            "b": 1
-        }
+        "t": 0,
+        "b": 1
+    }
     
     # These instance methods can translate to db data with only raw data (arg)
     # as input.
@@ -628,18 +618,12 @@ class _PlayDataTransformer:
         return raw_play_data
     
     def transform_raw_play_data(self,
-                                raw_play_data: Dict[str, str],
-                                appearances: "_PlayerAppearances",
-                                ) -> Dict[str, Any]:
+            raw_play_data: Dict[str, str], appearances: "_PlayerAppearances") -> Dict[str, Any]:
         transformed_stats = self.__transform_stats(raw_play_data)
-        self.__insert_player_ids(raw_play_data,
-                                 appearances,
-                                 into_dict=transformed_stats)
+        self.__insert_player_ids(raw_play_data, appearances, into_dict=transformed_stats)
         return transformed_stats
     
-    def __transform_stats(self,
-                          raw_play_data: Dict[str, str]
-                          ) -> Dict[str, Any]:
+    def __transform_stats(self, raw_play_data: Dict[str, str]) -> Dict[str, Any]:
         new_data: Dict[str, Any] = {}
         for pbp_statname, (db_statname, transform_func)\
                 in self.__PBP_TO_DB_STATS.items():
@@ -647,20 +631,14 @@ class _PlayDataTransformer:
         return new_data
     
     def __insert_player_ids(self,
-                            raw_play_data: Dict[str, str],
-                            appearances: "_PlayerAppearances",
-                            *,
-                            into_dict: Dict[str, Any]
-                            ) -> Dict[str, str]:
+            raw_play_data: Dict[str, str], appearances: "_PlayerAppearances",
+            *, into_dict: Dict[str, Any]) -> Dict[str, str]:
         inning_half_char = raw_play_data["inning"][0]
         for player_type, (player_type_id, player_lookup_func) \
                 in self.__PLAYERS.items():
             player_name = raw_play_data[player_type]
             into_dict[player_type_id] = \
-                    player_lookup_func(self,
-                                       player_name,
-                                       inning_half_char,
-                                       appearances)
+                    player_lookup_func(self, player_name, inning_half_char, appearances)
         return into_dict
     
     def __inning_to_inning_half(self, inning: str) -> int:
@@ -680,25 +658,15 @@ class _PlayDataTransformer:
         return on_base
     
     def __batter_to_id(self,
-                       batter_name: str,
-                       inning_half_char: str,
-                       appearances: "_PlayerAppearances"
-                       ) -> int:
+            batter_name: str, inning_half_char: str, appearances: "_PlayerAppearances") -> int:
         return self.__player_to_id(batter_name, inning_half_char, "batter", appearances)
     
     def __pitcher_to_id(self,
-                        pitcher_name: str,
-                        inning_half_char: str,
-                        appearances: "_PlayerAppearances"
-                        ) -> int:
+            pitcher_name: str, inning_half_char: str, appearances: "_PlayerAppearances") -> int:
         return self.__player_to_id(pitcher_name, inning_half_char, "pitcher", appearances)
     
     def __player_to_id(self,
-                       player_name: str,
-                       inning_half_char:str,
-                       player_type: str,
-                       appearances: "_PlayerAppearances"
-                       ) -> int:
+            player_name: str, inning_half_char:str, player_type: str, appearances: "_PlayerAppearances") -> int:
         side = _PlayQueryRunner.INNING_AND_PLAYER_TO_SIDE[(inning_half_char, player_type)]
         pmap = getattr(self.__player_tables, side)
         try:
@@ -759,17 +727,10 @@ class _PlayerAppearances:
             start_appearances[name] = {"batter": 0, "pitcher": 0}
         return start_appearances
     
-    def get_appearances(self,
-                        side: str,
-                        name: str,
-                        batter_or_pitcher: str
-                        ) -> int:
+    def get_appearances(self, side: str, name: str, batter_or_pitcher: str ) -> int:
         return self.__map[side][name][batter_or_pitcher]
     
-    def update(self,
-               this_raw: Optional[Dict[str, str]],
-               next_raw: Dict[str, str]
-               ) -> None:
+    def update(self, this_raw: Optional[Dict[str, str]], next_raw: Dict[str, str]) -> None:
         """Increments appearances by checking how players differ between
         subsequent plays. The appearances will be updated to reflect
         appearances of this play.
@@ -781,11 +742,7 @@ class _PlayerAppearances:
         if this_raw["pitcher"] != next_raw["pitcher"]:
             self.__inc_appearance(inning, "pitcher", this_raw["pitcher"])
         
-    def __inc_appearance(self,
-                         inning: str,
-                         player_type: str,
-                         name: str
-                         ) -> None:
+    def __inc_appearance(self, inning: str, player_type: str, name: str) -> None:
         inning_char = inning[0]
         inning_player = (inning_char, player_type)
         side = _PlayQueryRunner.INNING_AND_PLAYER_TO_SIDE[inning_player]

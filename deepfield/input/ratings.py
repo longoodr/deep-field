@@ -46,10 +46,7 @@ class PlayerRatings:
         self._avg_pitcher.update(event, pit_against_hand)
 
     def get_matchup_rating(self,
-                           bid: int,
-                           pid: int,
-                           pit_appearances: int = 0
-                           ) -> np.ndarray:
+        bid: int, pid: int, pit_appearances: int = 0) -> np.ndarray:
         """Returns the matchup rating for the given players. `pit_appearances`
         specifies the number of appearances the pitcher has accumulated for the
         current game.
@@ -105,8 +102,7 @@ class HandednessTracker:
             self._bat_hand[bid] = hand
         return self._bat_hand[bid]
 
-    def get_bat_pit_against_handednesses(self, bid: int, pid: int)\
-            -> Tuple[int, int]:
+    def get_bat_pit_against_handednesses(self, bid: int, pid: int) -> Tuple[int, int]:
         """Returns a tuple of the handednesses that the batter and pitcher are
         facing for the given matchup, respectively.
         """
@@ -131,10 +127,9 @@ class AbstractPlayerRating:
     """Tracks rating data for matchups."""
 
     def __init__(self,
-                 against_left: Iterable["AbstractSubrating"],
-                 against_right: Iterable["AbstractSubrating"],
-                 against_everyone: Iterable["AbstractSubrating"],
-                 ):
+            against_left: Iterable["AbstractSubrating"],
+            against_right: Iterable["AbstractSubrating"],
+            against_everyone: Iterable["AbstractSubrating"]):
         against_left = list(against_left)
         against_right = list(against_right)
         self._against_everyone = list(against_everyone)
