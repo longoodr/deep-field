@@ -126,9 +126,9 @@ class WritableDatafile(h5py.File):
         self.__y.resize(self.__last_num + 1, axis=0)
     
     def __get_x_shape(self) -> Tuple[int]:
-        return self.__get_rating_x_shape()
+        return self.__ratings.get_matchup_rating(1, 1).shape
     
-    def _get_x(num, self, bid, pid, pit_appearances) -> np.ndarray:
+    def _get_x(self, num: int, bid: int, pid: int, pit_appearances: int) -> np.ndarray:
         return self.__ratings.get_matchup_rating(bid, pid, pit_appearances)
     
     def __reset_pitcher_appearances(self) -> None:

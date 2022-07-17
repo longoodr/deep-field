@@ -40,6 +40,5 @@ class TestDatafile:
     def test_indices(self):
         train, test = self.df.get_train_test_ids(1)
         for i in range(self.LEN):
-            assert (
-                    (i in train and i not in test) or
-                    (i in test and i not in train))
+            assert ((i in train and i not in test) !=
+                (i in test and i not in train))
