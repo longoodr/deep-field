@@ -16,7 +16,7 @@ logger.setLevel(logging.INFO)
         
 class DbMatchupReader:
     """Reads plays from the database and produces the corresponding matchups
-    that need to be evaluated to generate rating input data.
+    in timestep-sequential order that need to be evaluated to generate input data.
     """
 
     LOG_FRAC_INTERVAL = 0.01
