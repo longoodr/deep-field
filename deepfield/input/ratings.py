@@ -11,7 +11,7 @@ from deepfield.enums import Handedness, Outcome
 
 class PlayerRatings:
     """A set of ratings for players that can be updated as plays are 
-    evaluated.
+    evaluated. Deprecated.
     """
 
     def __init__(self):

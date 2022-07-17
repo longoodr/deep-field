@@ -115,7 +115,7 @@ class WritableDatafile(h5py.File):
             self.__size *= 2
             self.__x.resize(self.__size, axis=0)
             self.__y.resize(self.__size, axis=0)
-        self.__x[num] = self._get_x(bid, pid, self.__pit_appearances[pid])
+        self.__x[num] = self._get_x(num, bid, pid, self.__pit_appearances[pid])
         self.__y[num] = outcome_oh
         self.__last_num = num
         self.__ratings.update(bid, pid, outcome_oh)
@@ -125,21 +125,11 @@ class WritableDatafile(h5py.File):
         self.__x.resize(self.__last_num + 1, axis=0)
         self.__y.resize(self.__last_num + 1, axis=0)
     
-    # Swap the following two implementations out as needed.    
     def __get_x_shape(self) -> Tuple[int]:
         return self.__get_rating_x_shape()
     
-    def _get_x(self, bid, pid, pit_appearances) -> np.ndarray:
-        return self.__get_rating_x(bid, pid, pit_appearances)
-    
-    # Legacy rating dataset.
-    def __get_rating_x_shape(self) -> Tuple[int]:
-        return self.__ratings.get_matchup_rating(1, 1).shape
-    
-    def __get_rating_x(self, bid, pid, pit_appearances) -> np.ndarray:
+    def _get_x(num, self, bid, pid, pit_appearances) -> np.ndarray:
         return self.__ratings.get_matchup_rating(bid, pid, pit_appearances)
-
-    # Dependency graph dataset.
-
+    
     def __reset_pitcher_appearances(self) -> None:
         self.__pit_appearances: CounterType[int] = Counter()
