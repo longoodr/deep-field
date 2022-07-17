@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 from deepfield.dbmodels import (Player, create_tables, db, drop_tables,
                                 get_db_name, init_db)
