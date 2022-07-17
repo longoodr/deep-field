@@ -19,13 +19,14 @@ class TestDag:
             immediate_prevs = list(gen.dag.neighbors(num))
             assert len(immediate_prevs) <= 2
             num += 1
-            
-        num_to_matchup = nx.get_node_attributes(gen.dag, "matchup")
-        for tier in enumerate(nx.topological_generations(gen.dag)):
+
+        for i, tier in enumerate(nx.topological_generations(gen.dag)):
             seen_bids = set()
             seen_pids = set()
             for n in tier:
-                (bid, pid, _, _) = num_to_matchup[n]
+                node = gen.dag.nodes[n]
+                (bid, pid, _, _) = node["matchup"]
+                assert (i >= max(node["bheight"], node["pheight"]))
                 assert bid not in seen_bids
                 assert pid not in seen_pids
                 seen_bids.add(bid)

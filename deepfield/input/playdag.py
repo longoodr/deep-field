@@ -31,7 +31,9 @@ class PlayDagGenerator:
         """
         matchup = next(self._matchups)
         (bid, pid, _, _) = matchup
-        self.dag.add_node(self._num, matchup=matchup)
+        num_b = 0 if bid not in self.bplays else len(self.bplays[bid])
+        num_p = 0 if pid not in self.bplays else len(self.pplays[pid])
+        self.dag.add_node(self._num, matchup=matchup, bheight=num_b, pheight=num_p)
         
         bplay, pplay = self._get_last_plays(bid, pid)
         if bplay is not None:
