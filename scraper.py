@@ -10,6 +10,7 @@ from deepfield.script_utils import config_logging, logger
 
 CUR_YEAR = datetime.now().year
 
+# TODO Add db name, crawl delay as parameter.
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description = "Scrapes data from baseball-reference.com.")
     parser.add_argument("year", type=check_year, 

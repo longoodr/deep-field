@@ -12,8 +12,9 @@ from bs4 import BeautifulSoup
 logger = logging.getLogger(__name__)
 
 class Link(ABC):
-    """A page located at a URL that can determine if itself already exists in 
-    the database or not.
+    """A page located at a URL that can determine if it exists in 
+    the database.
+    TODO Start here with DB refactoring.
     """
     
     def __init__(self, url: str):
@@ -171,6 +172,7 @@ class _WebHandler(_AbstractHtmlRetrievalHandler):
         self.__insert = cache_insert
     
     # baseball-reference.com's robots.txt specifies a crawl delay of 3 seconds
+    # TODO parametrize this
     __CRAWL_DELAY = 3
     __last_pull_time = 0.0
     
