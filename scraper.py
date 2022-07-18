@@ -13,12 +13,10 @@ CUR_YEAR = datetime.now().year
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description = "Scrapes data from baseball-reference.com.")
     parser.add_argument("year", type=check_year, 
-                        help="year to scrape"
-        )
+                        help="year to scrape")
     parser.add_argument("-n", "--no-earlier",
                         action = "store_true",
-                        help = "will scrape everything for given year and afterward (default: scrape only given year)"
-        )
+                        help = "will scrape everything for given year and afterward (default: scrape only given year)")
     return parser.parse_args()
 
 def main(args: argparse.Namespace) -> None:

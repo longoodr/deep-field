@@ -47,10 +47,7 @@ class PlayerRatings:
 
     def get_matchup_rating(self,
         bid: int, pid: int, pit_appearances: int = 0) -> np.ndarray:
-        """Returns the matchup rating for the given players. `pit_appearances`
-        specifies the number of appearances the pitcher has accumulated for the
-        current game.
-        """
+        """Returns the matchup rating for the given players."""
         brating = self.get_batter(bid)
         prating = self.get_pitcher(pid)
         b_avg = self._avg_batter.get_rating()

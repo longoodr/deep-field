@@ -20,15 +20,13 @@ class TestDag:
             assert len(immediate_prevs) <= 2
             num += 1
 
-        for i, tier in enumerate(nx.topological_generations(gen.dag)):
+        for tier in nx.topological_generations(gen.dag):
             seen_bids = set()
             seen_pids = set()
             for n in tier:
                 node = gen.dag.nodes[n]
                 (bid, pid, _, _) = node["matchup"]
-                assert (i >= max(node["bheight"], node["pheight"]))
                 assert bid not in seen_bids
                 assert pid not in seen_pids
                 seen_bids.add(bid)
                 seen_pids.add(pid)
-                
