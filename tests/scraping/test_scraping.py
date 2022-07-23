@@ -18,12 +18,12 @@ def teardown_module(module):
     utils.remove_files()
 
 class TestScrapeNode:
-    
+
     def test_from_page(self):
         link = BBRefLink("WAS201710120.shtml")
         page = Page.from_link(link)
         assert ScrapeNode.from_page(page).__class__ == InsertableScrapeNode
-        
+
     def test_no_visit_twice(self):
         # these games share the same lineups
         utils.clean_db()
@@ -52,7 +52,7 @@ PARSE_URLS: List[str] = [
 ]
 
 class TestParseable:
-    
+
     @pytest.mark.parametrize("url", PARSE_URLS)
     def test_can_parse(self, url: str):
         utils.clean_db()

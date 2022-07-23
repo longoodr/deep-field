@@ -17,11 +17,11 @@ class DeepFieldModel(Model):
 
 class Venue(DeepFieldModel):
     name = CharField(unique=True)
-    
+
 class Team(DeepFieldModel):
     name = CharField()
     abbreviation = FixedCharField(3)
-    
+
 class Player(DeepFieldModel):
     name = CharField()
     name_id = CharField(9, unique=True)
@@ -37,7 +37,7 @@ class Game(DeepFieldModel):
     venue_id = ForeignKeyField(Venue, null=True)
     home_team_id = ForeignKeyField(Team)
     away_team_id = ForeignKeyField(Team)
-    
+
 class Play(DeepFieldModel):
     game_id = ForeignKeyField(Game)
     inning_half = SmallIntegerField()
@@ -53,7 +53,7 @@ _MODELS = (Game, Play, Player, Team, Venue)
 
 def create_tables() -> None:
     db.create_tables(_MODELS)
-    
+
 def drop_tables() -> None:
     db.drop_tables(_MODELS)
 

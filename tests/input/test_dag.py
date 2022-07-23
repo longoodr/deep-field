@@ -4,12 +4,12 @@ from tests import utils
 from deepfield.input.playdag import PlayDagGenerator
 
 class TestDag:
-    
+
     @classmethod
     def setup_class(cls):
         utils.init_test_env()
         utils.insert_natls_game()
-        
+
     def test_dag(self):
         gen = PlayDagGenerator()
         num = 0

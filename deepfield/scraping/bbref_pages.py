@@ -12,6 +12,7 @@ from deepfield.db.models import (DeepFieldModel, Game, Play, Player, Team,
 from deepfield.db.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.scraping.pages import InsertablePage, Link, Page
 
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
