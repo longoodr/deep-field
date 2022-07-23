@@ -88,9 +88,12 @@ class SchedulePage(BBRefPage):
             try:
                 suffix = game.em.a["href"]
                 url = self.BASE_URL + suffix
+                if "/previews/" in url:
+                    # Future game.
+                    continue
                 yield BBRefLink(url)
             except AttributeError:
-                # no link to boxscore exists (future game?)
+                # No link to boxscore exists (future game?)
                 continue
 
 class BBRefInsertablePage(BBRefPage, InsertablePage):

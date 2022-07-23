@@ -1,13 +1,9 @@
-import os
 from typing import Optional
 
 from peewee import (CharField, DateField, FixedCharField, ForeignKeyField,
-                    Model, SmallIntegerField, SqliteDatabase,
-                    TimeField)
+                    Model, SmallIntegerField, SqliteDatabase, TimeField)
 
 _DB_NAME: Optional[str] = None
-_PROD_DB_NAME = "stats.db"
-_TEST_DB_NAME = "tmp.db"
 
 db = SqliteDatabase(None)
 
@@ -57,9 +53,9 @@ def create_tables() -> None:
 def drop_tables() -> None:
     db.drop_tables(_MODELS)
 
-def init_db() -> None:
+def init_db(db_name) -> None:
     global _DB_NAME
-    _DB_NAME = _TEST_DB_NAME if "TESTING" in os.environ else _PROD_DB_NAME
+    _DB_NAME = db_name + ".db"
     db.init(_DB_NAME)
     create_tables()
 
@@ -68,8 +64,3 @@ def get_db_name() -> str:
     if _DB_NAME is None:
         raise RuntimeError("Database not initialized")
     return _DB_NAME
-
-def get_data_name() -> str:
-    if "TESTING" in os.environ:
-        return "test_data"
-    return "data"

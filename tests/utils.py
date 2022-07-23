@@ -3,14 +3,15 @@ import os
 from deepfield.db.models import (Player, create_tables, db, drop_tables,
                                 get_db_name, init_db)
 from deepfield.db.enums import Handedness
+from deepfield.input.writing import InputDataPersistor
 from deepfield.scraping.bbref_pages import BBRefLink, GamePage
 from deepfield.scraping.nodes import ScrapeNode
-from deepfield.scraping.pages import HtmlCache, Page
-from deepfield.input.writing import InputDataPersistor
+from deepfield.scraping.pages import Page
+
+TEST_DB_NAME = "tmp"
 
 def init_test_env() -> None:
-    os.environ["TESTING"] = "True"
-    init_db()
+    init_db(TEST_DB_NAME)
     clean_db()
 
 def remove_files() -> None:
@@ -43,10 +44,10 @@ def insert_mock_players(page: GamePage) -> None:
 
 def _insert_mock_player(name: str, name_id: str) -> None:
     fields = {
-            "name": name,
-            "name_id": name_id,
-            "bats": Handedness.RIGHT.value,
-            "throws": Handedness.RIGHT.value,
-        }
+        "name": name,
+        "name_id": name_id,
+        "bats": Handedness.RIGHT.value,
+        "throws": Handedness.RIGHT.value,
+    }
     if Player.get_or_none(Player.name_id == name_id) is None:
         Player.create(**fields)
