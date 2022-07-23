@@ -1,8 +1,6 @@
 import numpy as np
-from keras.utils import to_categorical
 
-from deepfield.dbmodels import get_data_name
-from deepfield.enums import Outcome
+from deepfield.db.models import get_data_name
 from deepfield.input.reading import ReadableDatafile
 from deepfield.input.writing import InputDataPersistor
 from tests import utils

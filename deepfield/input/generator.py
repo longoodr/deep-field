@@ -1,7 +1,7 @@
 import argparse
 
 from deepfield.script_utils import config_logging, logger
-from deepfield.dbmodels import init_db
+from deepfield.db.models import init_db
 from deepfield.input.writing import InputDataPersistor
 
 

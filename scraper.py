@@ -2,7 +2,7 @@ import argparse
 from datetime import datetime
 from typing import Iterable
 
-from deepfield.dbmodels import init_db
+from deepfield.db.models import init_db
 from deepfield.scraping.bbref_pages import BBRefLink
 from deepfield.scraping.nodes import ScrapeNode
 from deepfield.scraping.pages import Page
@@ -13,7 +13,7 @@ CUR_YEAR = datetime.now().year
 # TODO Add db name, crawl delay as parameter.
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description = "Scrapes data from baseball-reference.com.")
-    parser.add_argument("year", type=check_year, 
+    parser.add_argument("year", type=check_year,
                         help="year to scrape")
     parser.add_argument("-n", "--no-earlier",
                         action = "store_true",
@@ -28,7 +28,7 @@ def main(args: argparse.Namespace) -> None:
             scrape_year(y)
     except KeyboardInterrupt:
         logger.info("Ending scrape")
-    
+
 def scrape_year(year: int) -> None:
     sched_url = f"https://www.baseball-reference.com/leagues/MLB/{year}-schedule.shtml"
     sched_link = BBRefLink(sched_url)

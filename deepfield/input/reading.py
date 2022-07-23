@@ -5,15 +5,15 @@ import h5py
 import numpy as np
 from keras.utils import Sequence
 
-from deepfield.dbmodels import Game, Play, get_data_name
-from deepfield.enums import Outcome
+from deepfield.db.models import Game, Play, get_data_name
+from deepfield.db.enums import Outcome
 
 Matchup = Tuple[int, int, int, str]
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-        
+
 class DbMatchupReader:
     """Reads plays from the database and produces the corresponding matchups
     in timestep-sequential order that need to be evaluated to generate input data.
@@ -67,7 +67,7 @@ class DbMatchupReader:
             )
 
 class ReadableDatafile(h5py.File):
-    
+
     def __init__(self, name: str, *args, **kwargs):
         super().__init__(f"{name}.hdf5", "r", *args, **kwargs)
         self.x = self["x"]

@@ -8,8 +8,8 @@ import h5py
 import numpy as np
 from keras.utils import to_categorical
 
-from deepfield.dbmodels import get_data_name, get_db_name
-from deepfield.enums import Outcome
+from deepfield.db.models import get_data_name, get_db_name
+from deepfield.db.enums import Outcome
 from deepfield.input.reading import DbMatchupReader
 
 

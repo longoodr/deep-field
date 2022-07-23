@@ -6,22 +6,22 @@ from typing import Optional
 import numpy as np
 from peewee import fn as fn
 
-from deepfield.dbmodels import Play
+from deepfield.db.models import Play
 
 
 class TimeOfDay(Enum):
     DAY = 0
     NIGHT = 1
-    
+
 class FieldType(Enum):
     TURF = 0
     GRASS = 1
-    
+
 class Handedness(Enum):
     LEFT = 0
     RIGHT = 1
     BOTH = 2
-    
+
 class InningHalf(Enum):
     TOP = 0
     BTM = 1
@@ -34,7 +34,7 @@ class OnBase(IntFlag):
 
 class Outcome(Enum):
     """Field agnostic outcomes for plays. "Field agnostic" means that outcomes
-    dependent on the field configuration should be ignored, like fielder's 
+    dependent on the field configuration should be ignored, like fielder's
     choices. This also means that errors should be treated as outs, because the
     errors are due to the fielder and would have otherwise been an out.
     """
@@ -154,4 +154,3 @@ class _OutcomePercentageTracker:
                 .limit(cls._SAMPLE_OVER)
                 .tuples()
             )
-        

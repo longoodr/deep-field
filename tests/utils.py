@@ -1,8 +1,8 @@
 import os
 
-from deepfield.dbmodels import (Player, create_tables, db, drop_tables,
+from deepfield.db.models import (Player, create_tables, db, drop_tables,
                                 get_db_name, init_db)
-from deepfield.enums import Handedness
+from deepfield.db.enums import Handedness
 from deepfield.scraping.bbref_pages import BBRefLink, GamePage
 from deepfield.scraping.nodes import ScrapeNode
 from deepfield.scraping.pages import HtmlCache, Page
