@@ -240,6 +240,7 @@ class HtmlCache(_AbstractHtmlCache):
     def get(cls) -> "HtmlCache":
         if not hasattr(cls, "_instance"):
             # ensure in right spot: scraping -> deepfield -> deep-field
+            # XXX Does this class need to know this?
             parents = Path(__file__).parents
             for actual, expected in zip(parents, ["scraping", "deepfield", "deep-field"]):
                 if actual.name != expected:
