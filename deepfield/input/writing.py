@@ -10,7 +10,6 @@ from keras.utils import to_categorical
 
 from deepfield.dbmodels import get_data_name, get_db_name
 from deepfield.enums import Outcome
-from deepfield.input.ratings import PlayerRatings
 from deepfield.input.reading import DbMatchupReader
 
 
@@ -95,7 +94,6 @@ class WritableDatafile(h5py.File):
 
     def __init__(self, name: str, *args, **kwargs):
         super().__init__(f"{name}.hdf5", "w", *args, **kwargs)
-        self.__ratings = PlayerRatings()
         rating_shape = self.__get_x_shape()
         self.__x = self.create_dataset("x", (1, *rating_shape), chunks=True,
                     maxshape=(None, *rating_shape))
@@ -124,12 +122,12 @@ class WritableDatafile(h5py.File):
     def trim_size(self) -> None:
         self.__x.resize(self.__last_num + 1, axis=0)
         self.__y.resize(self.__last_num + 1, axis=0)
-    
+
     def __get_x_shape(self) -> Tuple[int]:
-        return self.__ratings.get_matchup_rating(1, 1).shape
-    
+        raise NotImplementedError
+
     def _get_x(self, num: int, bid: int, pid: int, pit_appearances: int) -> np.ndarray:
-        return self.__ratings.get_matchup_rating(bid, pid, pit_appearances)
-    
+        raise NotImplementedError
+
     def __reset_pitcher_appearances(self) -> None:
         self.__pit_appearances: CounterType[int] = Counter()

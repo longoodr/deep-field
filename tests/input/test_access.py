@@ -30,15 +30,3 @@ class TestDatafile:
     @classmethod
     def teardown_class(cls):
         cls.df.close()
-
-    def test_access(self):
-        assert self.df.x.shape[0] == self.LEN
-        assert self.df.y.shape[0] == self.LEN
-        assert (self.df.y[0] == to_categorical(Outcome.DOUBLE.value, len(Outcome))).all()
-        assert (self.df.y[1] == to_categorical(Outcome.STRIKEOUT.value, len(Outcome))).all()
-
-    def test_indices(self):
-        train, test = self.df.get_train_test_ids(1)
-        for i in range(self.LEN):
-            assert ((i in train and i not in test) !=
-                (i in test and i not in train))
