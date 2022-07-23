@@ -23,6 +23,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("-c", "--crawl-delay", type=parse_crawl_delay, default=BBREF_CRAWL_DELAY,
                         help="The crawl delay to use, in seconds. baseball-reference.com/robots.txt specifies a " +
                         f"crawl delay of {BBREF_CRAWL_DELAY} seconds, which is the default.")
+    parser.add_argument("-db", "--database-name", type=)
     return parser.parse_args()
 
 def main(args: argparse.Namespace) -> None:
