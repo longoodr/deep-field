@@ -13,7 +13,7 @@ from deepfield.scraping.pages import Page
 from deepfield.script_utils import config_logging, logger
 
 DEFAULT_DB_NAME = "stats"
-EARLIEST_YEAR = 1871 # No available schedules before this year.
+EARLIEST_YEAR = 1920
 CUR_YEAR = datetime.now().year
 
 def parse_args() -> argparse.Namespace:
@@ -31,28 +31,29 @@ def parse_args() -> argparse.Namespace:
 def parse_db_name(arg: str) -> str:
     db = sanitize_filename_arg(arg)
     if len(arg) == 0:
-        raise ValueError("Database name cannot be empty")
+        raise argparse.ArgumentTypeError("Database name cannot be empty")
     if arg[-1] == '.' or len(os.path.splitext(db)[1]) > 0:
-        raise ValueError("Database name should not include a file extension")
+        raise argparse.ArgumentTypeError("Database name should not include a file extension")
     return db
 
 def parse_year(arg: str) -> int:
     year = int(arg)
     if year < EARLIEST_YEAR:
-        raise ValueError(f"Choose a year no earlier than {EARLIEST_YEAR}")
+        raise argparse.ArgumentTypeError(f"Choose a year no earlier than {EARLIEST_YEAR}")
     if year > CUR_YEAR:
-        raise ValueError(f"Choose a year no later than {CUR_YEAR}")
+        raise argparse.ArgumentTypeError(f"Choose a year no later than {CUR_YEAR}")
     return year
 
 def parse_crawl_delay(arg: str) -> float:
     delay = float(arg)
     if delay < 0:
-        raise ValueError("Crawl delay cannot be negative")
+        raise argparse.ArgumentTypeError("Crawl delay cannot be negative")
+    warn_delay = 15
     if delay < BBREF_CRAWL_DELAY:
         logger.warning(f"baseball-reference.com specifies a crawl delay of {BBREF_CRAWL_DELAY} seconds, " +
-            f"but you gave {delay}. It's highly recommended to be polite and abide by their crawl delay. " +
-            "Scrape at your own risk!")
-        time.sleep(10)
+            f"but you gave {delay}. It is HIGHLY RECOMMENDED to be polite and abide by their crawl delay. " +
+            f"Starting scrape in {warn_delay} seconds.")
+        time.sleep(15)
     return delay
 
 def main(args: argparse.Namespace) -> None:
