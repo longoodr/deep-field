@@ -65,8 +65,7 @@ def get_db_name() -> str:
         raise RuntimeError("Database not initialized")
     return _DB_NAME
 
-def get_db_filename() -> str:
-    return get_db_filename(get_db_name())
-
-def get_db_filename(db_name: str) -> str:
+def get_db_filename(db_name: str = None) -> str:
+    if db_name is None:
+        db_name = get_db_name()
     return f"{db_name}.db"

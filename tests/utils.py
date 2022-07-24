@@ -1,7 +1,7 @@
 import os
 
 from deepfield.db.models import (Player, create_tables, db, drop_tables,
-                                get_db_name, init_db)
+                                get_db_filename, init_db)
 from deepfield.db.enums import Handedness
 from deepfield.input.writing import InputDataPersistor
 from deepfield.scraping.bbref_pages import BBRefLink, GamePage
@@ -16,8 +16,8 @@ def init_test_env() -> None:
 
 def remove_files() -> None:
     db.close()
-    os.remove(get_db_name())
-    InputDataPersistor().remove_files()
+    os.remove(get_db_filename())
+    InputDataPersistor(TEST_DB_NAME).remove_files()
 
 def clean_db() -> None:
     drop_tables()
@@ -30,7 +30,8 @@ def insert_cubs_game() -> None:
     insert_game("CHN201710110.shtml")
 
 def insert_game(url: str) -> None:
-    link = BBRefLink(url)
+    full_url = f"https://www.baseball-reference.com/boxes/{url[:3]}/{url}"
+    link = BBRefLink(full_url)
     page = Page.from_link(link)
     insert_mock_players(page)  # type: ignore
     ScrapeNode.from_page(page).scrape()
