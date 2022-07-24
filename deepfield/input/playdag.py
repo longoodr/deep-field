@@ -11,7 +11,6 @@ class PlayDagGenerator:
     dag: nx.DiGraph
 
     def __init__(self):
-        # TODO rlongood: DI this.
         self._reader = DbMatchupReader()
 
     def build_dag(self, callback) -> nx.DiGraph:

@@ -1,5 +1,5 @@
 # Deep Field
-Deep Field contains a web scraper used to pull play-by-play information from [baseball-reference.com](https://www.baseball-reference.com/).
+Deep Field contains (among other things) a web scraper used to pull play-by-play information from [baseball-reference.com](https://www.baseball-reference.com/).
 
 ### Setup
 1. Ensure the latest version of [Python](https://www.python.org/downloads/) is installed.

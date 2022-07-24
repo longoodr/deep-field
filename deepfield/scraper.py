@@ -69,8 +69,8 @@ def main(args: argparse.Namespace) -> None:
 def scrape_year(year: int, crawl_delay: float) -> None:
     sched_url = f"https://www.baseball-reference.com/leagues/MLB/{year}-schedule.shtml"
     sched_link = BBRefLink(sched_url)
-    # since the current year's schedule will be continually updated as new games
-    # are played, do not want to use cached version of its page
+    # Since the current year's schedule will be continually updated as new games
+    # are played, do not want to use cached version of its page.
     use_cache = year != CUR_YEAR
     sched = Page.from_link(sched_link, use_cache)
     ScrapeNode.from_page(sched).scrape(crawl_delay)
