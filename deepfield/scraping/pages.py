@@ -18,7 +18,6 @@ logger = logging.getLogger(__name__)
 class Link(ABC):
     """A page located at a URL that can determine if it exists in
     the database.
-    TODO Start here with DB refactoring.
     """
 
     def __init__(self, url: str):

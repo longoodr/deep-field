@@ -4,7 +4,6 @@ import numpy as np
 import pytest
 
 from deepfield.db.enums import Outcome
-from deepfield.input.writing import InputDataPersistor
 from tests import utils
 
 STRIKEOUT = Outcome.STRIKEOUT

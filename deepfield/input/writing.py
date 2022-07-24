@@ -8,8 +8,8 @@ import h5py
 import numpy as np
 from keras.utils import to_categorical
 
-from deepfield.db.models import get_data_name, get_db_name
 from deepfield.db.enums import Outcome
+from deepfield.db.models import get_db_filename
 from deepfield.input.reading import DbMatchupReader
 
 
@@ -18,9 +18,9 @@ class InputDataPersistor:
     rewriting the data if inconsistent.
     """
 
-    def __init__(self):
-        db_name = os.path.splitext(get_db_name())[0]
-        self._data_filename = f"{get_data_name()}.hdf5"
+    def __init__(self, db_name: str):
+        self._db_name = db_name
+        self._data_filename = f"{db_name}.hdf5"
         self._hash_filename = f"{db_name}_data_hash.txt"
 
     def ensure_consistency(self) -> bool:
@@ -42,9 +42,6 @@ class InputDataPersistor:
 
     def is_consistent(self) -> bool:
         """Returns whether the saved data is consistent with the database."""
-        return self._data_and_db_hashes_match()
-
-    def _data_and_db_hashes_match(self) -> bool:
         data_hash = self._get_data_hash()
         if data_hash is None:
             return False
@@ -66,10 +63,10 @@ class InputDataPersistor:
             hash_file.write(self._get_db_hash())
 
     def _get_db_hash(self) -> str:
-        return ChecksumGenerator(get_db_name()).get_checksum()
+        return ChecksumGenerator(get_db_filename(self._db_name)).get_checksum()
 
     def _write_data(self) -> None:
-        with WritableDatafile(get_data_name()) as df:
+        with WritableDatafile(self._data_filename) as df:
             for i, (bid, pid, outcome, game_id)\
                     in enumerate(iter(DbMatchupReader())):
                 df.write_matchup(i, bid, pid, outcome, game_id)
@@ -93,7 +90,7 @@ class WritableDatafile(h5py.File):
     """Handles writing matchups to an hdf5 file."""
 
     def __init__(self, name: str, *args, **kwargs):
-        super().__init__(f"{name}.hdf5", "w", *args, **kwargs)
+        super().__init__(name, "w", *args, **kwargs)
         rating_shape = self.__get_x_shape()
         self.__x = self.create_dataset("x", (1, *rating_shape), chunks=True,
                     maxshape=(None, *rating_shape))

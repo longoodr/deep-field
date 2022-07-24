@@ -55,8 +55,8 @@ def drop_tables() -> None:
 
 def init_db(db_name) -> None:
     global _DB_NAME
-    _DB_NAME = db_name + ".db"
-    db.init(_DB_NAME)
+    _DB_NAME = db_name
+    db.init(get_db_filename(_DB_NAME))
     create_tables()
 
 def get_db_name() -> str:
@@ -64,3 +64,9 @@ def get_db_name() -> str:
     if _DB_NAME is None:
         raise RuntimeError("Database not initialized")
     return _DB_NAME
+
+def get_db_filename() -> str:
+    return get_db_filename(get_db_name())
+
+def get_db_filename(db_name: str) -> str:
+    return f"{db_name}.db"

@@ -5,7 +5,7 @@ import h5py
 import numpy as np
 from keras.utils import Sequence
 
-from deepfield.db.models import Game, Play, get_data_name
+from deepfield.db.models import Game, Play
 from deepfield.db.enums import Outcome
 
 Matchup = Tuple[int, int, int, str]
@@ -86,11 +86,11 @@ class ReadableDatafile(h5py.File):
 class DataGenerator(Sequence):
     """Reads x, y data for keras model training."""
 
-    def __init__(self, ids: np.ndarray, batch_size: int, shuffle: bool = True):
+    def __init__(self, db_name: str, ids: np.ndarray, batch_size: int, shuffle: bool = True):
         self._ids = ids
         self._shuffle = shuffle
         self._batch_size = batch_size
-        df = ReadableDatafile(get_data_name())
+        df = ReadableDatafile(f"{db_name}.hdf5")
         self.x = df.x
         self.y = df.y
         self.on_epoch_end()

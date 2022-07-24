@@ -1,6 +1,5 @@
 import numpy as np
 
-from deepfield.db.models import get_data_name
 from deepfield.input.reading import ReadableDatafile
 from deepfield.input.writing import InputDataPersistor
 from tests import utils
@@ -23,7 +22,7 @@ class TestDatafile:
     def setup_class(cls):
         utils.insert_natls_game()
         InputDataPersistor().ensure_consistency()
-        cls.df = ReadableDatafile(get_data_name())
+        cls.df = ReadableDatafile(utils.TEST_DB_NAME)
 
     @classmethod
     def teardown_class(cls):
