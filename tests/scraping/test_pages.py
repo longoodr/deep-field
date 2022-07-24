@@ -1,12 +1,9 @@
-import os
 from datetime import date, time
-from pathlib import Path
 from typing import Iterable, Tuple, Type
 
-import pytest
 from pytest import raises
 
-from deepfield.db.models import Game, Play, Player, Team, Venue, db
+from deepfield.db.models import Game, Play, Player, Team, Venue
 from deepfield.db.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.scraping.bbref_pages import (BBRefLink, BBRefPage, GamePage,
                                             PlayerPage, SchedulePage)

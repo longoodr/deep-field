@@ -49,6 +49,7 @@ PARSE_URLS: List[str] = [
     "https://www.baseball-reference.com/boxes/WS2/WS2197109300.shtml",
     "https://www.baseball-reference.com/players/j/jimend'01.shtml",
     "https://www.baseball-reference.com/players/s/sabatc.01.shtml",
+    "https://www.baseball-reference.com/players/k/kellyge01.shtml",
 ]
 
 class TestParseable:

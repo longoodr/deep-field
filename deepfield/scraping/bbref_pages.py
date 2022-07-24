@@ -126,8 +126,14 @@ class PlayerPage(BBRefInsertablePage):
     __HANDEDNESS_MATCHER = re.compile(r"(?:Bats:|Throws:) (\w+)")
 
     def __get_handedness(self) -> Dict[str, Any]: # Bats, Throws
-        handedness_p = self._player_info.find_all("p", limit=2)[-1]
-        hands_text = re.findall(self.__HANDEDNESS_MATCHER, handedness_p.text)
+        hands_text = []
+        # In most cases the containing p is the second, but sometimes there
+        # are additional p notes that throw this off (e.g. kellyge01).
+        plim = 2
+        while len(hands_text) != 2:
+            handedness_p = self._player_info.find_all("p", limit=plim)[-1]
+            hands_text = re.findall(self.__HANDEDNESS_MATCHER, handedness_p.text)
+            plim += 1
         hands: Dict[str, int] = {}
         hands["bats"]   = Handedness[hands_text[0].upper()].value
         hands["throws"] = Handedness[hands_text[1].upper()].value
