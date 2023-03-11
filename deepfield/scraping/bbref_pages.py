@@ -117,7 +117,7 @@ class PlayerPage(BBRefInsertablePage):
 
     def _run_queries(self) -> None:
         fields = self.__get_handedness()
-        fields["name"] = self._player_info.h1.text
+        fields["name"] = self._player_info.h1.text.strip()
         fields["name_id"] = self._link.name_id
         with db.atomic():
             Player.create(**fields)

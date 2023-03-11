@@ -120,6 +120,18 @@ class TestPlayerPage(TestPage):
                    and Player.bats == Handedness.LEFT.value
                    and Player.throws == Handedness.BOTH.value)
 
+class TestPlayerNameTrimming(TestPage):
+
+    name = "jeterde01.shtml"
+    page_type = PlayerPage
+    page: PlayerPage
+
+    def test_name_trimming(self):
+        assert not self.page._exists_in_db()
+        self.page.update_db()
+        assert self.page._exists_in_db()
+        Player.get(Player.name == "Derek Jeter")
+
 class AbstractTestGamePage(TestPage):
 
     page_type = GamePage

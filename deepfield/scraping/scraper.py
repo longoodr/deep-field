@@ -4,10 +4,8 @@ import sys
 from datetime import datetime
 from typing import Iterable
 
-from requests.exceptions import HTTPError
-
-from deepfield.scraping.bbref_pages import BBRefLink, SchedulePage
-from deepfield.scraping.dbmodels import create_tables, init_db
+from deepfield.scraping.bbref_pages import BBRefLink
+from deepfield.scraping.dbmodels import init_db
 from deepfield.scraping.nodes import ScrapeNode
 from deepfield.scraping.pages import Page
 
@@ -17,7 +15,7 @@ CUR_YEAR = datetime.now().year
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description = "Scrapes data from baseball-reference.com.")
-    parser.add_argument("year", type=check_year, 
+    parser.add_argument("year", type=check_year,
                         help="year to scrape"
         )
     parser.add_argument("-n", "--no-earlier",
@@ -34,7 +32,7 @@ def main(args: argparse.Namespace) -> None:
             scrape_year(y)
     except KeyboardInterrupt:
         logger.info("Ending scrape")
-    
+
 def scrape_year(year: int) -> None:
     sched_url = f"https://www.baseball-reference.com/leagues/MLB/{year}-schedule.shtml"
     sched_link = BBRefLink(sched_url)
@@ -56,7 +54,7 @@ def get_years(year: int, no_earlier: bool) -> Iterable[int]:
             yield y
     else:
         yield year
-        
+
 def config_logging():
     hdlr = logging.StreamHandler(sys.stdout)
     fmtr = logging.Formatter(

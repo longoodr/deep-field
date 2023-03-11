@@ -11,7 +11,7 @@ Note this database is intended to be used to aggregate your own stats. It does n
 ### Scraping
 The web scraper can be invoked by running 
 ```
-python -m deepfield.scraper start-year [end-year] [database-name]
+python -m deepfield.scraper start-year [end-year] [-db database-name]
 ```
 from the root.
 This scraper builds up a SQLite database of play-by-play information for every game in the given year range. You can issue a keyboard interrupt via Ctrl+C to end the scrape.
