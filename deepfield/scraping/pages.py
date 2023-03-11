@@ -9,81 +9,85 @@ from typing import Callable, Dict, Iterable, Optional, Type
 import requests
 from bs4 import BeautifulSoup
 
+
+# See baseball-reference.com/robots.txt
+BBREF_CRAWL_DELAY: float = 3.0
+
 logger = logging.getLogger(__name__)
 
 class Link(ABC):
-    """A page located at a URL that can determine if itself already exists in 
-    the database or not.
+    """A page located at a URL that can determine if it exists in
+    the database.
     """
-    
+
     def __init__(self, url: str):
         self._url = url
         self.name_id = self._get_name_id()
         self.page_type = self._get_page_type()
-    
+
     @abstractmethod
     def exists_in_db(self) -> bool:
         """Returns whether this page already exists in the database."""
         pass
-    
+
     @abstractmethod
     def _get_page_type(self) -> Type["Page"]:
         """Returns the type of page this link corresponds to."""
         pass
-    
+
     def _get_name_id(self) -> str:
         """Returns a unique identifier for the corresponding page."""
         return os.path.splitext(self._url.split("/")[-1])[0]
-    
+
     def __str__(self) -> str:
         return self._url
-    
+
     def __hash__(self):
         if not hasattr(self, "_hash"):
             self._hash = hash(str(self._url))
         return self._hash
-    
+
     def __eq__(self, other):
-        return (self.__class__ == other.__class__ 
-                and str(self._url) ==  str(other._url)    
+        return (self.__class__ == other.__class__
+                and str(self._url) ==  str(other._url)
             )
 
 class Page(ABC):
     """A collection of data located on an HTML page that references other pages
     via links.
     """
-    
+
     @staticmethod
-    def from_link(link: Link, cachable: bool = True) -> "Page":
-        return _PageRetriever(link, cachable).get_page()
-     
+    def from_link(link: Link, crawl_delay: float = BBREF_CRAWL_DELAY, cachable: bool = True) -> "Page":
+        return _PageRetriever(link, crawl_delay, cachable).get_page()
+
     def __init__(self, html: str):
-        self._soup = BeautifulSoup(html, "lxml")
-    
+        self._soup = BeautifulSoup(html, "html.parser")
+
     @abstractmethod
     def get_links(self) -> Iterable[Link]:
         """Enumerates all referenced links on this page."""
         pass
-    
+
     @abstractmethod
     def __str__(self) -> str:
         pass
-    
+
     def __hash__(self):
         if not hasattr(self, "_hash"):
             self._hash = hash(str(self._soup))
         return self._hash
-    
+
     def __eq__(self, other) -> bool:
-        return (self.__class__ == other.__class__ 
-                and str(self._soup) == str(other._soup)    
+        return (self.__class__ == other.__class__
+                and str(self._soup) == str(other._soup)
             )
-    
+
 class InsertablePage(Page):
     """A page containing data that can be inserted into the database. All
     referenced links are treated as dependencies of this page.
     """
-    
+
     def update_db(self) -> None:
         """Inserts all models on this page into the database. This method
         requires all dependent pages to already exist in the database. If the
@@ -95,30 +99,31 @@ class InsertablePage(Page):
             if not link.exists_in_db():
                 raise ValueError(f"Dependency for {link} not resolved")
         self._run_queries()
-        
+
     @abstractmethod
     def _run_queries(self) -> None:
         """Runs all queries that need to be executed to properly insert this
         page into the database.
         """
         pass
-    
+
     @abstractmethod
     def _exists_in_db(self) -> bool:
         """Returns whether this page already exists in the database."""
         pass
-    
+
 class _PageRetriever:
     """Retrieves the page associated with the given link."""
-    
+
     Handler = Callable[["_PageRetriever"], Optional[str]]
     _HANDLER_SEQUENCE: Iterable[Handler]
-    
-    def __init__(self, link: Link, cachable: bool = True):
+
+    def __init__(self, link: Link, crawl_delay: float, cachable: bool = True):
         self._link = link
         self.__init_handler_seq()
+        self._crawl_delay = crawl_delay
         self._cachable = cachable
-        
+
     @classmethod
     def __init_handler_seq(cls) -> None:
         if not hasattr(cls, "_HANDLER_SEQUENCE"):
@@ -126,7 +131,7 @@ class _PageRetriever:
                 cls._run_cached_handler,
                 cls._run_web_handler
             ]
-        
+
     def get_page(self) -> Page:
         for handler in self._HANDLER_SEQUENCE:
             html = handler(self)
@@ -137,43 +142,42 @@ class _PageRetriever:
                     logger.warning(
                         f"{handler.__name__} returned malformed HTML for link {self._link}")
         raise ValueError(f"HTML could not be retrieved for {self._link}")
-    
+
     def _run_cached_handler(self) -> Optional[str]:
         if self._cachable:
             return _CachedHandler(self._link).retrieve_html()
         return None
-    
+
     def _run_web_handler(self) -> Optional[str]:
-        return _WebHandler(self._link, self._cachable).retrieve_html()
+        return _WebHandler(self._link, self._crawl_delay, self._cachable).retrieve_html()
 
 class _AbstractHtmlRetrievalHandler(ABC):
     """A step in the HTML retrieval process."""
-    
+
     def __init__(self, link: Link):
         self._link = link
-    
+
     @abstractmethod
     def retrieve_html(self) -> Optional[str]:
         """Returns HTML if successful, or None if not."""
         pass
-    
+
 class _CachedHandler(_AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link from local cache."""
 
     def retrieve_html(self) -> Optional[str]:
         return HtmlCache.get().find_html(self._link)
-    
+
 class _WebHandler(_AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link from the web."""
-    
-    def __init__(self, link: Link, cache_insert: bool = True):
+
+    def __init__(self, link: Link, crawl_delay: float, cache_insert: bool = True):
         super().__init__(link)
         self.__insert = cache_insert
-    
-    # baseball-reference.com's robots.txt specifies a crawl delay of 3 seconds
-    __CRAWL_DELAY = 3
+        self.__crawl_delay = crawl_delay
+
     __last_pull_time = 0.0
-    
+
     def retrieve_html(self) -> Optional[str]:
         self.__wait_until_can_pull()
         self.__set_last_pull_time()
@@ -184,37 +188,37 @@ class _WebHandler(_AbstractHtmlRetrievalHandler):
         if self.__insert:
             HtmlCache.get().insert_html(html, self._link)
         return html
-    
+
     def __wait_until_can_pull(self) -> None:
         t = get_cur_time()
-        if self.__last_pull_time <= t - self.__CRAWL_DELAY:
+        if self.__last_pull_time <= t - self.__crawl_delay:
             return
-        secs_to_wait = max(0, self.__last_pull_time + self.__CRAWL_DELAY - t)
+        secs_to_wait = max(0, self.__last_pull_time + self.__crawl_delay - t)
         logger.info(f"Waiting {secs_to_wait:.1f} seconds to abide by crawl delay")
         sleep(secs_to_wait)
-        
+
     @classmethod
     def __set_last_pull_time(cls):
         cls.__last_pull_time = get_cur_time()
 
 class _AbstractHtmlCache(ABC):
     """A cache containing HTML pages."""
-    
+
     def __init__(self, root: str):
         self._root = root
-        
+
     @abstractmethod
     def find_html(self, link: Link) -> Optional[str]:
         """Returns HTML if cache lookup successful, or None if not."""
         pass
-    
+
     @abstractmethod
     def insert_html(self, html: str, link: Link) -> None:
         """Inserts the given HTML to the cache, with the name being determined
         by the given link.
         """
         pass
-    
+
     def _full_path(self, rel_path: str) -> str:
         return os.path.join(self._root, rel_path)
 
@@ -226,18 +230,19 @@ class _AbstractHtmlCache(ABC):
     def _get_filename(link: Link) -> str:
         """Gets the filename for the given link."""
         return link.name_id + ".shtml"
-    
+
 class HtmlCache(_AbstractHtmlCache):
     """A folder containing subfolders of HTML pages, each containing the HTML
     corresponding to the different types of pages.
     """
-    
+
     _instance: "HtmlCache"
-    
+
     @classmethod
     def get(cls) -> "HtmlCache":
         if not hasattr(cls, "_instance"):
             # ensure in right spot: scraping -> deepfield -> deep-field
+            # XXX Does this class need to know this?
             parents = Path(__file__).parents
             for actual, expected in zip(parents, ["scraping", "deepfield", "deep-field"]):
                 if actual.name != expected:
@@ -250,13 +255,13 @@ class HtmlCache(_AbstractHtmlCache):
                 root = (project_root / os.path.join("deepfield", "scraping", "pages")).resolve()
             cls._instance = HtmlCache(str(root))
         return cls._instance
-    
+
     __PAGE_TYPES = [
         "GamePage",
         "PlayerPage",
         "SchedulePage"
     ]
-    
+
     def __init__(self, root: str):
         """DO NOT CALL THIS EXTERNALLY!!! Use get() instead."""
         super().__init__(root)
@@ -264,11 +269,11 @@ class HtmlCache(_AbstractHtmlCache):
         for page_type in self.__PAGE_TYPES:
             cache_root = self._full_path(page_type)
             self.__caches[page_type] = _HtmlFolder(cache_root)
-    
+
     def find_html(self, link: Link) -> Optional[str]:
         page_type = link.page_type.__name__
         return self.__caches[page_type].find_html(link)
-    
+
     def insert_html(self, html: str, link: Link) -> None:
         if not os.path.isdir(self._root):
             os.mkdir(self._root)
@@ -277,7 +282,7 @@ class HtmlCache(_AbstractHtmlCache):
 
 class _HtmlFolder(_AbstractHtmlCache):
     """A folder containing HTML pages."""
-    
+
     def find_html(self, link: Link) -> Optional[str]:
         if not os.path.isdir(self._root):
             return None
@@ -287,7 +292,7 @@ class _HtmlFolder(_AbstractHtmlCache):
         if filename in self._contained_files:
             return self._get_file_html(filename)
         return None
-    
+
     def insert_html(self, html: str, link: Link) -> None:
         if not os.path.isdir(self._root):
             os.mkdir(self._root)

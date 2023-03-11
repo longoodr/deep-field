@@ -1,65 +1,65 @@
 import logging
-import math
 import re
-from collections import Counter
 from datetime import date, datetime, time
-from typing import (Any, Callable, Dict, Iterable, List, Optional, Set, Tuple,
-                    Type)
+from typing import Any, Callable, Iterable, Optional, Type
 
-import requests
-from bs4 import BeautifulSoup, Comment
-from peewee import Query, chunked
+from bs4 import BeautifulSoup, Tag
+from peewee import chunked
 
-from deepfield.scraping.dbmodels import (DeepFieldModel, Game, Play, Player, Team,
-                                     Venue, db)
-from deepfield.enums import FieldType, Handedness, OnBase, TimeOfDay
+from deepfield.db.models import (DeepFieldModel, Game, Play, Player, Team,
+                                Venue, db)
+from deepfield.db.enums import FieldType, Handedness, OnBase, TimeOfDay
 from deepfield.scraping.pages import InsertablePage, Link, Page
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+class MissingPlayDataError(ValueError):
+    pass
+
 class BBRefPage(Page):
     """A page from baseball-reference.com."""
-    
+
     BASE_URL = "https://www.baseball-reference.com"
-    
+
     def __init__(self, html: str):
         super().__init__(html)
         url = self._soup.find("link", rel="canonical")["href"]
         self._link = BBRefLink(url)
-        
+
     def __hash__(self):
         return hash(self._link)
-    
+
     def __eq__(self, other) -> bool:
         return (self.__class__ == other.__class__
                 and self._link == other._link
             )
-        
+
     def __str__(self) -> str:
         return str(self._link.name_id)
-    
+
 class BBRefLink(Link):
     """A link from baseball-reference.com. These links all follow a similar
     format, where the last component of the URL is the name_id for the
     corresponding record in the database: "/.../.../name_id.ext". Each link
     also knows the type of the Page that it points to.
     """
-    
+
     def __init__(self, url: str):
         super().__init__(url)
         self._link_model = self.__get_link_model()
-        
+
     def exists_in_db(self) -> bool:
         if self._link_model is None:
             raise TypeError("Model not defined for this link")
         expr = (self._link_model.name_id == self.name_id)
         record = self._link_model.get_or_none(expr)
         return record is not None
-    
+
     __PLAYER_NAME_ID_MATCHER = re.compile(r"^[\w\.']+\d\d$")
-    __GAME_NAME_ID_MATCHER   = re.compile(r"[A-Z]{3}\d{9}")
-    
+    __GAME_NAME_ID_MATCHER   = re.compile(r"[A-Z0-9]{3}\d{9}")
+
     def _get_page_type(self) -> Type[BBRefPage]:
         if re.fullmatch(self.__GAME_NAME_ID_MATCHER, self.name_id):
             return GamePage
@@ -68,66 +68,72 @@ class BBRefLink(Link):
         elif "schedule" in self._url:
             return SchedulePage
         raise ValueError(f"Could not determine page type of {self}")
-    
-    __TYPE_TO_MODEL: Dict[str, Optional[Type[DeepFieldModel]]] = {
+
+    __TYPE_TO_MODEL: dict[str, Optional[Type[DeepFieldModel]]] = {
         "GamePage"    : Game,
         "PlayerPage"  : Player,
         "SchedulePage": None
     }
-    
+
     def __get_link_model(self) -> Optional[Type[DeepFieldModel]]:
         return self.__TYPE_TO_MODEL[self.page_type.__name__]
 
 class SchedulePage(BBRefPage):
     """A page containing a set of URLs corresponding to game pages."""
-    
+
     def get_links(self) -> Iterable[Link]:
         games = self._soup.find_all("p", {"class": "game"})
         for game in games:
             try:
                 suffix = game.em.a["href"]
                 url = self.BASE_URL + suffix
+                if "/previews/" in url:
+                    # Future game.
+                    continue
                 yield BBRefLink(url)
             except AttributeError:
-                # no link to boxscore exists (future game?)
+                # No link to boxscore exists (future game?)
                 continue
 
 class BBRefInsertablePage(BBRefPage, InsertablePage):
     """A page from baseball-reference.com that can be inserted into the
     database.
     """
-        
+
     def _exists_in_db(self):
         return self._link.exists_in_db()
 
 class PlayerPage(BBRefInsertablePage):
     """A page containing info on a given player."""
-    
+
     def __init__(self, html: str):
         super().__init__(html)
         self._player_info = self._soup.find("div",
-            {"itemtype": "https://schema.org/Person"})
-    
+            {"id": "info", "class": "players"})
+
     def get_links(self) -> Iterable[Link]:
         """PlayerPages don't depend on anything else."""
         return []
-    
+
     def _run_queries(self) -> None:
         fields = self.__get_handedness()
         fields["name"] = self._player_info.h1.text
         fields["name_id"] = self._link.name_id
         with db.atomic():
             Player.create(**fields)
-    
-    def __get_player_name(self) -> str:
-        return self._player_info.h1.text
-    
+
     __HANDEDNESS_MATCHER = re.compile(r"(?:Bats:|Throws:) (\w+)")
-    
-    def __get_handedness(self) -> Dict[str, Any]: # Bats, Throws
-        handedness_p = self._player_info.find_all("p", limit=2)[-1]
-        hands_text = re.findall(self.__HANDEDNESS_MATCHER, handedness_p.text)
-        hands: Dict[str, int] = {}
+
+    def __get_handedness(self) -> dict[str, Any]: # Bats, Throws
+        hands_text = []
+        # In most cases the containing p is the second, but sometimes there
+        # are additional p notes that throw this off (e.g. kellyge01).
+        plim = 2
+        while len(hands_text) != 2:
+            handedness_p = self._player_info.find_all("p", limit=plim)[-1]
+            hands_text = re.findall(self.__HANDEDNESS_MATCHER, handedness_p.text)
+            plim += 1
+        hands: dict[str, int] = {}
         hands["bats"]   = Handedness[hands_text[0].upper()].value
         hands["throws"] = Handedness[hands_text[1].upper()].value
         return hands
@@ -136,26 +142,25 @@ class GamePage(BBRefInsertablePage):
     """A page corresponding to the play-by-play info for a game, along with
     relevant info relating to the play-by-play data.
     """
-    
+
     def __init__(self, html: str):
         super().__init__(html)
         self._player_tables = _PlayerTables(self._soup)
-        
+
     def get_links(self) -> Iterable[Link]:
         """For a GamePage, the referenced links are the players' pages."""
         for suffix in self._player_tables.get_page_suffixes():
             url = self.BASE_URL + suffix
             yield BBRefLink(url)
-        
+
     def _run_queries(self) -> None:
         if not hasattr(self, "_query_runner"):
             self.__query_runner = _GamePageQueryRunner(
-                    self._soup,
-                    self._player_tables,
-                    self._link.name_id
-                )
+                self._soup,
+                self._player_tables,
+                self._link.name_id)
         self.__query_runner.run_queries()
-    
+
 class _NameStripper:
     """There are a few edge cases for name lookups, since canonical player
     names and the names presented in play rows vary slightly. Players known
@@ -164,6 +169,7 @@ class _NameStripper:
     with accents in their names may not have these. This allows names to be
     standardized across these different presentations.
     """
+
     __NAME_TITLE = re.compile(r" [J|S]r\.")
     __MIDDLE_INITIAL = re.compile(r" \w\.")
 
@@ -172,86 +178,91 @@ class _NameStripper:
         name_wo_mid = re.sub(cls.__MIDDLE_INITIAL, "", name)
         fully_stripped = re.sub(cls.__NAME_TITLE, "", name_wo_mid)
         return fully_stripped
-    
+
 class _PlaceholderTable(BeautifulSoup):
     """Certain tables' contents are contained within comments, and are
     marked by divs with a class of placeholder preceding the comment of
     interest. Therefore, they should be instantiated by their placeholders.
     """
-    
+
     def __init__(self, ph_div):
         # Note the SECOND sibling is the comment of interest because there is
         # an intermediate \n.
-        table_contents = ph_div.next_sibling.next_sibling
-        super().__init__(table_contents, "lxml")
-    
+        try:
+            table_contents = ph_div.next_sibling.next_sibling
+        except AttributeError:
+            raise MissingPlayDataError
+        super().__init__(table_contents, "html.parser")
+
 class _PlaceholderDivFilter:
     """Matches placeholder divs whose comment of interest contains the
-    given text."""
-    
+    given text.
+    """
+
     def __init__(self, text: str):
         self._text = text
-        
+
     def __call__(self, tag) -> bool:
         return (tag.name == "div"
             and "class" in tag.attrs
             and tag["class"][0] == "placeholder"
             and self._text in tag.next_sibling.next_sibling.string
         )
-        
+
 class _PlayerTables:
     """Manages access to the tables of away and home players for the given
     game.
     """
+
     def __init__(self, soup):
         ptable_placeholders = list(soup.find_all(
             _PlaceholderDivFilter("batting"), limit=2))
         self.away = _PlayerTable(ptable_placeholders[0])
         self.home = _PlayerTable(ptable_placeholders[1])
-    
+
     def get_page_suffixes(self) -> Iterable[str]:
         for table in self:
             for suffix in table.get_page_suffixes():
                 yield suffix
-        
+
     def __iter__(self):
         self.__tables = [self.away, self.home]
         self.__cur = 0
         return self
-    
+
     def __next__(self):
         if self.__cur >= len(self.__tables):
             raise StopIteration
         this_table = self.__tables[self.__cur]
         self.__cur += 1
         return this_table
-    
+
 class _PlayerTable(_PlaceholderTable):
     """Manages access to a table of players."""
-    
+
     __PLAYER_TAG_ATTR_FILTER = {
         "data-stat": "player",
         "scope": "row"
     }
-    
+
     def __init__(self, ph_div):
         super().__init__(ph_div)
         self.__rows = None
         self.__name_ids = None
         self.__name_to_db_ids = None
         self.__name_name_ids = None
-            
+
     def get_page_suffixes(self) -> Iterable[str]:
         for row in self.__get_rows():
             yield self.__get_page_suffix(row)
-    
+
     def get_name_ids(self) -> Iterable[str]:
         if self.__name_ids is None:
             self.__name_ids = [self.__get_name_id(row)
                                for row in self.__get_rows()]
         return self.__name_ids
-    
-    def get_name_name_ids(self) -> Iterable[Tuple[str, str]]:
+
+    def get_name_name_ids(self) -> Iterable[tuple[str, str]]:
         """Returns a collection of tuples, where each tuple consists of the
         name and the name_id of a player in the table. These tuples are in the
         same order as they are found in the table. Names will be stripped to
@@ -262,10 +273,10 @@ class _PlayerTable(_PlaceholderTable):
         if self.__name_name_ids is None:
             self.__init_name_name_ids()
         return self.__name_name_ids # type: ignore
-    
+
     def __init_name_name_ids(self) -> None:
-        name_to_inds: Dict[str, int] = {}
-        n_nids: List[Tuple[str, str]] = []
+        name_to_inds: dict[str, int] = {}
+        n_nids: list[tuple[str, str]] = []
         rows = list(self.__get_rows())
         for i, row in enumerate(rows):
             name = self.__get_player_name(row)
@@ -279,16 +290,16 @@ class _PlayerTable(_PlaceholderTable):
             n_nids.append((name, nid))
             name_to_inds[name] = i
         self.__name_name_ids = n_nids
-    
+
     @staticmethod
-    def __unstrip_row_name(row_ind, rows: list, n_nids: List[Tuple[str, str]]) -> None:
+    def __unstrip_row_name(row_ind, rows: list, n_nids: list[tuple[str, str]]) -> None:
         """Modifies n_nids in place to unstrip the name for the given row."""
         row = rows[row_ind]
         unstripped_name = _PlayerTable.__get_player_name(row, strip=False)
         _, nid = n_nids[row_ind]
         n_nids[row_ind] = (unstripped_name, nid)
-    
-    def get_name_to_db_ids(self, player_name: str) -> Tuple[int]:
+
+    def get_name_to_db_ids(self, player_name: str) -> tuple[int]:
         """Returns a mapping to database IDs found for a given name. If there
         are multiple names for the same player, the IDs will appear in the
         order that they occur in the player table.
@@ -296,7 +307,7 @@ class _PlayerTable(_PlaceholderTable):
         if self.__name_to_db_ids is None:
             self.__init_name_to_db_ids()
         return self.__name_to_db_ids[player_name] # type: ignore
-    
+
     def __init_name_to_db_ids(self) -> None:
         self.__name_to_db_ids = {}
         for n, nid in self.get_name_name_ids():
@@ -306,7 +317,7 @@ class _PlayerTable(_PlaceholderTable):
             self.__name_to_db_ids[n].append(db_player.id)
         self.__name_to_db_ids = {name: tuple(ids)
                                  for name, ids in self.__name_to_db_ids.items()}
-    
+
     def __get_rows(self):
         if self.__rows is None:
             self.__rows = self.find_all(
@@ -314,112 +325,105 @@ class _PlayerTable(_PlaceholderTable):
                     attrs=self.__PLAYER_TAG_ATTR_FILTER
                 )
         return self.__rows
-    
+
     @staticmethod
     def __get_player_name(row, strip: bool = True) -> str:
         canonical_name = row.a.text.replace(u"\xa0", u" ")
         if strip:
             return _NameStripper.get_stripped_name(canonical_name)
         return canonical_name
-    
+
     @staticmethod
     def __get_name_id(row) -> str:
         page_suffix = _PlayerTable.__get_page_suffix(row)
         return BBRefLink(page_suffix).name_id
-    
+
     @staticmethod
     def __get_page_suffix(row) -> str:
         return row.a["href"] # /players/s/smithjo01.shtml
-                
-    @staticmethod 
-    def __player_tag_filter(tag) -> bool:
-        return tag.name == "th" and len(tag.attrs) == 5
+
+    @staticmethod
+    def __player_tag_filter(tag: Tag) -> bool:
+        return tag.name == "th" and tag.has_attr("data-append-csv")\
+            and (len(tag.attrs) == 4 or len(tag.attrs) == 5)
 
 class _GamePageQueryRunner:
     """Handles execution of queries for data contained on a GamePage."""
-    
+
     def __init__(self, soup, player_tables: _PlayerTables, game_name: str):
         self.__soup = soup
-        self.__scorebox = self.__soup.find(
-                "div", {"class": "scorebox"}
-            )
-        self.__scorebox_meta = self.__scorebox.find(
-                "div", {"class": "scorebox_meta"}
-            )
+        self.__scorebox = self.__soup.find("div", {"class": "scorebox"})
+        self.__scorebox_meta = self.__scorebox.find("div", {"class": "scorebox_meta"})
         self.__team_adder = _TeamQueryRunner(self.__scorebox)
         self.__venue_adder = _VenueQueryRunner(self.__scorebox_meta)
-        self.__game_adder = _GameQueryRunner(
-                self.__soup,
-                self.__scorebox_meta,
-                game_name
-            )
+        self.__game_adder = _GameQueryRunner(self.__soup, self.__scorebox_meta, game_name)
         self.__pbp_adder = _PlayQueryRunner(self.__soup, player_tables)
-        
+
     def run_queries(self) -> None:
         with db.atomic():
             teams = self.__team_adder.add_teams()
             venue = self.__venue_adder.add_venue()
             game = self.__game_adder.add_game(teams, venue)
             self.__pbp_adder.add_plays(game)
-        
+
 class _TeamQueryRunner:
-    
+
     def __init__(self, scorebox):
         self.__scorebox = scorebox
 
-    def add_teams(self) -> List[Team]:
+    def add_teams(self) -> list[Team]:
         teams = []
         info = self.__get_team_info()
         for name, abbreviation in info:
             team, _ = Team.get_or_create(name=name, abbreviation=abbreviation)
             teams.append(team)
         return teams
-    
-    def __get_team_info(self) -> Iterable[Tuple[str, str]]:
+
+    def __get_team_info(self) -> Iterable[tuple[str, str]]:
         """Returns 2 elements, which are tuples of the name and
         abbreviation for away, home teams respectively.
         """
         team_divs = self.__scorebox.find_all("div", recursive=False, limit=2)
         for td in team_divs:
             yield self.__get_team_div_info(td)
-    
+
     @staticmethod
-    def __get_team_div_info(td) -> Tuple[str, str]:
+    def __get_team_div_info(td) -> tuple[str, str]:
         team_info = td.div.strong.a
         suffix = team_info["href"] # /teams/abbreviation/year.html
         abbreviation = suffix.split("/")[2]
         name = str(team_info.string)
         return name, abbreviation
-    
+
 class _VenueQueryRunner:
-    
+
     def __init__(self, scorebox_meta):
         self.__scorebox_meta = scorebox_meta
-        
+
     def add_venue(self) -> Optional[Venue]:
         name = self.__get_venue_name()
         if name is None:
             return None
         venue, _ = Venue.get_or_create(name=name)
         return venue
-        
+
     def __get_venue_name(self) -> Optional[str]:
         venue_div = self.__scorebox_meta.find(self.__venue_div_filter)
         if venue_div is None:
             return None
         return venue_div.text.split(": ")[1] # "Venue: <venue name>"
-    
+
     @staticmethod
     def __venue_div_filter(div) -> bool:
         return div.text.startswith("Venue: ")
-    
+
 class _GameQueryRunner:
-    
+
     def __init__(self, soup, scorebox_meta, game_name: str):
         self.__scorebox_meta = scorebox_meta
         self.__game_name = game_name
 
-    def add_game(self, teams: List[Team], venue: Optional[Venue]) -> Game:
+    def add_game(self, teams: list[Team], venue: Optional[Venue]) -> Game:
         fields = {
             "name_id"         : self.__game_name,
             "local_start_time": self.__get_local_start_time(),
@@ -432,13 +436,13 @@ class _GameQueryRunner:
         }
         game, _ = Game.get_or_create(**fields)
         return game
-        
+
     @staticmethod
     def __enum_to_int(enum):
         if enum is None:
             return None
         return enum.value
-        
+
     def __get_local_start_time(self) -> Optional[time]:
         lst_div = self.__scorebox_meta.find(self.__lst_filter)
         if lst_div is None:
@@ -456,11 +460,11 @@ class _GameQueryRunner:
         except ValueError:
             logger.warning(f"Could not parse {lst_text}, defaulting to no local time")
             return None
-    
+
     @staticmethod
     def __lst_filter(div) -> bool:
         return "Time: " in div.text
-    
+
     def __get_time_of_day(self) -> Optional[TimeOfDay]:
         tod_div = self.__scorebox_meta.find(self.__tod_filter)
         if tod_div is None:
@@ -468,14 +472,14 @@ class _GameQueryRunner:
         # "day/night game, ..."
         tod_text = tod_div.text.split()[0]
         return TimeOfDay[tod_text.upper()]
-    
+
     @staticmethod
     def __tod_filter(div) -> bool:
         for tod in ["day", "night"]:
             if div.text.lower().startswith(tod):
                 return True
         return False
-    
+
     def __get_field_type(self) -> Optional[FieldType]:
         field_div = self.__scorebox_meta.find(self.__field_div_filter)
         if field_div is None:
@@ -483,47 +487,47 @@ class _GameQueryRunner:
         # "... on turf/grass"
         field_text = field_div.text.split()[-1]
         return FieldType[field_text.upper()]
-        
+
     @staticmethod
     def __field_div_filter(div) -> bool:
         for field in ["turf", "grass"]:
             if div.text.endswith(field):
                 return True
         return False
-    
+
     def __get_date(self) -> date:
         date_div = self.__scorebox_meta.find(self.__date_div_filter)
         dt = datetime.strptime(date_div.text, "%A, %B %d, %Y")
         return dt.date()
-    
+
     @staticmethod
     def __date_div_filter(div) -> bool:
         weekday = div.text.split()[0]
         return weekday.endswith("day,")
 
 class _PlayQueryRunner:
-    
+
     __ROWS_PER_BATCH = 100
-    
+
     # Home team gets to bat last, i.e. in second half of inning (b).
-    INNING_AND_PLAYER_TO_SIDE: Dict[Tuple[str, str], str] = {
+    INNING_AND_PLAYER_TO_SIDE: dict[tuple[str, str], str] = {
         ("t", "batter") : "away",
         ("b", "batter") : "home",
         ("t", "pitcher"): "home",
         ("b", "pitcher"): "away",
     }
-    
+
     def __init__(self, soup, player_tables: _PlayerTables):
         self.__soup = soup
         self.__pbp_table = self.__get_pbp_table()
         self.__transformer = _PlayDataTransformer(player_tables)
         self.__player_tables = player_tables
-            
+
     def add_plays(self, game: Game) -> None:
-        for batch in chunked(self.__get_play_data(game), self.__ROWS_PER_BATCH): 
+        for batch in chunked(self.__get_play_data(game), self.__ROWS_PER_BATCH):
             Play.insert_many(batch).execute()
-        
-    def __get_play_data(self, game: Game) -> Iterable[Dict[str, Any]]:
+
+    def __get_play_data(self, game: Game) -> Iterable[dict[str, Any]]:
         appearances = _PlayerAppearances(self.__player_tables)
         prev_play = None
         for play_num, play_row in enumerate(self.__get_play_rows()):
@@ -534,60 +538,52 @@ class _PlayQueryRunner:
             play_data["play_num"] = play_num
             yield play_data
             prev_play = raw_play_data
-        
+
     def __get_pbp_table(self) -> _PlaceholderTable:
         ph = self.__soup.find(_PlaceholderDivFilter("play_by_play"))
         return _PlaceholderTable(ph)
-    
+
     def __get_play_rows(self):
         return self.__pbp_table.find_all(
-                "tr",
-                id=lambda id: id and id.startswith("event_")
-            )
-        
+            "tr",
+            id=lambda id: id and id.startswith("event_"))
+
 class _PlayDataTransformer:
     """Transforms data contained in play rows to data that is ready for
     insertion into the Play database table.
     """
-    
-    __INNING_CHAR_OFFSET = {
-            "t": 0,
-            "b": 1
-        }
-    
+
+    __INNING_CHAR_OFFset = {
+        "t": 0,
+        "b": 1
+    }
+
     # These instance methods can translate to db data with only raw data (arg)
     # as input.
     __RawStatTranslation = Callable[["_PlayDataTransformer", str], Any]
-    
+
     # These instance methods require knowledge of inning half (2nd str arg) to
     # determine if home or away player for id lookup. They require appearances
     # to disambiguate among players with the same name.
     __PlayerLookup = Callable[["_PlayDataTransformer", str, str, "_PlayerAppearances"], int]
-    
-    """
-    THE FOLLOWING CLASS VARS ARE INSTANTIATED IN A CLASS METHOD AND NOT HERE.
-    
-    Each of the translation/lookup functions are not defined yet at this point,
-    so they can't be instantiated here.
-    """
-    
+
     # Matches each raw stat name to its db stat name and translation function.
-    __PBP_TO_DB_STATS: Dict[str, Tuple[str, __RawStatTranslation]]
-    
+    __PBP_TO_DB_STATS: dict[str, tuple[str, __RawStatTranslation]]
+
     # Matches each player raw name_id to the db field for the player id, along
     # with the lookup function to translate name_id to player id.
-    __PLAYERS: Dict[str, Tuple[str, __PlayerLookup]]
-    
+    __PLAYERS: dict[str, tuple[str, __PlayerLookup]]
+
     # "data-stat" names to extract from each player row: just the union of
     # the previous two dicts' keys.
-    __PBP_STATS: Set[str]
-    
+    __PBP_STATS: set[str]
+
     __lookups_init = False
-    
+
     def __init__(self, player_tables: _PlayerTables):
         self.__init_lookups()
         self.__player_tables = player_tables
-        
+
     @classmethod
     def __init_lookups(cls):
         """Initializes dicts to lookup database stat names and
@@ -595,25 +591,27 @@ class _PlayDataTransformer:
         """
         if cls.__lookups_init:
             return
-        
+
         cls.__PBP_TO_DB_STATS = {
+        #   data-stat name           db field name    translation function
             "inning":               ("inning_half"  , cls.__inning_to_inning_half),
             "pitches_pbp":          ("pitch_ct"     , cls.__strip),
             "play_desc":            ("desc"         , cls.__no_transformation_needed),
             "runners_on_bases_pbp": ("start_on_base", cls.__runners_to_on_base),
             "outs":                 ("start_outs"   , cls.__convert_to_int),
         }
-        
+
         cls.__PLAYERS = {
+        #   player_type              db field name    lookup function
             "batter":               ("batter_id"    , cls.__batter_to_id),
             "pitcher":              ("pitcher_id"   , cls.__pitcher_to_id),
         }
         all_keys = set(cls.__PBP_TO_DB_STATS.keys()).union(set(cls.__PLAYERS.keys()))
         cls.__PBP_STATS = set(all_keys)
         cls.__lookups_init = True
-        
-    def extract_raw_play_data(self, play_row) -> Dict[str, str]:
-        raw_play_data: Dict[str, str] = {}
+
+    def extract_raw_play_data(self, play_row) -> dict[str, str]:
+        raw_play_data: dict[str, str] = {}
         for play_data_pt in play_row.find_all():
             # each row (tr) has tags (th, td) with "data-stat" attributes; the
             # values of these attributes are the names of the contained stats
@@ -621,50 +619,38 @@ class _PlayDataTransformer:
             if data_stat in self.__PBP_STATS:
                 raw_play_data[data_stat] = play_data_pt.text.replace(u"\xa0", u" ")
         return raw_play_data
-    
+
     def transform_raw_play_data(self,
-                                raw_play_data: Dict[str, str],
-                                appearances: "_PlayerAppearances",
-                                ) -> Dict[str, Any]:
+            raw_play_data: dict[str, str], appearances: "_PlayerAppearances") -> dict[str, Any]:
         transformed_stats = self.__transform_stats(raw_play_data)
-        self.__insert_player_ids(raw_play_data,
-                                 appearances,
-                                 into_dict=transformed_stats)
+        self.__insert_player_ids(raw_play_data, appearances, into_dict=transformed_stats)
         return transformed_stats
-    
-    def __transform_stats(self,
-                          raw_play_data: Dict[str, str]
-                          ) -> Dict[str, Any]:
-        new_data: Dict[str, Any] = {}
+
+    def __transform_stats(self, raw_play_data: dict[str, str]) -> dict[str, Any]:
+        new_data: dict[str, Any] = {}
         for pbp_statname, (db_statname, transform_func)\
                 in self.__PBP_TO_DB_STATS.items():
             new_data[db_statname] = transform_func(self, raw_play_data[pbp_statname])
         return new_data
-    
+
     def __insert_player_ids(self,
-                            raw_play_data: Dict[str, str],
-                            appearances: "_PlayerAppearances",
-                            *,
-                            into_dict: Dict[str, Any]
-                            ) -> Dict[str, str]:
+            raw_play_data: dict[str, str], appearances: "_PlayerAppearances",
+            *, into_dict: dict[str, Any]) -> dict[str, str]:
         inning_half_char = raw_play_data["inning"][0]
         for player_type, (player_type_id, player_lookup_func) \
                 in self.__PLAYERS.items():
             player_name = raw_play_data[player_type]
             into_dict[player_type_id] = \
-                    player_lookup_func(self,
-                                       player_name,
-                                       inning_half_char,
-                                       appearances)
+                    player_lookup_func(self, player_name, inning_half_char, appearances)
         return into_dict
-    
+
     def __inning_to_inning_half(self, inning: str) -> int:
         #[t|b][0-9]+ (t1, b2, t11, etc)
         inning_num = int(inning[1:])
         inning_half_char = inning[0]
         # 0-indexed (t1 -> 0; b1 -> 1; t2 -> 2 etc)
-        return 2 * (inning_num - 1) + self.__INNING_CHAR_OFFSET[inning_half_char]
-    
+        return 2 * (inning_num - 1) + self.__INNING_CHAR_OFFset[inning_half_char]
+
     def __runners_to_on_base(self, runners: str) -> int:
         #[-|1][-|2][-|3] where - means nobody on base (---, 1-3, 12-, etc)
         on_base = 0
@@ -673,27 +659,17 @@ class _PlayDataTransformer:
             if not base == "-":
                 on_base += on_base_flag.value
         return on_base
-    
+
     def __batter_to_id(self,
-                       batter_name: str,
-                       inning_half_char: str,
-                       appearances: "_PlayerAppearances"
-                       ) -> int:
+            batter_name: str, inning_half_char: str, appearances: "_PlayerAppearances") -> int:
         return self.__player_to_id(batter_name, inning_half_char, "batter", appearances)
-    
+
     def __pitcher_to_id(self,
-                        pitcher_name: str,
-                        inning_half_char: str,
-                        appearances: "_PlayerAppearances"
-                        ) -> int:
+            pitcher_name: str, inning_half_char: str, appearances: "_PlayerAppearances") -> int:
         return self.__player_to_id(pitcher_name, inning_half_char, "pitcher", appearances)
-    
+
     def __player_to_id(self,
-                       player_name: str,
-                       inning_half_char:str,
-                       player_type: str,
-                       appearances: "_PlayerAppearances"
-                       ) -> int:
+            player_name: str, inning_half_char:str, player_type: str, appearances: "_PlayerAppearances") -> int:
         side = _PlayQueryRunner.INNING_AND_PLAYER_TO_SIDE[(inning_half_char, player_type)]
         pmap = getattr(self.__player_tables, side)
         try:
@@ -704,69 +680,61 @@ class _PlayDataTransformer:
             stripped_name = _NameStripper.get_stripped_name(player_name)
             appear_no = appearances.get_appearances(side, stripped_name, player_type)
             return self.__get_id(pmap, stripped_name, appear_no)
-    
+
     @staticmethod
     def __get_id(pmap, name: str, appear_no: int):
-        # assume that a subsequent appearance cycles to the next ID found for 
+        # assume that a subsequent appearance cycles to the next ID found for
         # that name
         ids = pmap.get_name_to_db_ids(name)
         id_index = appear_no % len(ids)
         return ids[id_index]
-        
+
     def __strip(self, stat: str) -> str:
         return stat.strip()
-    
+
     def __no_transformation_needed(self, stat: str) -> str:
         return stat
-    
+
     def __convert_to_int(self, stat: str) -> int:
         return int(stat)
-    
+
 class _PlayerAppearances:
     """Maps home and away player names to the number of times they have
     continuously appeared in the game. Appearances are counted separately for
-    batting appearances and pitcher appearances. 
-    
+    batting appearances and pitcher appearances.
+
     This is used to determine which ID to infer from a name with multiple IDs
     (i.e. 2 players with the same name on the same team)
-    
+
     For batters, this increments for every plate appearance, but for pitchers,
     this only increments when they are switched out. This is because 2 pitchers
     with the same name only switch between each other when they retire, but for
     batters, it is necessary for the other player with the same name to bat
     before the original player appears again at the plate.
     """
-    
-    __Appearances = Dict[str, int] # {"batter": #, "pitcher": #}
-    __AppearancesForSide = Dict[str, __Appearances] # apps_4_side[name] -> appearances
-    __map: Dict[str, __AppearancesForSide] # map[side][name] -> appearances
-    
+
+    __Appearances = dict[str, int] # {"batter": #, "pitcher": #}
+    __AppearancesForSide = dict[str, __Appearances] # apps_4_side[name] -> appearances
+    __map: dict[str, __AppearancesForSide] # map[side][name] -> appearances
+
     def __init__(self, player_tables: _PlayerTables):
         self.__map = {
             "away": self.__get_start_appearances(player_tables.away),
             "home": self.__get_start_appearances(player_tables.home),
         }
-    
+
     @staticmethod
     def __get_start_appearances(ptable: _PlayerTable) -> __AppearancesForSide:
         start_appearances = {}
         for name, _ in ptable.get_name_name_ids():
             start_appearances[name] = {"batter": 0, "pitcher": 0}
         return start_appearances
-    
-    def get_appearances(self,
-                        side: str,
-                        name: str,
-                        batter_or_pitcher: str
-                        ) -> int:
+
+    def get_appearances(self, side: str, name: str, batter_or_pitcher: str ) -> int:
         return self.__map[side][name][batter_or_pitcher]
-    
-    def update(self,
-               this_raw: Optional[Dict[str, str]],
-               next_raw: Dict[str, str]
-               ) -> None:
-        """
-        Increments appearances by checking how players differ between
+
+    def update(self, this_raw: Optional[dict[str, str]], next_raw: dict[str, str]) -> None:
+        """Increments appearances by checking how players differ between
         subsequent plays. The appearances will be updated to reflect
         appearances of this play.
         """
@@ -776,12 +744,8 @@ class _PlayerAppearances:
         self.__inc_appearance(inning, "batter", this_raw["batter"])
         if this_raw["pitcher"] != next_raw["pitcher"]:
             self.__inc_appearance(inning, "pitcher", this_raw["pitcher"])
-        
-    def __inc_appearance(self,
-                         inning: str,
-                         player_type: str,
-                         name: str
-                         ) -> None:
+
+    def __inc_appearance(self, inning: str, player_type: str, name: str) -> None:
         inning_char = inning[0]
         inning_player = (inning_char, player_type)
         side = _PlayQueryRunner.INNING_AND_PLAYER_TO_SIDE[inning_player]

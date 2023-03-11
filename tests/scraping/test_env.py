@@ -1,8 +1,7 @@
 from os import environ
-from pathlib import Path
 
-from deepfield.enums import Handedness
-from deepfield.scraping.bbref_pages import BBRefLink, GamePage
+from deepfield.db.enums import Handedness
+from deepfield.scraping.bbref_pages import GamePage
 from deepfield.scraping.dbmodels import (Player, create_tables, db,
                                          drop_tables, init_db)
 from deepfield.scraping.pages import HtmlCache
