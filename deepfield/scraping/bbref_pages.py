@@ -46,9 +46,14 @@ class BBRefLink(Link):
     also knows the type of the Page that it points to.
     """
 
-    def __init__(self, url: str):
+    def __init__(self, url: str, is_cachable=True):
         super().__init__(url)
         self._link_model = self.__get_link_model()
+        self._is_cachable = is_cachable
+
+    @property
+    def is_cachable(self) -> bool:
+        return self._is_cachable
 
     def exists_in_db(self) -> bool:
         if self._link_model is None:

@@ -25,6 +25,10 @@ class Link(ABC):
         self.name_id = self._get_name_id()
         self.page_type = self._get_page_type()
 
+    @property
+    def is_cachable(self) -> bool:
+        return True
+
     @abstractmethod
     def exists_in_db(self) -> bool:
         """Returns whether this page already exists in the database."""
@@ -58,8 +62,8 @@ class Page(ABC):
     """
 
     @staticmethod
-    def from_link(link: Link, crawl_delay: float = BBREF_CRAWL_DELAY, cachable: bool = True) -> "Page":
-        return _PageRetriever(link, crawl_delay, cachable).get_page()
+    def from_link(link: Link, crawl_delay: float = BBREF_CRAWL_DELAY) -> "Page":
+        return _PageRetriever(link, crawl_delay).get_page()
 
     def __init__(self, html: str):
         self._soup = BeautifulSoup(html, "html.parser")
@@ -118,11 +122,10 @@ class _PageRetriever:
     Handler = Callable[["_PageRetriever"], Optional[str]]
     _HANDLER_SEQUENCE: Iterable[Handler]
 
-    def __init__(self, link: Link, crawl_delay: float, cachable: bool = True):
+    def __init__(self, link: Link, crawl_delay: float):
         self._link = link
         self.__init_handler_seq()
         self._crawl_delay = crawl_delay
-        self._cachable = cachable
 
     @classmethod
     def __init_handler_seq(cls) -> None:
@@ -144,12 +147,12 @@ class _PageRetriever:
         raise ValueError(f"HTML could not be retrieved for {self._link}")
 
     def _run_cached_handler(self) -> Optional[str]:
-        if self._cachable:
+        if self._link.is_cachable:
             return _CachedHandler(self._link).retrieve_html()
         return None
 
     def _run_web_handler(self) -> Optional[str]:
-        return _WebHandler(self._link, self._crawl_delay, self._cachable).retrieve_html()
+        return _WebHandler(self._link, self._crawl_delay).retrieve_html()
 
 class _AbstractHtmlRetrievalHandler(ABC):
     """A step in the HTML retrieval process."""
@@ -171,9 +174,8 @@ class _CachedHandler(_AbstractHtmlRetrievalHandler):
 class _WebHandler(_AbstractHtmlRetrievalHandler):
     """Retrieves HTML associated with the given link from the web."""
 
-    def __init__(self, link: Link, crawl_delay: float, cache_insert: bool = True):
+    def __init__(self, link: Link, crawl_delay: float):
         super().__init__(link)
-        self.__insert = cache_insert
         self.__crawl_delay = crawl_delay
 
     __last_pull_time = 0.0
@@ -185,7 +187,7 @@ class _WebHandler(_AbstractHtmlRetrievalHandler):
         response = requests.get(str(self._link))
         response.raise_for_status()
         html = response.text
-        if self.__insert:
+        if self._link.is_cachable:
             HtmlCache.get().insert_html(html, self._link)
         return html
 
